@@ -19,10 +19,10 @@ angular
                 $scope.isProcessing = true;
                 ApiCallService.callApi('POST',  'company_users/login', credentials)
                     .success(function(data) {
-                        Session.create(data.object);
-                        $translate.use(data.object.language);
                         $scope.isProcessing = false;
                         if (data.success) {
+                            Session.create(data.object);
+                            $translate.use(data.object.language);
                             if (data.object.mustChangePassword) {
                                 $window.location.href = "/#/change_password";
                             } else{
