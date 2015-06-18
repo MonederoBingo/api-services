@@ -29,7 +29,7 @@ public class BaseRepositoryTest {
     }
 
     protected void insertFixture(String fixturesFileName) throws Exception {
-        final String fixturesDirectory = "../../Backend/database/scripts/fixtures/test/unit/";
+        final String fixturesDirectory = "../../neerpoints-services/database/scripts/fixtures/test/unit/";
         File file = new File(fixturesDirectory + fixturesFileName);
         executeFixtureFile(file);
     }
