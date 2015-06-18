@@ -7,12 +7,12 @@ public class ProductionDatabaseManager implements DatabaseManager {
 
     @Override
     public String getUrl() {
-        return "jdbc:postgresql://127.13.137.2:5432/services";
+        return "jdbc:postgresql://127.3.94.2:5432/services";
     }
 
     @Override
     public String getUrlWithoutDatabase() {
-        return "jdbc:postgresql://127.13.137.2:5432";
+        return "jdbc:postgresql://127.3.94.2:5432";
     }
 
     @Override
