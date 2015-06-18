@@ -1,9 +1,11 @@
+# Idea files #
 .idea/*
 
 *.iml
+
 target/
+build/
 *.class
-app.log
-.ant-targets-build.xml
-*.DS_Store
-api/src/main/webapp/images/*
+
+webapp/src/main/webapp/node_modules/*
+.DS_Store

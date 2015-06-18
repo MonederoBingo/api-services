@@ -1,0 +1,15 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>{{'PHONE_NUMBER' | translate}}</th>
+            <th>{{'POINTS' | translate}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="client in clients">
+            <td>{{client.phone}}</td>
+            <td>{{client.points}}</td>
+        </tr>
+    </tbody>
+</table>
+<div ng-include="'/templates/common/messageHandling.html'"></div>

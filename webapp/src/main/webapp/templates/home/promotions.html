@@ -1,0 +1,30 @@
+<form class="form-inline" ng-submit="processSearchForm()">
+    <div class="form-group">
+        <label for="phone" class="sr-only">{{'PHONE_NUMBER' | translate}}</label>
+        <input type="text" name="phone" id="phone" class="form-control" autofocus placeholder="{{'PHONE_NUMBER' | translate}}"
+                required title="{{'PHONE_NUMBER' | translate}}" ng-model="formData.phone" />
+        <button type="submit" class="btn btn-primary">{{'SEARCH' | translate}}</button>
+    </div>
+</form>
+<br/>
+<div ng-include="'/templates/common/messageHandling.html'"></div>
+<strong>{{'POINTS' | translate}}:</strong> {{clientPoints.points}}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>{{'DESCRIPTION' | translate}}</th>
+            <th>{{'REQUIRED_POINTS' | translate}}</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="promotion in promotions">
+            <td>{{promotion.promotionConfigurationId}}</td>
+            <td>{{promotion.description}}</td>
+            <td>{{promotion.requiredPoints}}</td>
+            <td>
+                <button type="submit" class="btn btn-primary" ng-click="processApplyForm($index)">{{'APPLY_PROMOTION' | translate}}</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
