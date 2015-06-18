@@ -22,12 +22,12 @@ public class ProductionDatabaseManager implements DatabaseManager {
 
     @Override
     public String getUser() {
-        return "adminkvmftl3";
+        return "adminbpgiuam";
     }
 
     @Override
     public String getPassword() {
-        return "xA3W1Zi7pUW8";
+        return "VAmdITUgEGdg";
     }
 
 }

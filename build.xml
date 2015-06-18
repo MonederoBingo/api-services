@@ -102,6 +102,9 @@
     <target name="migrate" description="Updates the database" depends="compile">
         <java classname="com.neerpoints.migrations.Migrate" classpathref="classpath"/>
     </target>
+    <target name="prod_migrate" description="Updates the database" depends="compile">
+        <java classname="com.neerpoints.migrations.MigrateProduction" classpathref="classpath"/>
+    </target>
     <target name="create-migration" description="Creates a new file into migrations directory" depends="compile">
         <javac srcdir="${src.migrations}/util" destdir="${build}" classpathref="classpath"/>
         <taskdef name="slugifytask" classname="com.neerpoints.migrations.util.SlugifyTask"
