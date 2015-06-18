@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>frontend_web</groupId>
-  <artifactId>frontend_web</artifactId>
+  <groupId>neerpoints-web-client</groupId>
+  <artifactId>neerpoints-web-client</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>webapp</module>
     </modules>
-    <name>Archetype - frontend_web</name>
+    <name>Archetype - neerpoints-web-client</name>
   <url>http://maven.apache.org</url>
 
     <build>
@@ -39,4 +39,29 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <!-- When built in OpenShift the 'openshift' profile will be used when
+                    invoking mvn. -->
+            <!-- Use this profile for any OpenShift specific customization your app
+                    will need. -->
+            <!-- By default that is to put the resulting archive into the 'webapps'
+                    folder. -->
+            <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
+            <id>openshift</id>
+            <build>
+                <finalName>web</finalName>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <configuration>
+                            <outputDirectory>webapps</outputDirectory>
+                            <warName>ROOT</warName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
