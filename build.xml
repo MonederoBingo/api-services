@@ -5,7 +5,7 @@
       - the load the defaults to set anything that wasn't overridden
     -->
     <property environment="env" />
-    <property name="env.MAVEN_REPOSITORY" value="/Users/aayala/projects/m2repos/"/>
+    <property name="env.MAVEN_REPOSITORY" value="~/.m2/repository/"/>
     <property name="project.other_libs" value="libs/other"/>
     <property name="build" value="build"/>
     <property name="src.migrations.util" value="migrations/src/main/java/com/neerpoints/migrations/util"/>
