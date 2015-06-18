@@ -1,0 +1,115 @@
+package com.neerpoints.service;
+
+import com.neerpoints.context.ThreadContextService;
+import com.neerpoints.db.QueryAgent;
+import com.neerpoints.model.Client;
+import com.neerpoints.model.CompanyClientMapping;
+import com.neerpoints.model.Points;
+import com.neerpoints.model.PointsConfiguration;
+import com.neerpoints.repository.ClientRepository;
+import com.neerpoints.repository.CompanyClientMappingRepository;
+import com.neerpoints.repository.PointsConfigurationRepository;
+import com.neerpoints.repository.PointsRepository;
+import com.neerpoints.service.model.PointsAwarding;
+import com.neerpoints.service.model.ServiceResult;
+import com.neerpoints.service.model.ValidationResult;
+import com.neerpoints.util.DateUtil;
+import com.neerpoints.util.Translations;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class PointsService extends BaseService {
+    private static final Logger logger = LogManager.getLogger(PointsService.class.getName());
+    private final PointsRepository _pointsRepository;
+    private final PointsConfigurationRepository _pointsConfigurationRepository;
+    private final ClientRepository _clientRepository;
+    private final CompanyClientMappingRepository _companyClientMappingRepository;
+    private final ThreadContextService _threadContextService;
+
+    @Autowired
+    public PointsService(PointsRepository pointsRepository, PointsConfigurationRepository pointsConfigurationRepository,
+        ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
+        Translations translations) {
+        super(translations, threadContextService);
+        _pointsRepository = pointsRepository;
+        _pointsConfigurationRepository = pointsConfigurationRepository;
+        _clientRepository = clientRepository;
+        _companyClientMappingRepository = companyClientMappingRepository;
+        _threadContextService = threadContextService;
+    }
+
+    public ServiceResult<Float> awardPoints(PointsAwarding pointsAwarding) {
+        try {
+            ValidationResult validationResult = validateRegistration(pointsAwarding);
+            if (validationResult.isSuccess()) {
+                final QueryAgent queryAgent = _threadContextService.getQueryAgent();
+                queryAgent.beginTransaction();
+                float earnedPoints = awardPointsAndUpdateClientStatus(pointsAwarding);
+                queryAgent.commitTransaction();
+                if (earnedPoints > 0) {
+                    return new ServiceResult<>(true, getTranslation(Translations.Message.POINTS_AWARDED) + ": " + earnedPoints, earnedPoints);
+                } else {
+                    return new ServiceResult<>(true, getTranslation(Translations.Message.THE_CLIENT_DID_NOT_GET_POINTS), earnedPoints);
+                }
+            } else {
+                return new ServiceResult<>(false, validationResult.getMessage());
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+        }
+    }
+
+    private float awardPointsAndUpdateClientStatus(PointsAwarding pointsAwarding) throws Exception {
+        //Inserting client if it doesn't exist
+        PointsConfiguration pointsConfiguration = _pointsConfigurationRepository.getByCompanyId(pointsAwarding.getCompanyId());
+        if (pointsConfiguration == null) {
+            throw new IllegalArgumentException("Points configuration doesn't exist");
+        }
+        if (pointsAwarding.getSaleAmount() >= pointsConfiguration.getRequiredAmount()) {
+            Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhone());
+            //Inserting company client mapping if it doesn't exist
+            _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), client.getClientId());
+
+            Points points = new Points();
+            points.setCompanyId(pointsAwarding.getCompanyId());
+            points.setClientId(client.getClientId());
+            points.setSaleKey(pointsAwarding.getSaleKey());
+            points.setRequiredAmount(pointsConfiguration.getRequiredAmount());
+            points.setPointsToEarn(pointsConfiguration.getPointsToEarn());
+            points.setSaleAmount(pointsAwarding.getSaleAmount());
+            points.setEarnedPoints(calculateEarnedPoints(points));
+            points.setDate(DateUtil.dateNow());
+
+            //Inserting points for this client
+            _pointsRepository.insert(points);
+
+            // Updating points in company client mapping table
+            CompanyClientMapping companyClientMapping =
+                _companyClientMappingRepository.getByCompanyIdClientId(pointsAwarding.getCompanyId(), client.getClientId());
+            if (companyClientMapping == null) {
+                throw new IllegalArgumentException("CompanyClientMapping doesn't exist.");
+            }
+            companyClientMapping.setPoints(companyClientMapping.getPoints() + points.getEarnedPoints());
+            _companyClientMappingRepository.updatePoints(companyClientMapping);
+            return points.getEarnedPoints();
+        } else {
+            return 0;
+        }
+    }
+
+    private float calculateEarnedPoints(Points points) {
+        return (int) (points.getSaleAmount() / points.getRequiredAmount() * points.getPointsToEarn());
+    }
+
+    private ValidationResult validateRegistration(PointsAwarding pointsAwarding) throws Exception {
+        Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
+        if (points != null) {
+            return new ValidationResult(false, getTranslation(Translations.Message.SALE_KEY_ALREADY_EXISTS));
+        }
+        return new ValidationResult(true, "");
+    }
+}

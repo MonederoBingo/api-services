@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS client(
+  client_id SERIAL PRIMARY KEY,
+  phone     TEXT UNIQUE
+);

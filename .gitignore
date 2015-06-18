@@ -1,0 +1,14 @@
+# Idea files #
+.idea/*
+
+*.iml
+
+target/
+build/
+*.class
+
+app.log
+
+.ant-targets-build.xml
+
+.DS_Store
