@@ -4,7 +4,6 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import com.neerpoints.migrations.MigrationException;
 import org.apache.commons.io.FileUtils;
 
 public class DBUtil {

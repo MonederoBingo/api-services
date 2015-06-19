@@ -9,11 +9,11 @@ public class ProductionDatabaseManager implements DatabaseManager {
     protected static Connection _connection;
 
     public String getUrl() {
-        return "jdbc:postgresql://127.13.137.2:5432/services";
+        return "jdbc:postgresql://127.3.94.2:5432/services";
     }
 
     public String getUrlWithoutDatabase() {
-        return "jdbc:postgresql://127.13.137.2:5432";
+        return "jdbc:postgresql://127.3.94.2:5432";
     }
 
     public String getDriver() {

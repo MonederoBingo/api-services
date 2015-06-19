@@ -1,4 +1,4 @@
-package com.neerpoints.migrations.util;
+package com.neerpoints.migrations;
 
 import java.io.File;
 import java.sql.Connection;
@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.List;
 import com.neerpoints.migrations.db.DatabaseManager;
 import com.neerpoints.migrations.db.ProductionDatabaseManager;
+import com.neerpoints.migrations.util.DBUtil;
+import com.neerpoints.migrations.util.DateUtil;
 import org.apache.commons.collections15.CollectionUtils;
 import org.apache.commons.collections15.Predicate;
 
