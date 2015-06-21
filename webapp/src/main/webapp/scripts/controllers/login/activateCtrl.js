@@ -1,18 +1,19 @@
 angular
     .module('app')
     .controller('activateCtrl', [
-        '$scope', '$http', 'ApiCallService', '$location', '$translate', function($scope, $http, ApiCallService, $location, $translate) {
+        '$scope', '$http', 'ApiCallService', '$location', '$translate', '$timeout',
+        function($scope, $http, ApiCallService, $location, $translate, $timeout) {
             $scope.showMessage = false;
             $scope.isProcessing = true;
             $scope.isError = false;
-            $scope.formData = {};
-            ApiCallService.callApi('GET',  'company_users/activate/' + $location.search().key)
+            ApiCallService.callAuthApi('GET',  'company/activate/' + $location.search().key)
                 .success(function(data) {
                     $scope.isProcessing = false;
                     if (data.success) {
                         $scope.message = data.message;
-                        $scope.formData.description = '';
-                        $scope.formData.requiredPoints = '';
+                        $timeout(function(){
+                            window.location.href = "/#/signin";
+                        }, 3000);
                     } else {
                         $scope.message = $scope.message = $translate.instant('AN_ERROR_OCCURRED');
                         $scope.isError = true;

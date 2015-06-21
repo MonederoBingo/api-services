@@ -11,7 +11,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callApi('POST', 'companies', $scope.formData)
+                ApiCallService.callAuthApi('POST', 'company/register', $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

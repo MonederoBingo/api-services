@@ -4,12 +4,17 @@ angular
         '$scope', 'ApiCallService', '$translate', 'Session', '$timeout', function($scope, ApiCallService, $translate, Session, $timeout) {
             $scope.formData = {};
             $scope.isProcessing = false;
+            $scope.isWarning = true;
+            $scope.showMessage = true;
+            $scope.message = $translate.instant('YOU_MUST_CHANGE_YOUR_PASSWORD');
+            console.log(Session.user.email);
             $scope.processForm = function() {
-                $scope.formData.email = Session.email;
+                $scope.formData.email = Session.user.email;
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callApi('POST', 'company_users/change_password', $scope.formData)
+                $scope.isWarning = false;
+                ApiCallService.callAuthApi('POST', 'company/change_password', $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

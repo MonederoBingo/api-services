@@ -8,7 +8,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callApi('POST',  'company_users/send_temp_password_email', $scope.email)
+                ApiCallService.callAuthApi('POST',  'company/send_temp_password_email', $scope.email)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

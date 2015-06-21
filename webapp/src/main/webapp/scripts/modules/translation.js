@@ -48,7 +48,8 @@ angular.module('translation', ['pascalprecht.translate'])
             PLEASE_CHANGE_YOUR_PASSWORD: 'Please change your password',
             CHANGE_PASSWORD: 'Change password',
             YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'You need to configure your points awarding strategy. ' +
-            'Please go to <strong> Settings -> Points configuration</strong>  or click on <a href="/#/settings/points_configuration"> this link</a>.'
+            'Please go to <strong> Settings -> Points configuration</strong>  or click on <a href="/#/settings/points_configuration"> this link</a>.',
+            YOU_MUST_CHANGE_YOUR_PASSWORD: 'You must change your password.'
 
         })
             .translations('es', {
@@ -99,7 +100,8 @@ angular.module('translation', ['pascalprecht.translate'])
                 PLEASE_CHANGE_YOUR_PASSWORD: 'Favor de cambiar su contraseña',
                 CHANGE_PASSWORD: 'Cambiar contraseña',
                 YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'No se ha configurado la cantidad de puntos a otorgar. ' +
-                'Favor de ir a <strong>Configuraciones -> Configuración de puntos</strong> o dar click en <a href="/#/settings/points_configuration"> este link</a>.'
+                'Favor de ir a <strong>Configuraciones -> Configuración de puntos</strong> o dar click en <a href="/#/settings/points_configuration"> este link</a>.',
+                YOU_MUST_CHANGE_YOUR_PASSWORD: 'Es necesario que cambie su contraseña.'
             });
         $translateProvider.preferredLanguage('es');
     });
