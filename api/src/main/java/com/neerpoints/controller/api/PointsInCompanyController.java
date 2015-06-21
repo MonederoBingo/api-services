@@ -1,4 +1,4 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.servlet.annotation.MultipartConfig;
 import javax.ws.rs.Produces;
@@ -19,7 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RestController
 @RequestMapping("/points_in_company")
 @MultipartConfig
-public class PointsInCompanyController extends AbstractRestController {
+public class PointsInCompanyController extends AbstractApiController {
 
     private CompanyService _companyService;
 

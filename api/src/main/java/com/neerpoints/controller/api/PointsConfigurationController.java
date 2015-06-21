@@ -1,4 +1,4 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +18,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @RestController
 @RequestMapping("/points_configuration")
-public class PointsConfigurationController extends AbstractRestController {
+public class PointsConfigurationController extends AbstractApiController {
 
     private PointsConfigurationService _pointsConfigurationService;
 

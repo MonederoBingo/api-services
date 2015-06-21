@@ -6,18 +6,26 @@
     <display-name>Neerpoints Api</display-name>
 
     <filter>
-        <filter-name>contextFilter</filter-name>
+        <filter-name>apiContextFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter>
+        <filter-name>authContextFilter</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
     </filter>
     <filter-mapping>
-        <filter-name>contextFilter</filter-name>
-        <servlet-name>rest</servlet-name>
+        <filter-name>apiContextFilter</filter-name>
+        <servlet-name>api</servlet-name>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>authContextFilter</filter-name>
+        <servlet-name>auth</servlet-name>
     </filter-mapping>
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
     <servlet>
-        <servlet-name>rest</servlet-name>
+        <servlet-name>api</servlet-name>
         <servlet-class>
             org.springframework.web.servlet.DispatcherServlet
         </servlet-class>
@@ -27,8 +35,19 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+        <servlet-name>auth</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
     <servlet-mapping>
-        <servlet-name>rest</servlet-name>
+        <servlet-name>api</servlet-name>
         <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>auth</servlet-name>
+        <url-pattern>/auth/*</url-pattern>
     </servlet-mapping>
 </web-app>

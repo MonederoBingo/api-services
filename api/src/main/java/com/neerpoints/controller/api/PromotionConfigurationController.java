@@ -1,4 +1,4 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -20,7 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/promotion_configuration")
-public class PromotionConfigurationController extends AbstractRestController {
+public class PromotionConfigurationController extends AbstractApiController {
 
     private final PromotionConfigurationService _promotionConfigurationService;
 

@@ -69,11 +69,12 @@ public class CompanyUserService extends BaseService {
         try {
             _threadContextService.getQueryAgent().beginTransaction();
             int updatedRows = _companyUserRepository.updateActivateByActivationKey(activationKey);
-            _companyUserRepository.clearActivationKey(activationKey);
-            _threadContextService.getQueryAgent().commitTransaction();
-            if (updatedRows >= 1) {
+            if (updatedRows > 0) {
+                _companyUserRepository.clearActivationKey(activationKey);
+                _threadContextService.getQueryAgent().commitTransaction();
                 return new ServiceResult(true, getTranslation(Translations.Message.YOUR_USER_IS_ACTIVE_NOW));
             } else {
+                _threadContextService.getQueryAgent().rollbackTransaction();
                 return new ServiceResult(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
             }
         } catch (Exception ex) {

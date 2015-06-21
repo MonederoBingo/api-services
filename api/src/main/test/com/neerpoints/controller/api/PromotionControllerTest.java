@@ -1,5 +1,6 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api.controller;
 
+import com.neerpoints.controller.api.PromotionController;
 import com.neerpoints.service.PromotionService;
 import com.neerpoints.service.model.PromotionApplying;
 import com.neerpoints.service.model.ServiceResult;

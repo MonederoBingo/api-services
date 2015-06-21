@@ -1,4 +1,4 @@
-package com.neerpoints.api.filter;
+package com.neerpoints.controller.api.filter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ContextFilter implements Filter {
+public class ApiContextFilter implements Filter {
 
     @Autowired
     private ThreadContextService _threadContextService;

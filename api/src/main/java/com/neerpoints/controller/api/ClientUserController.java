@@ -1,4 +1,4 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
@@ -18,7 +18,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/client_users")
-public class ClientUserController extends AbstractRestController{
+public class ClientUserController extends AbstractApiController{
 
     private final ClientUserService _clientUserService;
 

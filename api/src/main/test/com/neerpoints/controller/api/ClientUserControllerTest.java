@@ -1,5 +1,6 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api.controller;
 
+import com.neerpoints.controller.api.ClientUserController;
 import com.neerpoints.service.ClientUserService;
 import com.neerpoints.service.model.ClientUserLogin;
 import com.neerpoints.service.model.ClientUserRegistration;

@@ -1,11 +1,10 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import com.neerpoints.model.Company;
 import com.neerpoints.service.CompanyService;
-import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.util.Translations;
 import org.apache.commons.fileupload.FileItem;
@@ -19,27 +18,6 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 public class CompanyControllerTest {
-    @Test
-    public void testRegister() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "1");
-        final CompanyService companyService = createCompanyServiceForRegister(expectedServiceResult);
-        final CompanyController companyController = new CompanyController(companyService);
-
-        final CompanyRegistration companyRegistration = new CompanyRegistration();
-        companyRegistration.setCompanyName("company name");
-        companyRegistration.setUserName("user name");
-        companyRegistration.setEmail("email@test.com");
-        companyRegistration.setPassword("Pa$$w0rd");
-        companyRegistration.setUrlImageLogo("images/logo.png");
-
-        ResponseEntity<ServiceResult> responseEntity = companyController.register(companyRegistration);
-        assertNotNull(responseEntity);
-        ServiceResult actualServiceResults = responseEntity.getBody();
-        assertNotNull(actualServiceResults);
-        assertEquals(expectedServiceResult.isSuccess(), actualServiceResults.isSuccess());
-        assertEquals(expectedServiceResult.getMessage(), actualServiceResults.getMessage());
-        verify(companyService);
-    }
 
     @Test
     public void testUpdateLogo() throws FileUploadException {
@@ -86,13 +64,6 @@ public class CompanyControllerTest {
     private CompanyService createCompanyService(ServiceResult<Boolean> serviceResult) {
         CompanyService companyService = createMock(CompanyService.class);
         expect(companyService.updateLogo((List<FileItem>) anyObject(), anyLong())).andReturn(serviceResult);
-        replay(companyService);
-        return companyService;
-    }
-
-    private CompanyService createCompanyServiceForRegister(ServiceResult serviceResult) throws Exception {
-        final CompanyService companyService = EasyMock.createMock(CompanyService.class);
-        expect(companyService.register((CompanyRegistration) anyObject())).andReturn(serviceResult).times(1);
         replay(companyService);
         return companyService;
     }

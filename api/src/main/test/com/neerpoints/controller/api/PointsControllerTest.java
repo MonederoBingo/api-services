@@ -1,5 +1,6 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api.controller;
 
+import com.neerpoints.controller.api.PointsController;
 import com.neerpoints.service.PointsService;
 import com.neerpoints.service.model.PointsAwarding;
 import com.neerpoints.service.model.ServiceResult;

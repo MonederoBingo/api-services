@@ -1,4 +1,4 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -20,7 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/clients")
-public class ClientController extends AbstractRestController {
+public class ClientController extends AbstractApiController {
 
     private ClientService _clientService;
 

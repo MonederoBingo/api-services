@@ -1,7 +1,8 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.neerpoints.controller.api.PointsInCompanyController;
 import com.neerpoints.model.PointsInCompany;
 import com.neerpoints.service.CompanyService;
 import com.neerpoints.service.model.ServiceResult;

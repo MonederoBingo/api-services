@@ -1,8 +1,10 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.auth;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import com.neerpoints.service.CompanyService;
 import com.neerpoints.service.CompanyUserService;
+import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
 import com.neerpoints.service.model.LoginResult;
@@ -19,15 +21,29 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/company_users")
-public class CompanyUserController extends AbstractRestController {
+@RequestMapping("/company")
+public class CompanyAuthController extends AbstractAuthController {
 
     private final CompanyUserService _companyUserService;
+    private final CompanyService _companyService;
 
     @Autowired
-    public CompanyUserController(CompanyUserService companyUserService) {
+    public CompanyAuthController(CompanyUserService companyUserService, CompanyService companyService) {
         _companyUserService = companyUserService;
+        _companyService = companyService;
     }
+
+    @RequestMapping(value="/register", method = POST, headers = ACCEPT_HEADER)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<ServiceResult> register(@RequestBody CompanyRegistration companyRegistration) {
+        try {
+            ServiceResult serviceResult = _companyService.register(companyRegistration);
+            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @RequestMapping(value="/login", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
@@ -40,9 +56,9 @@ public class CompanyUserController extends AbstractRestController {
         }
     }
 
-    @RequestMapping(value = "/send_activation_email/{email}", method = POST, headers = ACCEPT_HEADER)
+    @RequestMapping(value = "/send_activation_email", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult> sendActivationEmail(@PathVariable("email") String email) {
+    public ResponseEntity<ServiceResult> sendActivationEmail(@RequestBody String email) {
         try {
             ServiceResult serviceResult = _companyUserService.sendActivationEmail(email);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);

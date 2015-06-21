@@ -1,4 +1,4 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.util.List;
 import com.neerpoints.model.Company;
 import com.neerpoints.service.CompanyService;
-import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.ServiceResult;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -23,7 +22,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,24 +31,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequestMapping("/companies")
 @MultipartConfig
-public class CompanyController extends AbstractRestController {
+public class CompanyController extends AbstractApiController {
 
     private CompanyService _companyService;
 
     @Autowired
     public CompanyController(CompanyService companyService) {
         _companyService = companyService;
-    }
-
-    @RequestMapping(method = POST, headers = ACCEPT_HEADER)
-    @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult> register(@RequestBody CompanyRegistration companyRegistration) {
-        try {
-            ServiceResult serviceResult = _companyService.register(companyRegistration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @RequestMapping(value = "/{companyId}", method = GET)

@@ -1,7 +1,8 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.neerpoints.controller.api.PromotionConfigurationController;
 import com.neerpoints.model.PromotionConfiguration;
 import com.neerpoints.service.PromotionConfigurationService;
 import com.neerpoints.service.model.ServiceResult;

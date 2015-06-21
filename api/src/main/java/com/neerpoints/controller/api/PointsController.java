@@ -1,9 +1,9 @@
-package com.neerpoints.api.controller;
+package com.neerpoints.controller.api;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import com.neerpoints.service.PromotionService;
-import com.neerpoints.service.model.PromotionApplying;
+import com.neerpoints.service.PointsService;
+import com.neerpoints.service.model.PointsAwarding;
 import com.neerpoints.service.model.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,24 +15,25 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/promotions")
-public class PromotionController extends AbstractRestController {
-
-    private final PromotionService _promotionService;
+@RequestMapping("/points")
+public class PointsController extends AbstractApiController {
+    private PointsService _pointsService;
 
     @Autowired
-    public PromotionController(PromotionService promotionService) {
-        _promotionService = promotionService;
+    public PointsController(PointsService pointsService) {
+        _pointsService = pointsService;
     }
 
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<Long>> applyPromotion(@RequestBody PromotionApplying promotionApplying) {
+    public ResponseEntity<ServiceResult<Float>> awardPoints(@RequestBody PointsAwarding pointsAwarding) {
         try {
-            ServiceResult<Long> serviceResult = _promotionService.applyPromotion(promotionApplying);
+            long companyId = pointsAwarding.getCompanyId();
+            pointsAwarding.setCompanyId(companyId);
+            ServiceResult<Float> serviceResult = _pointsService.awardPoints(pointsAwarding);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Long>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<Float>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
