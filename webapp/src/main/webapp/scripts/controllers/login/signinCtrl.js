@@ -17,7 +17,7 @@ angular
                 $scope.isError = false;
                 $scope.isUserActive = true;
                 $scope.isProcessing = true;
-                ApiCallService.callApi('POST',  'company_users/login', credentials)
+                ApiCallService.callAuthApi('POST',  'company/login', credentials)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
