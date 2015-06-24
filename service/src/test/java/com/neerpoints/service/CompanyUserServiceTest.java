@@ -54,13 +54,6 @@ public class CompanyUserServiceTest {
         verify(companyUserRepository, companyRepository);
     }
 
-    private CompanyRepository createCompanyRepository() throws Exception {
-        CompanyRepository companyRepository = createMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
-        replay(companyRepository);
-        return companyRepository;
-    }
-
     @Test
     public void testUserLoginWhenIsNotActive() throws Exception {
         CompanyUser companyUser = new CompanyUser();
@@ -222,7 +215,6 @@ public class CompanyUserServiceTest {
         CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
-
             }
 
             @Override
@@ -238,6 +230,13 @@ public class CompanyUserServiceTest {
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Translations.Message.PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT.name(), serviceResult.getMessage());
+    }
+
+    private CompanyRepository createCompanyRepository() throws Exception {
+        CompanyRepository companyRepository = createMock(CompanyRepository.class);
+        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
+        replay(companyRepository);
+        return companyRepository;
     }
 
     private CompanyUserRepository createCompanyUserRepositoryForActivate() throws Exception {

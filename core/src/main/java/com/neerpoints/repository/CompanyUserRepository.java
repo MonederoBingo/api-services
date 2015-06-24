@@ -48,7 +48,7 @@ public class CompanyUserRepository extends BaseRepository {
             @Override
             public String sql() {
                 StringBuilder sql = new StringBuilder();
-                sql.append("SELECT company_user.* FROM ").append("company_user");
+                sql.append("SELECT company_user.* FROM company_user");
                 sql.append(" WHERE company_user.email = '").append(email).append("';");
                 return sql.toString();
             }
@@ -78,6 +78,24 @@ public class CompanyUserRepository extends BaseRepository {
         return getQueryAgent().executeUpdate("UPDATE company_user SET activation_key = NULL WHERE activation_key = '" + activationKey + "';");
     }
 
+    public CompanyUser getByCompanyUserIdApiKey(final String companyUserId, final String apiKey) throws Exception {
+        return getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
+            @Override
+            public String sql() {
+                StringBuilder sql = new StringBuilder();
+                sql.append("SELECT company_user.* FROM company_user");
+                sql.append(" WHERE company_user.company_user_id = ").append(companyUserId);
+                sql.append(" AND company_user.api_key = ").append(encryptForSelect("api_key", apiKey)).append(";");
+                return sql.toString();
+            }
+
+            @Override
+            public CompanyUser build(ResultSet resultSet) throws SQLException {
+                return buildCompanyUser(resultSet);
+            }
+        });
+    }
+
     private CompanyUser buildCompanyUser(ResultSet resultSet) throws SQLException {
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyUserId(resultSet.getLong("company_user_id"));
@@ -89,6 +107,7 @@ public class CompanyUserRepository extends BaseRepository {
         companyUser.setActivationKey(resultSet.getString("activation_key"));
         companyUser.setLanguage(resultSet.getString("language"));
         companyUser.setMustChangePassword(resultSet.getBoolean("must_change_password"));
+        companyUser.setApiKey(resultSet.getString("api_key"));
         return companyUser;
     }
 }

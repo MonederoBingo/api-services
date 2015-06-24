@@ -55,6 +55,7 @@ public class CompanyUserService extends BaseService {
             loginResult.setMustChangePassword(companyUser.getMustChangePassword());
             loginResult.setActive(true);
             loginResult.setCompanyId(companyUser.getCompanyId());
+            loginResult.setCompanyUserId(companyUser.getCompanyUserId());
             loginResult.setLanguage(companyUser.getLanguage());
             loginResult.setCompanyName(_companyRepository.getByCompanyId(companyUser.getCompanyId()).getName());
             loginResult.setApiKey(apiKey);

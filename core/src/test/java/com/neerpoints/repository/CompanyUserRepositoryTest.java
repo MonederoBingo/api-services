@@ -125,6 +125,19 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
         assertNotEquals(beforeUpdateCompanyUser.getApiKey(), afterUpdateCompanyUser.getApiKey());
     }
 
+    @Test
+    public void testGetByCompanyUserIdApiKey() throws Exception {
+        insertFixture("company_user_repository_test_fixture_for_get.sql");
+        CompanyUser companyUser = _companyUserRepository.getByCompanyUserIdApiKey("1", "ASDQWE");
+        assertNotNull(companyUser);
+    }
+
+    @Test
+    public void testGetByCompanyUserIdApiKeyWhenDoesNotExist() throws Exception {
+        CompanyUser companyUser = _companyUserRepository.getByCompanyUserIdApiKey("1", "ASDQWE");
+        assertNull(companyUser);
+    }
+
     private CompanyUser getCompanyUserById(long companyUserId) throws Exception {
         CompanyUser companyUser = new CompanyUser();
         try (Statement st = getQueryAgent().getConnection().createStatement()) {

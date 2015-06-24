@@ -2,6 +2,7 @@ package com.neerpoints.service.model;
 
 public class LoginResult {
     private long companyId;
+    private long companyUserId;
     private String companyName;
     private String email;
     private String language;
@@ -63,5 +64,13 @@ public class LoginResult {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public long getCompanyUserId() {
+        return companyUserId;
+    }
+
+    public void setCompanyUserId(long companyUserId) {
+        this.companyUserId = companyUserId;
     }
 }
