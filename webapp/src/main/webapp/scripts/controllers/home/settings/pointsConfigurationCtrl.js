@@ -1,14 +1,14 @@
 angular
     .module('app')
     .controller('settingsPointsConfigurationCtrl', [
-        '$scope', '$http', 'ApiCallService', 'Session', '$window', '$translate', function($scope, $http, ApiCallService, Session, $window, $translate) {
+        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate', function($scope, $http, ApiService, Session, $window, $translate) {
             if(Session.isClosed()) {
                 $window.location.href = "/#/";
             }
             $scope.formData = {};
             $scope.showMessage = false;
             $scope.isProcessing = true;
-            ApiCallService.callApi('GET', 'points_configuration/' + Session.user.companyId)
+            ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     console.log(data);
                     $scope.isProcessing = false;
@@ -25,7 +25,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isError = false;
                 $scope.isProcessing = true;
-                ApiCallService.callApi('PUT', 'points_configuration',  $scope.formData)
+                ApiService.callApi('PUT', 'points_configuration',  $scope.formData)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

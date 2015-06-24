@@ -1,6 +1,6 @@
 angular
     .module('app')
-    .factory('ApiCallService', [
+    .factory('ApiService', [
         '$http', '$window',  'Session', '$translate', '$location', function($http, $window, Session, $translate, $location) {
             var service = {};
             service.apiUrl = function (){
@@ -22,12 +22,14 @@ angular
             };
 
             service.callApi = function(method, path, data) {
-                var key = Session.user ? Session.user.apiKey : '';
+                var userId = Session.user ? Session.user.companyUserId : '';
+                var apiKey = Session.user ? Session.user.apiKey : '';
+                console.log(Session.user);
                 return $http({
                     method: method,
                     url: service.apiUrl() + path,
                     data: data,
-                    headers: {'Content-Type': 'application/json', 'Api-Key': key, 'Language': $translate.use()}
+                    headers: {'Content-Type': 'application/json', 'Api-Key': apiKey, 'User-Id': userId, 'Language': $translate.use()}
                 })
             };
 

@@ -1,8 +1,8 @@
 angular
     .module('app')
     .controller('pointsCtrl', [
-        '$scope', '$http', 'ApiCallService', 'Session', '$window', '$translate', '$sce',
-        function($scope, $http, ApiCallService, Session, $window, $translate, $sce) {
+        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate', '$sce',
+        function($scope, $http, ApiService, Session, $window, $translate, $sce) {
             if(Session.isClosed()) {
                 $window.location.href = "/#/";
             }
@@ -10,7 +10,7 @@ angular
             $scope.showMessage = false;
             $scope.isProcessing = false;
 
-            ApiCallService.callApi('GET', 'points_configuration/' + Session.user.companyId)
+            ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     if(data.object.pointsToEarn == 0 ) {
                         $scope.isWarning = true;
@@ -25,7 +25,7 @@ angular
                 $scope.formData.companyId = Session.user.companyId;
                 $scope.isProcessing = true;
                 $scope.showMessage = false;
-                ApiCallService.callApi('POST', 'points/', $scope.formData)
+                ApiService.callApi('POST', 'points/', $scope.formData)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

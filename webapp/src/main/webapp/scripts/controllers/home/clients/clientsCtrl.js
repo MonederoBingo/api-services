@@ -1,7 +1,7 @@
 angular
     .module('app')
     .controller('clientsCtrl', [
-        '$scope', '$http', 'ApiCallService', '$window', 'Session', '$translate', function($scope, $http, ApiCallService, $window, Session, $translate) {
+        '$scope', '$http', 'ApiService', '$window', 'Session', '$translate', function($scope, $http, ApiService, $window, Session, $translate) {
             if(Session.isClosed()) {
                 $window.location.href = "/#/";
             }
@@ -9,7 +9,7 @@ angular
             $scope.isProcessing = true;
             $scope.showMessage = false;
             $scope.isError = false;
-            ApiCallService.callApi('GET', 'clients/' + Session.user.companyId)
+            ApiService.callApi('GET', 'clients/' + Session.user.companyId)
                 .success(function(data) {
                     console.log(data);
                     $scope.isProcessing = false;

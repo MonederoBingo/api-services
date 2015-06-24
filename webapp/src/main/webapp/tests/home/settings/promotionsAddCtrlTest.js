@@ -1,14 +1,14 @@
 describe("settingsPromotionsAddCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, ApiCallService, Session, authRequestHandler, $translate, url;
+    var $controller, $httpBackend, ApiService, Session, authRequestHandler, $translate, url;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
-        url = ApiCallService.apiUrl() + 'promotion_configuration/';
+        ApiService = $injector.get('ApiService');
+        url = ApiService.apiUrl() + 'promotion_configuration/';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;
@@ -19,7 +19,7 @@ describe("settingsPromotionsAddCtrlTest", function() {
     describe('call api getting successful response', function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
-            $controller('settingsPromotionsAddCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPromotionsAddCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.showMessage).toBe(false);
             expect(scope.isProcessing).toBe(false);
             $httpBackend.expectPOST(url);
@@ -39,7 +39,7 @@ describe("settingsPromotionsAddCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             authRequestHandler.respond(201, {success: false, 'message': 'error', 'object': {}});
-            $controller('settingsPromotionsAddCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPromotionsAddCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.showMessage).toBe(false);
             expect(scope.isProcessing).toBe(false);
             $httpBackend.expectPOST(url);
@@ -59,7 +59,7 @@ describe("settingsPromotionsAddCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             authRequestHandler.respond(500, {success: false, 'message': 'error', 'object': {}});
-            $controller('settingsPromotionsAddCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPromotionsAddCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.showMessage).toBe(false);
             expect(scope.isProcessing).toBe(false);
             $httpBackend.expectPOST(url);

@@ -1,7 +1,7 @@
 angular
     .module('app')
     .factory('AuthService', [
-        '$http', '$window',  'Session', 'ApiCallService', '$translate', function($http, $window, Session, ApiCallService, $translate) {
+        '$http', '$window',  'Session', 'ApiService', '$translate', function($http, $window, Session, ApiService, $translate) {
             var authService = {};
 
             authService.logout = function() {

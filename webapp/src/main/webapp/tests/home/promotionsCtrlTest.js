@@ -1,18 +1,18 @@
 describe("promotionsCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, Session, authRequestHandlerGET, authRequestHandlerPOST, ApiCallService,
+    var $controller, $httpBackend, Session, authRequestHandlerGET, authRequestHandlerPOST, ApiService,
         PromotionsService, $translate, urlGET, urlPOST, urlGetPoints;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
+        ApiService = $injector.get('ApiService');
         PromotionsService = $injector.get('PromotionsService');
-        urlGET = ApiCallService.apiUrl() + 'promotion_configuration/1/1234567890';
-        urlPOST = ApiCallService.apiUrl() + 'promotions';
-        urlGetPoints = ApiCallService.apiUrl() + 'clients/1/1234567890';
+        urlGET = ApiService.apiUrl() + 'promotion_configuration/1/1234567890';
+        urlPOST = ApiService.apiUrl() + 'promotions';
+        urlGetPoints = ApiService.apiUrl() + 'clients/1/1234567890';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;

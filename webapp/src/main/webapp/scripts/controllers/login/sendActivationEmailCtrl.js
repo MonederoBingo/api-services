@@ -1,7 +1,7 @@
 angular
     .module('app')
     .controller('sendActivationEmailCtrl', [
-        '$scope', '$http', 'ApiCallService', '$translate', function($scope, $http, ApiCallService, $translate) {
+        '$scope', '$http', 'ApiService', '$translate', function($scope, $http, ApiService, $translate) {
 
             $scope.formData = {};
             $scope.isProcessing = false;
@@ -9,7 +9,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callAuthApi('POST',  'company/send_activation_email/', $scope.formData.email)
+                ApiService.callAuthApi('POST',  'company/send_activation_email/', $scope.formData.email)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

@@ -1,11 +1,11 @@
 angular
     .module('app')
     .factory('PromotionsService', [
-        '$rootScope', 'ApiCallService', 'Session', '$translate', function($rootScope, ApiCallService, Session, $translate) {
+        '$rootScope', 'ApiService', 'Session', '$translate', function($rootScope, ApiService, Session, $translate) {
             var service = {};
             service.getClientPoints = function (phone){
                 $rootScope.isProcessing = true;
-                ApiCallService.callApi('GET', 'clients/' + Session.user.companyId + "/" + phone, $rootScope.formData)
+                ApiService.callApi('GET', 'clients/' + Session.user.companyId + "/" + phone, $rootScope.formData)
                     .success(function(data) {
                         $rootScope.isProcessing = false;
                         if (data.success) {

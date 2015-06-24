@@ -1,7 +1,7 @@
 angular
     .module('app')
     .controller('changePasswordCtrl', [
-        '$scope', 'ApiCallService', '$translate', 'Session', '$timeout', function($scope, ApiCallService, $translate, Session, $timeout) {
+        '$scope', 'ApiService', '$translate', 'Session', '$timeout', function($scope, ApiService, $translate, Session, $timeout) {
             $scope.formData = {};
             $scope.isProcessing = false;
             $scope.isWarning = true;
@@ -14,7 +14,7 @@ angular
                 $scope.isProcessing = true;
                 $scope.isError = false;
                 $scope.isWarning = false;
-                ApiCallService.callAuthApi('POST', 'company/change_password', $scope.formData)
+                ApiService.callAuthApi('POST', 'company/change_password', $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

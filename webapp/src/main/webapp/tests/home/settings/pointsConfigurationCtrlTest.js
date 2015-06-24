@@ -1,15 +1,15 @@
 describe("settingsPointsConfigurationCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, ApiCallService, Session, authRequestHandlerGET, authRequestHandlerPUT, $translate, urlGet, urlPut;
+    var $controller, $httpBackend, ApiService, Session, authRequestHandlerGET, authRequestHandlerPUT, $translate, urlGet, urlPut;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
-        urlGet = ApiCallService.apiUrl() + 'points_configuration/1';
-        urlPut = ApiCallService.apiUrl() + 'points_configuration';
+        ApiService = $injector.get('ApiService');
+        urlGet = ApiService.apiUrl() + 'points_configuration/1';
+        urlPut = ApiService.apiUrl() + 'points_configuration';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;
@@ -23,7 +23,7 @@ describe("settingsPointsConfigurationCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             $httpBackend.expectGET(urlGet);
-            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.showMessage).toBe(false);
             expect(scope.isProcessing).toBe(true);
             $httpBackend.flush();
@@ -38,7 +38,7 @@ describe("settingsPointsConfigurationCtrlTest", function() {
             var scope = {};
             authRequestHandlerGET.respond(500, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(urlGet);
-            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.showMessage).toBe(false);
             expect(scope.isProcessing).toBe(true);
             $httpBackend.flush();
@@ -53,7 +53,7 @@ describe("settingsPointsConfigurationCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             $httpBackend.expectGET(urlGet);
-            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             $httpBackend.flush();
             $httpBackend.expectPUT(urlPut);
             scope.processForm();
@@ -73,7 +73,7 @@ describe("settingsPointsConfigurationCtrlTest", function() {
             var scope = {};
             authRequestHandlerPUT.respond(201, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(urlGet);
-            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             $httpBackend.flush();
             $httpBackend.expectPUT(urlPut);
             scope.processForm();
@@ -94,7 +94,7 @@ describe("settingsPointsConfigurationCtrlTest", function() {
             var scope = {};
             authRequestHandlerPUT.respond(500, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(urlGet);
-            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('settingsPointsConfigurationCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             $httpBackend.flush();
             $httpBackend.expectPUT(urlPut);
             scope.processForm();

@@ -1,13 +1,13 @@
 angular
     .module('app')
     .controller('myLogoCtrl', [
-        '$scope', '$http', 'ApiCallService', 'Session', '$window', '$translate', '$location',
-        function($scope, $http, ApiCallService, Session, $window, $translate, $location) {
+        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate', '$location',
+        function($scope, $http, ApiService, Session, $window, $translate, $location) {
             if(Session.isClosed()) {
                 $window.location.href = "/#/";
             }
             $scope.isProcessing = false;
-            $scope.logoUrl = ApiCallService.apiUrl() + "companies/logo/" + Session.user.companyId + "?" + new Date().getTime();
+            $scope.logoUrl = ApiService.apiUrl() + "companies/logo/" + Session.user.companyId + "?" + new Date().getTime();
             $scope.processForm = function() {
                 $scope.isProcessing = true;
                 $scope.isError = false;
@@ -17,13 +17,13 @@ angular
                 $http({
                     transformRequest: angular.identity,
                     method: 'POST',
-                    url: ApiCallService.apiUrl()  + 'companies/logo/' + Session.user.companyId,
+                    url: ApiService.apiUrl()  + 'companies/logo/' + Session.user.companyId,
                     data: fd,
-                    headers: {'Content-Type': undefined, 'Api-Key': ApiCallService.apiKey, 'Language': $translate.use()}
+                    headers: {'Content-Type': undefined, 'Api-Key': ApiService.apiKey, 'Language': $translate.use()}
                 })
                     .success(function(data) {
                         console.log(data);
-                        //$scope.logoUrl = ApiCallService.apiUrl() + "companies/logo/" + Session.user.companyId + "?" + new Date().getTime();
+                        //$scope.logoUrl = ApiService.apiUrl() + "companies/logo/" + Session.user.companyId + "?" + new Date().getTime();
                         $scope.isProcessing = false;
                         if (data.success) {
                             $scope.message = data.message;

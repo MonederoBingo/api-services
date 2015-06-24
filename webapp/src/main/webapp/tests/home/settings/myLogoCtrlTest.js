@@ -1,14 +1,14 @@
 describe("myLogoTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, ApiCallService, Session, authRequestHandler, $translate, url;
+    var $controller, $httpBackend, ApiService, Session, authRequestHandler, $translate, url;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
-        url = ApiCallService.apiUrl() + 'companies/logo/1';
+        ApiService = $injector.get('ApiService');
+        url = ApiService.apiUrl() + 'companies/logo/1';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;
@@ -20,9 +20,9 @@ describe("myLogoTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             $httpBackend.expectPOST(url);
-            $controller('myLogoCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});;
+            $controller('myLogoCtrl', {$scope: scope, ApiService: ApiService, Session: Session});;
             expect(scope.isProcessing).toBe(false);
-            expect(scope.logoUrl.substring(0, scope.logoUrl.lastIndexOf('?'))).toBe(ApiCallService.apiUrl() + "companies/logo/" + Session.user.companyId);
+            expect(scope.logoUrl.substring(0, scope.logoUrl.lastIndexOf('?'))).toBe(ApiService.apiUrl() + "companies/logo/" + Session.user.companyId);
             scope.processForm();
             expect(scope.isProcessing).toBe(true);
             expect(scope.isError).toBe(false);
@@ -40,9 +40,9 @@ describe("myLogoTest", function() {
             var scope = {};
             authRequestHandler.respond(201, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectPOST(url);
-            $controller('myLogoCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});;
+            $controller('myLogoCtrl', {$scope: scope, ApiService: ApiService, Session: Session});;
             expect(scope.isProcessing).toBe(false);
-            expect(scope.logoUrl.substring(0, scope.logoUrl.lastIndexOf('?'))).toBe(ApiCallService.apiUrl() + "companies/logo/" + Session.user.companyId);
+            expect(scope.logoUrl.substring(0, scope.logoUrl.lastIndexOf('?'))).toBe(ApiService.apiUrl() + "companies/logo/" + Session.user.companyId);
             scope.processForm();
             expect(scope.isProcessing).toBe(true);
             expect(scope.isError).toBe(false);
@@ -61,9 +61,9 @@ describe("myLogoTest", function() {
             var scope = {};
             authRequestHandler.respond(500, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectPOST(url);
-            $controller('myLogoCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});;
+            $controller('myLogoCtrl', {$scope: scope, ApiService: ApiService, Session: Session});;
             expect(scope.isProcessing).toBe(false);
-            expect(scope.logoUrl.substring(0, scope.logoUrl.lastIndexOf('?'))).toBe(ApiCallService.apiUrl() + "companies/logo/" + Session.user.companyId);
+            expect(scope.logoUrl.substring(0, scope.logoUrl.lastIndexOf('?'))).toBe(ApiService.apiUrl() + "companies/logo/" + Session.user.companyId);
             scope.processForm();
             expect(scope.isProcessing).toBe(true);
             expect(scope.isError).toBe(false);

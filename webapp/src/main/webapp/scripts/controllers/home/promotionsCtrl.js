@@ -1,8 +1,8 @@
 angular
     .module('app')
     .controller('promotionsCtrl', [
-        '$scope', '$http', 'ApiCallService', 'Session', '$window', '$translate', 'PromotionsService',
-        function($scope, $http, ApiCallService, Session, $window, $translate, PromotionsService) {
+        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate', 'PromotionsService',
+        function($scope, $http, ApiService, Session, $window, $translate, PromotionsService) {
             if(Session.isClosed()) {
                 $window.location.href = "/#/";
             }
@@ -17,7 +17,7 @@ angular
                 $scope.isError = false;
                 $scope.isWarning = false;
                 $scope.clientPoints = 0;
-                ApiCallService.callApi('GET', 'promotion_configuration/' + Session.user.companyId + "/" + $scope.formData.phone, $scope.formData)
+                ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId + "/" + $scope.formData.phone, $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
@@ -50,7 +50,7 @@ angular
                 $scope.applyData.promotionConfigurationId = $scope.promotions[idx].promotionConfigurationId;
                 $scope.applyData.phone = $scope.formData.phone;
                 $scope.applyData.companyId = Session.user.companyId;
-                ApiCallService.callApi('POST', 'promotions', $scope.applyData)
+                ApiService.callApi('POST', 'promotions', $scope.applyData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

@@ -1,7 +1,7 @@
 angular
     .module('app')
     .controller('signupCtrl', [
-        '$scope', 'ApiCallService', '$translate', function($scope, ApiCallService, $translate) {
+        '$scope', 'ApiService', '$translate', function($scope, ApiService, $translate) {
             $scope.formData = {};
             $scope.isProcessing = false;
             $scope.processForm = function() {
@@ -11,7 +11,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callAuthApi('POST', 'company/register', $scope.formData)
+                ApiService.callAuthApi('POST', 'company/register', $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

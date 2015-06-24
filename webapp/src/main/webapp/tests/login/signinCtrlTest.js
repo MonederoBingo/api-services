@@ -1,15 +1,15 @@
 describe("sendTempPasswordEmailCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, authRequestHandler, ApiCallService, $translate, url, Session;
+    var $controller, $httpBackend, authRequestHandler, ApiService, $translate, url, Session;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
         Session = $injector.get('Session');
-        ApiCallService = $injector.get('ApiCallService');
-        url = ApiCallService.apiUrl() + 'company_users/login';
+        ApiService = $injector.get('ApiService');
+        url = ApiService.apiUrl() + 'company_users/login';
         authRequestHandler = $httpBackend.when('POST', url).respond({success: true, 'message': 'xxx', 'object': ''});
     }));
 
