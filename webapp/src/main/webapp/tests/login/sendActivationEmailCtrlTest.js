@@ -1,14 +1,14 @@
 describe("sendActivationEmailCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, authRequestHandler, ApiCallService, $translate, url;
+    var $controller, $httpBackend, authRequestHandler, ApiService, $translate, url;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
-        url = ApiCallService.apiUrl() + 'company_users/send_activation_email/user@email.com';
+        ApiService = $injector.get('ApiService');
+        url = ApiService.apiUrl() + 'company_users/send_activation_email/user@email.com';
         authRequestHandler = $httpBackend.when('POST', url).respond({success: true, 'message': 'xxx', 'object': ''});
     }));
 

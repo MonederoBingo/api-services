@@ -1,14 +1,14 @@
 angular
     .module('app')
     .controller('sendTempPasswordEmailCtrl', [
-        '$scope', '$http', 'ApiCallService', '$translate', function($scope, $http, ApiCallService, $translate) {
+        '$scope', '$http', 'ApiService', '$translate', function($scope, $http, ApiService, $translate) {
 
             $scope.isProcessing = false;
             $scope.processForm = function() {
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callAuthApi('POST',  'company/send_temp_password_email', $scope.email)
+                ApiService.callAuthApi('POST',  'company/send_temp_password_email', $scope.email)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

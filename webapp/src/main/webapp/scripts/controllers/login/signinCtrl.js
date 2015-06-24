@@ -1,8 +1,8 @@
 angular
     .module('app')
     .controller('signinCtrl', [
-        '$scope', '$http', '$rootScope', '$window', 'authEvents', 'AuthService', '$translate', 'Session', 'ApiCallService',
-        function($scope, $http, $rootScope, $window, authEvents, AuthService, $translate, Session, ApiCallService) {
+        '$scope', '$http', '$rootScope', '$window', 'authEvents', 'AuthService', '$translate', 'Session', 'ApiService',
+        function($scope, $http, $rootScope, $window, authEvents, AuthService, $translate, Session, ApiService) {
             $scope.showMessage = false;
             $scope.isError = false;
             $scope.isUserActive = true;
@@ -17,7 +17,7 @@ angular
                 $scope.isError = false;
                 $scope.isUserActive = true;
                 $scope.isProcessing = true;
-                ApiCallService.callAuthApi('POST',  'company/login', credentials)
+                ApiService.callAuthApi('POST',  'company/login', credentials)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

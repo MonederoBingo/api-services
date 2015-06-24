@@ -1,17 +1,17 @@
 describe("pointsCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, ApiCallService, Session,
+    var $controller, $httpBackend, ApiService, Session,
         authRequestHandlerGET, authRequestHandlerPOST, $translate, urlGET, urlPOST, $sce;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
+        ApiService = $injector.get('ApiService');
         $sce = $injector.get('$sce');
-        urlGET = ApiCallService.apiUrl() + 'points_configuration/1';
-        urlPOST = ApiCallService.apiUrl() + 'points/';
+        urlGET = ApiService.apiUrl() + 'points_configuration/1';
+        urlPOST = ApiService.apiUrl() + 'points/';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;
@@ -26,7 +26,7 @@ describe("pointsCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             $httpBackend.expectGET(urlGET);
-            $controller('pointsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session, $sce: $sce});
+            $controller('pointsCtrl', {$scope: scope, ApiService: ApiService, Session: Session, $sce: $sce});
             expect(scope.showMessage).toBe(false);
             expect(scope.isProcessing).toBe(false);
             $httpBackend.flush();
@@ -42,7 +42,7 @@ describe("pointsCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             $httpBackend.expectGET(urlGET);
-            $controller('pointsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session, $sce: $sce});
+            $controller('pointsCtrl', {$scope: scope, ApiService: ApiService, Session: Session, $sce: $sce});
             scope.processForm();
             expect(scope.isWarning).toBe(false);
             expect(scope.isError).toBe(false);
@@ -67,7 +67,7 @@ describe("pointsCtrlTest", function() {
             var scope = {};
             authRequestHandlerPOST.respond(201, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(urlGET);
-            $controller('pointsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session, $sce: $sce});
+            $controller('pointsCtrl', {$scope: scope, ApiService: ApiService, Session: Session, $sce: $sce});
             scope.processForm();
             expect(scope.isWarning).toBe(false);
             expect(scope.isError).toBe(false);
@@ -92,7 +92,7 @@ describe("pointsCtrlTest", function() {
             var scope = {};
             authRequestHandlerPOST.respond(500, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(urlGET);
-            $controller('pointsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session, $sce: $sce});
+            $controller('pointsCtrl', {$scope: scope, ApiService: ApiService, Session: Session, $sce: $sce});
             scope.processForm();
             expect(scope.isWarning).toBe(false);
             expect(scope.isError).toBe(false);

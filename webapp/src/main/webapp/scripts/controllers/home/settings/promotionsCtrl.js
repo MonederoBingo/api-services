@@ -1,8 +1,8 @@
 angular
     .module('app')
     .controller('settingsPromotionsCtrl', [
-        '$scope', '$http', 'ApiCallService', 'Session', '$window', '$translate',
-        function($scope, $http, ApiCallService, Session, $window, $translate) {
+        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate',
+        function($scope, $http, ApiService, Session, $window, $translate) {
             if (Session.isClosed()) {
                 $window.location.href = "/#/";
             }
@@ -24,7 +24,7 @@ angular
 
             function getPromotions() {
                 $scope.isProcessing = true;
-                ApiCallService.callApi('GET', 'promotion_configuration/' + Session.user.companyId)
+                ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;
@@ -42,7 +42,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiCallService.callApi('DELETE', 'promotion_configuration/' + $scope.promotions[idx].promotionConfigurationId)
+                ApiService.callApi('DELETE', 'promotion_configuration/' + $scope.promotions[idx].promotionConfigurationId)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

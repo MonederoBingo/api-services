@@ -1,14 +1,14 @@
 describe("clientsAddCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, ApiCallService, Session, authRequestHandler, $translate, url;
+    var $controller, $httpBackend, ApiService, Session, authRequestHandler, $translate, url;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
-        url = ApiCallService.apiUrl() + 'clients/';
+        ApiService = $injector.get('ApiService');
+        url = ApiService.apiUrl() + 'clients/';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;
@@ -18,7 +18,7 @@ describe("clientsAddCtrlTest", function() {
     describe('call api getting successful response', function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
-            $controller('clientsAddCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('clientsAddCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.isProcessing).toBe(false);
             $httpBackend.expectPOST(url);
             scope.processForm();
@@ -37,7 +37,7 @@ describe("clientsAddCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             authRequestHandler.respond(201, {success: false, 'message': 'error', 'object': {}});
             var scope = {};
-            $controller('clientsAddCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('clientsAddCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.isProcessing).toBe(false);
             $httpBackend.expectPOST(url);
             scope.processForm();
@@ -56,7 +56,7 @@ describe("clientsAddCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             authRequestHandler.respond(500, {success: false, 'message': 'error', 'object': {}});
             var scope = {};
-            $controller('clientsAddCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('clientsAddCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.isProcessing).toBe(false);
             $httpBackend.expectPOST(url);
             scope.processForm();

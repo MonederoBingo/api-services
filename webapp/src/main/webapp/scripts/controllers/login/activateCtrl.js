@@ -1,12 +1,12 @@
 angular
     .module('app')
     .controller('activateCtrl', [
-        '$scope', '$http', 'ApiCallService', '$location', '$translate', '$timeout',
-        function($scope, $http, ApiCallService, $location, $translate, $timeout) {
+        '$scope', '$http', 'ApiService', '$location', '$translate', '$timeout',
+        function($scope, $http, ApiService, $location, $translate, $timeout) {
             $scope.showMessage = false;
             $scope.isProcessing = true;
             $scope.isError = false;
-            ApiCallService.callAuthApi('GET',  'company/activate/' + $location.search().key)
+            ApiService.callAuthApi('GET',  'company/activate/' + $location.search().key)
                 .success(function(data) {
                     $scope.isProcessing = false;
                     if (data.success) {

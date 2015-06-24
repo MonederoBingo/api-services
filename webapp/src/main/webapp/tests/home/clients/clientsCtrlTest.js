@@ -1,14 +1,14 @@
 describe("clientsCtrlTest", function() {
     beforeEach(module('app'));
 
-    var $controller, $httpBackend, ApiCallService, Session, authRequestHandler, $translate, url;
+    var $controller, $httpBackend, ApiService, Session, authRequestHandler, $translate, url;
 
     beforeEach(inject(function($injector) {
         $controller = $injector.get('$controller');
         $httpBackend = $injector.get('$httpBackend');
         $translate = $injector.get('$translate');
-        ApiCallService = $injector.get('ApiCallService');
-        url = ApiCallService.apiUrl() + 'clients/1';
+        ApiService = $injector.get('ApiService');
+        url = ApiService.apiUrl() + 'clients/1';
         Session = $injector.get('Session');
         Session.user = {};
         Session.user.companyId = 1;
@@ -21,7 +21,7 @@ describe("clientsCtrlTest", function() {
         it('changes scope variables depending on api call', function() {
             var scope = {};
             $httpBackend.expectGET(url);
-            $controller('clientsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('clientsCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.isProcessing).toBe(true);
             expect(scope.showMessage).toBe(false);
             expect(scope.isError).toBe(false);
@@ -40,7 +40,7 @@ describe("clientsCtrlTest", function() {
             var scope = {};
             authRequestHandler.respond(201, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(url);
-            $controller('clientsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('clientsCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.isProcessing).toBe(true);
             expect(scope.showMessage).toBe(false);
             expect(scope.isError).toBe(false);
@@ -59,7 +59,7 @@ describe("clientsCtrlTest", function() {
             var scope = {};
             authRequestHandler.respond(500, {success: false, 'message': 'error', 'object': {}});
             $httpBackend.expectGET(url);
-            $controller('clientsCtrl', {$scope: scope, ApiCallService: ApiCallService, Session: Session});
+            $controller('clientsCtrl', {$scope: scope, ApiService: ApiService, Session: Session});
             expect(scope.isProcessing).toBe(true);
             expect(scope.showMessage).toBe(false);
             expect(scope.isError).toBe(false);
