@@ -19,7 +19,8 @@ angular
                     method: 'POST',
                     url: ApiService.apiUrl()  + 'companies/logo/' + Session.user.companyId,
                     data: fd,
-                    headers: {'Content-Type': undefined, 'Api-Key': ApiService.apiKey, 'Language': $translate.use()}
+                    headers: {'Content-Type': undefined, 'Api-Key': Session.user.apiKey,  'User-Id': Session.user.companyUserId ,
+                        'Language': $translate.use()}
                 })
                     .success(function(data) {
                         console.log(data);
