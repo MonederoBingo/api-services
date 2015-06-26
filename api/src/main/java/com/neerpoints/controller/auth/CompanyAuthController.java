@@ -7,7 +7,7 @@ import com.neerpoints.service.CompanyUserService;
 import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
-import com.neerpoints.service.model.LoginResult;
+import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,12 +47,12 @@ public class CompanyAuthController extends AbstractAuthController {
 
     @RequestMapping(value="/login", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<LoginResult>> login(@RequestBody CompanyUserLogin companyUserLogin) {
+    public ResponseEntity<ServiceResult<CompanyLoginResult>> login(@RequestBody CompanyUserLogin companyUserLogin) {
         try {
-            ServiceResult<LoginResult> serviceResult = _companyUserService.loginUser(companyUserLogin);
+            ServiceResult<CompanyLoginResult> serviceResult = _companyUserService.loginUser(companyUserLogin);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<LoginResult>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<CompanyLoginResult>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

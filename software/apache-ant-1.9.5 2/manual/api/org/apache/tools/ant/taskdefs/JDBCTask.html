@@ -281,7 +281,7 @@ public class SQLExampleTask extends JDBCTask {
 <tr class="rowColor">
 <td class="colFirst"><code>java.lang.String</code></td>
 <td class="colLast"><code><strong><a href="../../../../../org/apache/tools/ant/taskdefs/JDBCTask.html#getUserId()">getUserId</a></strong>()</code>
-<div class="block">Gets the userId.</div>
+<div class="block">Gets the clientUserId.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -368,7 +368,7 @@ public class SQLExampleTask extends JDBCTask {
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><strong><a href="../../../../../org/apache/tools/ant/taskdefs/JDBCTask.html#setUserid(java.lang.String)">setUserid</a></strong>(java.lang.String&nbsp;userId)</code>
+<td class="colLast"><code><strong><a href="../../../../../org/apache/tools/ant/taskdefs/JDBCTask.html#setUserid(java.lang.String)">setUserid</a></strong>(java.lang.String&nbsp;clientUserId)</code>
 <div class="block">Set the user name for the connection; required.</div>
 </td>
 </tr>
@@ -677,7 +677,7 @@ public class SQLExampleTask extends JDBCTask {
 <li class="blockList">
 <h4>getUserId</h4>
 <pre>public&nbsp;java.lang.String&nbsp;getUserId()</pre>
-<div class="block">Gets the userId.</div>
+<div class="block">Gets the clientUserId.</div>
 <dl><dt><span class="strong">Returns:</span></dt><dd>Returns a String</dd></dl>
 </li>
 </ul>
@@ -687,9 +687,9 @@ public class SQLExampleTask extends JDBCTask {
 <ul class="blockList">
 <li class="blockList">
 <h4>setUserid</h4>
-<pre>public&nbsp;void&nbsp;setUserid(java.lang.String&nbsp;userId)</pre>
+<pre>public&nbsp;void&nbsp;setUserid(java.lang.String&nbsp;clientUserId)</pre>
 <div class="block">Set the user name for the connection; required.</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>userId</code> - The userId to set</dd></dl>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>clientUserId</code> - The clientUserId to set</dd></dl>
 </li>
 </ul>
 <a name="getPassword()">

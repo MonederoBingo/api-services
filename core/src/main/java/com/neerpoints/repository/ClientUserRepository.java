@@ -42,14 +42,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public ClientUser build(ResultSet resultSet) throws SQLException {
-                ClientUser clientUser = new ClientUser();
-                clientUser.setClientUserId(resultSet.getLong("client_user_id"));
-                clientUser.setClientId(resultSet.getLong("client_id"));
-                clientUser.setName(resultSet.getString("name"));
-                clientUser.setEmail(resultSet.getString("email"));
-                clientUser.setPassword(resultSet.getString("password"));
-                clientUser.setSmsKey(resultSet.getString("sms_key"));
-                return clientUser;
+                return buildClientUser(resultSet);
             }
         });
     }
@@ -68,14 +61,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public ClientUser build(ResultSet resultSet) throws SQLException {
-                ClientUser clientUser = new ClientUser();
-                clientUser.setClientUserId(resultSet.getLong("client_user_id"));
-                clientUser.setClientId(resultSet.getLong("client_id"));
-                clientUser.setName(resultSet.getString("name"));
-                clientUser.setEmail(resultSet.getString("email"));
-                clientUser.setPassword(resultSet.getString("password"));
-                clientUser.setSmsKey(resultSet.getString("sms_key"));
-                return clientUser;
+                return buildClientUser(resultSet);
             }
         });
     }
@@ -93,16 +79,42 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public ClientUser build(ResultSet resultSet) throws SQLException {
-                ClientUser clientUser = new ClientUser();
-                clientUser.setClientUserId(resultSet.getLong("client_user_id"));
-                clientUser.setClientId(resultSet.getLong("client_id"));
-                clientUser.setName(resultSet.getString("name"));
-                clientUser.setEmail(resultSet.getString("email"));
-                clientUser.setPassword(resultSet.getString("password"));
-                clientUser.setSmsKey(resultSet.getString("sms_key"));
-                return clientUser;
+                return buildClientUser(resultSet);
             }
         });
     }
 
+    public int updateApiKeyById(long clientUserId, String apiKey) throws Exception {
+        return getQueryAgent()
+            .executeUpdate("UPDATE client_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE client_user_id = '" + clientUserId + "';");
+    }
+
+    public ClientUser getByClientUserIdApiKey(final String userId, final String apiKey) throws Exception {
+        return getQueryAgent().selectObject(new DbBuilder<ClientUser>() {
+            @Override
+            public String sql() {
+                StringBuilder sql = new StringBuilder();
+                sql.append("SELECT client_user.* FROM client_user");
+                sql.append(" WHERE client_user.client_user_id = ").append(userId);
+                sql.append(" AND client_user.api_key = ").append(encryptForSelect("api_key", apiKey)).append(";");
+                return sql.toString();
+            }
+
+            @Override
+            public ClientUser build(ResultSet resultSet) throws SQLException {
+                return buildClientUser(resultSet);
+            }
+        });
+    }
+
+    private ClientUser buildClientUser(ResultSet resultSet) throws SQLException {
+        ClientUser clientUser = new ClientUser();
+        clientUser.setClientUserId(resultSet.getLong("client_user_id"));
+        clientUser.setClientId(resultSet.getLong("client_id"));
+        clientUser.setName(resultSet.getString("name"));
+        clientUser.setEmail(resultSet.getString("email"));
+        clientUser.setPassword(resultSet.getString("password"));
+        clientUser.setSmsKey(resultSet.getString("sms_key"));
+        return clientUser;
+    }
 }

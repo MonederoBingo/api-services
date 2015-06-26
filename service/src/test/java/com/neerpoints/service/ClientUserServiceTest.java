@@ -9,6 +9,7 @@ import com.neerpoints.model.Client;
 import com.neerpoints.model.ClientUser;
 import com.neerpoints.repository.ClientRepository;
 import com.neerpoints.repository.ClientUserRepository;
+import com.neerpoints.service.model.ClientLoginResult;
 import com.neerpoints.service.model.ClientUserLogin;
 import com.neerpoints.service.model.ClientUserRegistration;
 import com.neerpoints.service.model.ServiceResult;
@@ -117,10 +118,45 @@ public class ClientUserServiceTest {
         clientUserLogin.setSmsKey("qwerty");
         clientUserLogin.setEmail("");
         clientUserLogin.setPassword("");
-        ServiceResult serviceResult = clientUserService.login(clientUserLogin);
+        ServiceResult<ClientLoginResult> serviceResult = clientUserService.login(clientUserLogin);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(clientUser.getClientId(), serviceResult.getObject());
+        assertEquals(clientUser.getClientId(), serviceResult.getObject().getClientUserId());
+        verify(clientUserRepository, clientRepository);
+    }
+
+    @Test
+    public void testUserLoginWithPhoneWhenNotUpdatingApiKey() throws Exception {
+        ClientUser clientUser = new ClientUser();
+        clientUser.setClientUserId(1);
+        clientUser.setClientId(1);
+        clientUser.setName("name");
+        clientUser.setEmail("a@a.com");
+        clientUser.setPassword("password");
+        clientUser.setSmsKey("qwerty");
+        final ClientUserRepository clientUserRepository = createClientUserRepositoryForPhoneWhenNotUpdatingApiKey(clientUser);
+        final ClientRepository clientRepository = createClientRepository();
+        final ClientUserService clientUserService =
+            new ClientUserService(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null) {
+                @Override
+                String generateAndSendSms(String phone) throws MessagingException {
+                    return "";
+                }
+                @Override
+                String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+            };
+
+        ClientUserLogin clientUserLogin = new ClientUserLogin();
+        clientUserLogin.setPhone("6141112233");
+        clientUserLogin.setSmsKey("qwerty");
+        clientUserLogin.setEmail("");
+        clientUserLogin.setPassword("");
+        ServiceResult serviceResult = clientUserService.login(clientUserLogin);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
         verify(clientUserRepository, clientRepository);
     }
 
@@ -148,10 +184,45 @@ public class ClientUserServiceTest {
         clientUserLogin.setSmsKey("");
         clientUserLogin.setEmail("a@a.com");
         clientUserLogin.setPassword("password");
-        ServiceResult serviceResult = clientUserService.login(clientUserLogin);
+        ServiceResult<ClientLoginResult> serviceResult = clientUserService.login(clientUserLogin);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(clientUser.getClientId(), serviceResult.getObject());
+        assertEquals(clientUser.getClientId(), serviceResult.getObject().getClientUserId());
+        verify(clientUserRepository, clientRepository);
+    }
+
+    @Test
+    public void testUserLoginWithEmailWhenNotUpdatingApiKey() throws Exception {
+        ClientUser clientUser = new ClientUser();
+        clientUser.setClientUserId(1);
+        clientUser.setClientId(1);
+        clientUser.setName("name");
+        clientUser.setEmail("a@a.com");
+        clientUser.setPassword("password");
+        clientUser.setSmsKey("qwerty");
+        final ClientUserRepository clientUserRepository = createClientUserRepositoryForEmailWhenNotUpdatingApiKey(clientUser);
+        final ClientRepository clientRepository = createClientRepository();
+        final ClientUserService clientUserService =
+            new ClientUserService(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null){
+                @Override
+                String generateAndSendSms(String phone) throws MessagingException {
+                    return "";
+                }
+                @Override
+                String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+            };
+
+        ClientUserLogin clientUserLogin = new ClientUserLogin();
+        clientUserLogin.setPhone("");
+        clientUserLogin.setSmsKey("");
+        clientUserLogin.setEmail("a@a.com");
+        clientUserLogin.setPassword("password");
+        ServiceResult serviceResult = clientUserService.login(clientUserLogin);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
         verify(clientUserRepository, clientRepository);
     }
 
@@ -201,6 +272,15 @@ public class ClientUserServiceTest {
     private ClientUserRepository createClientUserRepositoryForPhone(ClientUser clientUser) throws Exception {
         final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
         expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(1);
+        replay(clientUserRepository);
+        return clientUserRepository;
+    }
+
+    private ClientUserRepository createClientUserRepositoryForPhoneWhenNotUpdatingApiKey(ClientUser clientUser) throws Exception {
+        final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
+        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(0);
         replay(clientUserRepository);
         return clientUserRepository;
     }
@@ -209,6 +289,16 @@ public class ClientUserServiceTest {
         final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
         expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(null);
         expect(clientUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(1);
+        replay(clientUserRepository);
+        return clientUserRepository;
+    }
+
+    private ClientUserRepository createClientUserRepositoryForEmailWhenNotUpdatingApiKey(ClientUser clientUser) throws Exception {
+        final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
+        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(null);
+        expect(clientUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(0);
         replay(clientUserRepository);
         return clientUserRepository;
     }

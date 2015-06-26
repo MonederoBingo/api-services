@@ -10,7 +10,7 @@ import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
-import com.neerpoints.service.model.LoginResult;
+import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.util.Translations;
 import org.easymock.EasyMock;
@@ -40,12 +40,12 @@ public class CompanyUserServiceTest {
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
         companyUserLogin.setPassword("password");
-        ServiceResult<LoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+        ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
-        LoginResult loginResult = serviceResult.getObject();
+        CompanyLoginResult loginResult = serviceResult.getObject();
         assertTrue(loginResult.isActive());
         assertEquals(1, loginResult.getCompanyId());
         assertEquals("es", loginResult.getLanguage());
@@ -75,13 +75,41 @@ public class CompanyUserServiceTest {
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
         companyUserLogin.setPassword("password");
-        ServiceResult<LoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+        ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Translations.Message.YOUR_USER_IS_NOT_ACTIVE.name(), serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
-        LoginResult loginResult = serviceResult.getObject();
+        CompanyLoginResult loginResult = serviceResult.getObject();
         assertFalse(loginResult.isActive());
+        verify(companyUserRepository);
+    }
+
+    @Test
+    public void testUserLoginWhenNotUpdatingApiKey() throws Exception {
+        CompanyUser companyUser = new CompanyUser();
+        companyUser.setCompanyUserId(1);
+        companyUser.setCompanyId(1);
+        companyUser.setName("name");
+        companyUser.setEmail("a@a.com");
+        companyUser.setPassword("password");
+        companyUser.setActive(true);
+        final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
+        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return message.name();
+            }
+        };
+        replay(companyUserRepository);
+
+        CompanyUserLogin companyUserLogin = new CompanyUserLogin();
+        companyUserLogin.setEmail("a@a.com");
+        companyUserLogin.setPassword("password");
+        ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
         verify(companyUserRepository);
     }
 
@@ -276,10 +304,16 @@ public class CompanyUserServiceTest {
         return companyUserRepository;
     }
 
-
     private CompanyUserRepository createCompanyUserRepositoryIsNotActive(CompanyUser companyUser) throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
         expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(companyUser);
+        return companyUserRepository;
+    }
+
+    private CompanyUserRepository createCompanyUserRepositoryWhenNotUpdatingApiKey(CompanyUser companyUser) throws Exception {
+        final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
+        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(companyUser);
+        expect(companyUserRepository.updateApiKeyByEmail(anyString(), anyString())).andReturn(0);
         return companyUserRepository;
     }
 

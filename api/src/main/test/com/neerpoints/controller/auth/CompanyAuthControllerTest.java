@@ -5,7 +5,7 @@ import com.neerpoints.service.CompanyUserService;
 import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
-import com.neerpoints.service.model.LoginResult;
+import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -41,9 +41,9 @@ public class CompanyAuthControllerTest {
 
     @Test
     public void testLoginUser() throws Exception {
-        LoginResult loginResult = new LoginResult();
+        CompanyLoginResult loginResult = new CompanyLoginResult();
         loginResult.setActive(true);
-        final ServiceResult<LoginResult> expectedServiceResult = new ServiceResult<>(true, "name", loginResult);
+        final ServiceResult<CompanyLoginResult> expectedServiceResult = new ServiceResult<>(true, "name", loginResult);
         final CompanyUserService companyUserService = createCompanyUserForLogin(expectedServiceResult);
         final CompanyService companyService = createMock(CompanyService.class);
         final CompanyAuthController companyUserController = new CompanyAuthController(companyUserService, companyService);
@@ -51,14 +51,14 @@ public class CompanyAuthControllerTest {
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
         companyUserLogin.setPassword("password");
-        final ResponseEntity<ServiceResult<LoginResult>> actualServiceResult = companyUserController.login(companyUserLogin);
+        final ResponseEntity<ServiceResult<CompanyLoginResult>> actualServiceResult = companyUserController.login(companyUserLogin);
         assertNotNull(actualServiceResult);
         ServiceResult actualServiceResults = actualServiceResult.getBody();
         assertNotNull(actualServiceResults);
         assertEquals(expectedServiceResult.isSuccess(), actualServiceResults.isSuccess());
         assertEquals(expectedServiceResult.getMessage(), actualServiceResults.getMessage());
         assertNotNull(expectedServiceResult.getObject());
-        LoginResult expectedLoginResult = expectedServiceResult.getObject();
+        CompanyLoginResult expectedLoginResult = expectedServiceResult.getObject();
         assertTrue(expectedLoginResult.isActive());
         verify(companyUserService);
     }
@@ -123,7 +123,7 @@ public class CompanyAuthControllerTest {
         verify(companyUserService);
     }
 
-    private CompanyUserService createCompanyUserForLogin(ServiceResult<LoginResult> serviceResult) throws Exception {
+    private CompanyUserService createCompanyUserForLogin(ServiceResult<CompanyLoginResult> serviceResult) throws Exception {
         CompanyUserService companyUserService = EasyMock.createMock(CompanyUserService.class);
         expect(companyUserService.loginUser((CompanyUserLogin) anyObject())).andReturn(serviceResult);
         replay(companyUserService);

@@ -1,9 +1,11 @@
-package com.neerpoints.controller.api;
+package com.neerpoints.controller.auth;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import com.neerpoints.controller.api.AbstractApiController;
 import com.neerpoints.service.ClientUserService;
+import com.neerpoints.service.model.ClientLoginResult;
 import com.neerpoints.service.model.ClientUserLogin;
 import com.neerpoints.service.model.ClientUserRegistration;
 import com.neerpoints.service.model.ServiceResult;
@@ -17,13 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/client_users")
-public class ClientUserController extends AbstractApiController{
+@RequestMapping("/client")
+public class ClientAuthController extends AbstractApiController{
 
     private final ClientUserService _clientUserService;
 
     @Autowired
-    public ClientUserController(ClientUserService clientUserService) {
+    public ClientAuthController(ClientUserService clientUserService) {
         _clientUserService = clientUserService;
     }
 
@@ -40,12 +42,12 @@ public class ClientUserController extends AbstractApiController{
 
     @RequestMapping(value="/login", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult> loginUser(@RequestBody ClientUserLogin clientUserLogin) throws Exception {
+    public ResponseEntity<ServiceResult<ClientLoginResult>> loginUser(@RequestBody ClientUserLogin clientUserLogin) throws Exception {
         try {
-            ServiceResult serviceResult = _clientUserService.login(clientUserLogin);
+            ServiceResult<ClientLoginResult> serviceResult = _clientUserService.login(clientUserLogin);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<ClientLoginResult>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

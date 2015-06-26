@@ -13,6 +13,7 @@ import com.neerpoints.model.ClientUser;
 import com.neerpoints.model.NotificationEmail;
 import com.neerpoints.repository.ClientRepository;
 import com.neerpoints.repository.ClientUserRepository;
+import com.neerpoints.service.model.ClientLoginResult;
 import com.neerpoints.service.model.ClientUserLogin;
 import com.neerpoints.service.model.ClientUserRegistration;
 import com.neerpoints.service.model.ServiceResult;
@@ -59,7 +60,7 @@ public class ClientUserService extends BaseService {
         }
     }
 
-    public ServiceResult<Long> login(ClientUserLogin clientUserLogin) {
+    public ServiceResult<ClientLoginResult> login(ClientUserLogin clientUserLogin) {
         try {
             if (clientUserLogin == null || (StringUtils.isEmpty(clientUserLogin.getEmail()) && StringUtils.isEmpty(clientUserLogin.getPhone()))) {
                 return null;
@@ -71,7 +72,16 @@ public class ClientUserService extends BaseService {
             if (clientUser == null) {
                 return new ServiceResult<>(false, getTranslation(Translations.Message.LOGIN_FAILED));
             } else {
-                return new ServiceResult<>(true, "", clientUser.getClientUserId());
+                String apiKey = RandomStringUtils.random(20, true, true) + "cli";
+                final int updatedRows = _clientUserRepository.updateApiKeyById(clientUser.getClientUserId(), apiKey);
+                if (updatedRows != 1) {
+                    logger.error("The client user api key could not be updated. updatedRows: " + updatedRows);
+                    return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+                }
+                ClientLoginResult clientLoginResult = new ClientLoginResult();
+                clientLoginResult.setClientUserId(clientUser.getClientUserId());
+                clientLoginResult.setApiKey(apiKey);
+                return new ServiceResult<>(true, "", clientLoginResult);
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);

@@ -542,7 +542,7 @@ implements <a href="../../../../org/apache/tools/tar/TarConstants.html" title="i
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><strong><a href="../../../../org/apache/tools/tar/TarEntry.html#setIds(int,%20int)">setIds</a></strong>(int&nbsp;userId,
+<td class="colLast"><code><strong><a href="../../../../org/apache/tools/tar/TarEntry.html#setIds(int,%20int)">setIds</a></strong>(int&nbsp;clientUserId,
       int&nbsp;groupId)</code>
 <div class="block">Convenience method to set this entry's group and user ids.</div>
 </td>
@@ -592,13 +592,13 @@ implements <a href="../../../../org/apache/tools/tar/TarConstants.html" title="i
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><strong><a href="../../../../org/apache/tools/tar/TarEntry.html#setUserId(int)">setUserId</a></strong>(int&nbsp;userId)</code>
+<td class="colLast"><code><strong><a href="../../../../org/apache/tools/tar/TarEntry.html#setUserId(int)">setUserId</a></strong>(int&nbsp;clientUserId)</code>
 <div class="block">Set this entry's user id.</div>
 </td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><strong><a href="../../../../org/apache/tools/tar/TarEntry.html#setUserId(long)">setUserId</a></strong>(long&nbsp;userId)</code>
+<td class="colLast"><code><strong><a href="../../../../org/apache/tools/tar/TarEntry.html#setUserId(long)">setUserId</a></strong>(long&nbsp;clientUserId)</code>
 <div class="block">Set this entry's user id.</div>
 </td>
 </tr>
@@ -931,9 +931,9 @@ public&nbsp;int&nbsp;getUserId()</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>setUserId</h4>
-<pre>public&nbsp;void&nbsp;setUserId(int&nbsp;userId)</pre>
+<pre>public&nbsp;void&nbsp;setUserId(int&nbsp;clientUserId)</pre>
 <div class="block">Set this entry's user id.</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>userId</code> - This entry's new user id.</dd></dl>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>clientUserId</code> - This entry's new user id.</dd></dl>
 </li>
 </ul>
 <a name="getLongUserId()">
@@ -954,9 +954,9 @@ public&nbsp;int&nbsp;getUserId()</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>setUserId</h4>
-<pre>public&nbsp;void&nbsp;setUserId(long&nbsp;userId)</pre>
+<pre>public&nbsp;void&nbsp;setUserId(long&nbsp;clientUserId)</pre>
 <div class="block">Set this entry's user id.</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>userId</code> - This entry's new user id.</dd><dt><span class="strong">Since:</span></dt>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>clientUserId</code> - This entry's new user id.</dd><dt><span class="strong">Since:</span></dt>
   <dd>1.9.5</dd></dl>
 </li>
 </ul>
@@ -1059,10 +1059,10 @@ public&nbsp;int&nbsp;getGroupId()</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>setIds</h4>
-<pre>public&nbsp;void&nbsp;setIds(int&nbsp;userId,
+<pre>public&nbsp;void&nbsp;setIds(int&nbsp;clientUserId,
           int&nbsp;groupId)</pre>
 <div class="block">Convenience method to set this entry's group and user ids.</div>
-<dl><dt><span class="strong">Parameters:</span></dt><dd><code>userId</code> - This entry's new user id.</dd><dd><code>groupId</code> - This entry's new group id.</dd></dl>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>clientUserId</code> - This entry's new user id.</dd><dd><code>groupId</code> - This entry's new group id.</dd></dl>
 </li>
 </ul>
 <a name="setNames(java.lang.String, java.lang.String)">

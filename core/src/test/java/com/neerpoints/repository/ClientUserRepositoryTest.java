@@ -78,6 +78,30 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
         Assert.assertEquals("a@a.com", clientUser.getEmail());
     }
 
+    @Test
+    public void testApiKeyByEmail() throws Exception {
+        insertFixture("client_user_repository_test_fixture_for_update.sql");
+        ClientUser beforeUpdateClientUser = getClientUserById(1);
+        _clientUserRepository.updateApiKeyById(1, "QWER");
+        ClientUser afterUpdateClientUser = getClientUserById(1);
+        assertNotEquals(beforeUpdateClientUser.getApiKey(), afterUpdateClientUser.getApiKey());
+    }
+
+
+    @Test
+    public void testGetByCompanyUserIdApiKey() throws Exception {
+        insertFixture("client_user_repository_test_fixture_for_get.sql");
+        ClientUser companyUser = _clientUserRepository.getByClientUserIdApiKey("1", "ASDQWE");
+        assertNotNull(companyUser);
+    }
+
+    @Test
+    public void testGetByCompanyUserIdApiKeyWhenDoesNotExist() throws Exception {
+        ClientUser companyUser = _clientUserRepository.getByClientUserIdApiKey("1", "ASDQWE");
+        assertNull(companyUser);
+    }
+
+
     private ClientUser getClientUserById(long clientUserId) throws Exception {
         Statement st = null;
         ClientUser clientUser = null;
@@ -92,6 +116,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
                 clientUser.setEmail(resultSet.getString("email"));
                 clientUser.setPassword(resultSet.getString("password"));
                 clientUser.setSmsKey(resultSet.getString("sms_key"));
+                clientUser.setApiKey(resultSet.getString("api_key"));
             }
         }
         finally {

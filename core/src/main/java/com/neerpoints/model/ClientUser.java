@@ -8,6 +8,7 @@ public class ClientUser {
     private String email;
     private String password;
     private String smsKey;
+    private String apiKey;
 
     public long getClientUserId() {
         return clientUserId;
@@ -55,5 +56,13 @@ public class ClientUser {
 
     public void setSmsKey(String smsKey) {
         this.smsKey = smsKey;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

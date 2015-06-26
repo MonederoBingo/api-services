@@ -1,6 +1,6 @@
 package com.neerpoints.service.model;
 
-public class LoginResult {
+public class CompanyLoginResult {
     private long companyId;
     private long companyUserId;
     private String companyName;

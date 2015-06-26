@@ -8,7 +8,7 @@ import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
-import com.neerpoints.service.model.LoginResult;
+import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.service.model.ValidationResult;
 import com.neerpoints.util.EmailUtil;
@@ -35,8 +35,8 @@ public class CompanyUserService extends BaseService {
         _companyRepository = companyRepository;
     }
 
-    public ServiceResult<LoginResult> loginUser(CompanyUserLogin companyUserLogin) {
-        LoginResult loginResult = new LoginResult();
+    public ServiceResult<CompanyLoginResult> loginUser(CompanyUserLogin companyUserLogin) {
+        CompanyLoginResult loginResult = new CompanyLoginResult();
         try {
             if (companyUserLogin == null || companyUserLogin.getEmail() == null || companyUserLogin.getPassword() == null) {
                 return null;
@@ -49,8 +49,12 @@ public class CompanyUserService extends BaseService {
                 loginResult.setActive(false);
                 return new ServiceResult<>(false, getTranslation(Translations.Message.YOUR_USER_IS_NOT_ACTIVE), loginResult);
             }
-            String apiKey = RandomStringUtils.random(20, true, true);
-            _companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
+            String apiKey = RandomStringUtils.random(20, true, true) + "com";
+            final int updatedRows = _companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
+            if (updatedRows != 1) {
+                logger.error("The company user api key could not be updated. updatedRows: " + updatedRows);
+                return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+            }
             loginResult.setEmail(companyUser.getEmail());
             loginResult.setMustChangePassword(companyUser.getMustChangePassword());
             loginResult.setActive(true);
