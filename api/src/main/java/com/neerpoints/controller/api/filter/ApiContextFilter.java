@@ -28,6 +28,7 @@ public class ApiContextFilter implements Filter {
         initializeContext(httpServletRequest, httpServletResponse);
         if (!isValidCall(httpServletRequest)) {
             httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
         chain.doFilter(request, response);
     }
