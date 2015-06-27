@@ -1,7 +1,12 @@
 package com.neerpoints.controller.auth;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import com.neerpoints.service.CompanyService;
 import com.neerpoints.service.CompanyUserService;
 import com.neerpoints.service.model.CompanyRegistration;
@@ -9,7 +14,10 @@ import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
 import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -97,6 +105,31 @@ public class CompanyAuthController extends AbstractAuthController {
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RequestMapping(value = "/logo/{companyId}", method = GET)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<byte[]> getLogo(@PathVariable("companyId") long companyId, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            File file = _companyService.getLogo(companyId);
+            InputStream input = new FileInputStream(file);
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(getMediaTypeFromExtension(FilenameUtils.getExtension(file.getName())));
+            return new ResponseEntity<>(IOUtils.toByteArray(input), headers, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private org.springframework.http.MediaType getMediaTypeFromExtension(String extension) {
+        if (extension.equalsIgnoreCase("png")) {
+            return org.springframework.http.MediaType.IMAGE_PNG;
+        } else if (extension.equalsIgnoreCase("gif")) {
+            return org.springframework.http.MediaType.IMAGE_GIF;
+        } else {
+            return org.springframework.http.MediaType.IMAGE_PNG;
         }
     }
 }

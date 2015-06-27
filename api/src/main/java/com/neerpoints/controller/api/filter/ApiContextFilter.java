@@ -34,13 +34,12 @@ public class ApiContextFilter implements Filter {
     }
 
     private boolean isValidCall(HttpServletRequest request) {
-//        if (request.getMethod().equals("OPTIONS")) {
-//            return true;
-//        }
-//        final String userId = request.getHeader("User-Id");
-//        final String apiKey = request.getHeader("Api-Key");
-//        return userId != null && apiKey != null && _authenticationService.isValidApiKey(userId, apiKey).isSuccess();
-        return true;
+        if (request.getMethod().equals("OPTIONS")) {
+            return true;
+        }
+        final String userId = request.getHeader("User-Id");
+        final String apiKey = request.getHeader("Api-Key");
+        return userId != null && apiKey != null && _authenticationService.isValidApiKey(userId, apiKey).isSuccess();
     }
 
     public void init(FilterConfig filterConfig) {
