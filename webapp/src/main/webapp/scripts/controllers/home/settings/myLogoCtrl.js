@@ -7,7 +7,11 @@ angular
                 $window.location.href = "/#/";
             }
             $scope.isProcessing = false;
-            $scope.logoUrl = ApiService.apiUrl() + "companies/logo/" + Session.user.companyId + "?" + new Date().getTime();
+            getLogo();
+            function getLogo() {
+                $scope.logoUrl = ApiService.authApiUrl() + "company/logo/" + Session.user.companyId + "?" + new Date().getTime();
+            }
+
             $scope.processForm = function() {
                 $scope.isProcessing = true;
                 $scope.isError = false;
@@ -24,7 +28,7 @@ angular
                 })
                     .success(function(data) {
                         console.log(data);
-                        //$scope.logoUrl = ApiService.apiUrl() + "companies/logo/" + Session.user.companyId + "?" + new Date().getTime();
+                        getLogo();
                         $scope.isProcessing = false;
                         if (data.success) {
                             $scope.message = data.message;
