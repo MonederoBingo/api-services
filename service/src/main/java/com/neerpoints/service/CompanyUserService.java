@@ -6,14 +6,15 @@ import com.neerpoints.model.CompanyUser;
 import com.neerpoints.model.NotificationEmail;
 import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
+import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
-import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.service.model.ValidationResult;
 import com.neerpoints.util.EmailUtil;
 import com.neerpoints.util.Translations;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,13 @@ public class CompanyUserService extends BaseService {
     public ServiceResult<CompanyLoginResult> loginUser(CompanyUserLogin companyUserLogin) {
         CompanyLoginResult loginResult = new CompanyLoginResult();
         try {
-            if (companyUserLogin == null || companyUserLogin.getEmail() == null || companyUserLogin.getPassword() == null) {
-                return null;
+            if (StringUtils.isEmpty(companyUserLogin.getEmail())) {
+                logger.error("The company user email is empty");
+                return new ServiceResult<>(false, getTranslation(Translations.Message.EMAIL_IS_EMPTY));
+            }
+            if (StringUtils.isEmpty(companyUserLogin.getPassword())) {
+                logger.error("The company user password is empty");
+                return new ServiceResult<>(false, getTranslation(Translations.Message.PASSWORD_IS_EMPTY));
             }
             CompanyUser companyUser = _companyUserRepository.getByEmailAndPassword(companyUserLogin.getEmail(), companyUserLogin.getPassword());
             if (companyUser == null) {

@@ -52,7 +52,7 @@ public class CompanyServiceTest {
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertNotNull(serviceResult.getMessage());
-
+        assertEquals(Translations.Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK.name(), serviceResult.getMessage());
         verify(companyRepository, companyUserRepository, threadContextService, queryAgent, pointsConfigurationRepository);
     }
 

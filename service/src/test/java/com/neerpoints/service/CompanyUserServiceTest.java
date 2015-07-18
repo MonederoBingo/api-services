@@ -8,9 +8,9 @@ import com.neerpoints.model.Company;
 import com.neerpoints.model.CompanyUser;
 import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
+import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.CompanyUserLogin;
 import com.neerpoints.service.model.CompanyUserPasswordChanging;
-import com.neerpoints.service.model.CompanyLoginResult;
 import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.util.Translations;
 import org.easymock.EasyMock;
@@ -22,16 +22,8 @@ import static org.junit.Assert.*;
 public class CompanyUserServiceTest {
 
     @Test
-    public void testUserLogin() throws Exception {
-        CompanyUser companyUser = new CompanyUser();
-        companyUser.setCompanyUserId(1);
-        companyUser.setCompanyId(1);
-        companyUser.setName("name");
-        companyUser.setEmail("a@a.com");
-        companyUser.setPassword("password");
-        companyUser.setActive(true);
-        companyUser.setLanguage("es");
-        companyUser.setMustChangePassword(true);
+    public void testLoginUser() throws Exception {
+        CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository(companyUser);
         CompanyRepository companyRepository = createCompanyRepository();
         final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, companyRepository);
@@ -55,14 +47,44 @@ public class CompanyUserServiceTest {
     }
 
     @Test
+    public void testUserLoginWithoutEmail() throws Exception {
+        final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return message.name();
+            }
+        };
+        CompanyUserLogin companyUserLogin = new CompanyUserLogin();
+        companyUserLogin.setEmail("");
+        companyUserLogin.setPassword("password");
+        ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.EMAIL_IS_EMPTY.name(), serviceResult.getMessage());
+        assertNull(serviceResult.getObject());
+    }
+
+    @Test
+    public void testUserLoginWithoutPassword() throws Exception {
+        final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return message.name();
+            }
+        };
+        CompanyUserLogin companyUserLogin = new CompanyUserLogin();
+        companyUserLogin.setEmail("a@a.com");
+        companyUserLogin.setPassword("");
+        ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.PASSWORD_IS_EMPTY.name(), serviceResult.getMessage());
+        assertNull(serviceResult.getObject());
+    }
+
+    @Test
     public void testUserLoginWhenIsNotActive() throws Exception {
-        CompanyUser companyUser = new CompanyUser();
-        companyUser.setCompanyUserId(1);
-        companyUser.setCompanyId(1);
-        companyUser.setName("name");
-        companyUser.setEmail("a@a.com");
-        companyUser.setPassword("password");
-        companyUser.setActive(false);
+        CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", false, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryIsNotActive(companyUser);
         final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
             @Override
@@ -87,13 +109,7 @@ public class CompanyUserServiceTest {
 
     @Test
     public void testUserLoginWhenNotUpdatingApiKey() throws Exception {
-        CompanyUser companyUser = new CompanyUser();
-        companyUser.setCompanyUserId(1);
-        companyUser.setCompanyId(1);
-        companyUser.setName("name");
-        companyUser.setEmail("a@a.com");
-        companyUser.setPassword("password");
-        companyUser.setActive(true);
+        CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
         final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
             @Override
@@ -333,5 +349,19 @@ public class CompanyUserServiceTest {
         expectLastCall().times(1);
         replay(queryAgent);
         return queryAgent;
+    }
+
+    private CompanyUser createCompanyUser(int companyUserId, int companyId, String name, String email, String password, boolean active,
+        String language, boolean mustChangePassword) {
+        CompanyUser companyUser = new CompanyUser();
+        companyUser.setCompanyUserId(companyUserId);
+        companyUser.setCompanyId(companyId);
+        companyUser.setName(name);
+        companyUser.setEmail(email);
+        companyUser.setPassword(password);
+        companyUser.setActive(active);
+        companyUser.setLanguage(language);
+        companyUser.setMustChangePassword(mustChangePassword);
+        return companyUser;
     }
 }

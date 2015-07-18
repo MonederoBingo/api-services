@@ -73,7 +73,8 @@ public class Translations {
         NEW_PASSWORD_EMAIL_SUBJECT,
         YOUR_PASSWORD_HAS_BEEN_CHANGED,
         PROMOTION_APPLIED,
-        NEW_PASSWORD_EMAIL_BODY
-
+        NEW_PASSWORD_EMAIL_BODY,
+        EMAIL_IS_EMPTY,
+        PASSWORD_IS_EMPTY
     }
 }
