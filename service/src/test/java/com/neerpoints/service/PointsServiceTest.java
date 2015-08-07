@@ -55,35 +55,6 @@ public class PointsServiceTest {
     }
 
     @Test
-    public void testAwardPointsWhenNotEnoughSaleAmount() throws Exception {
-        PointsRepository pointsRepository = createPointsRepositoryWhenNotEnoughSaleAmount();
-        final PointsConfiguration pointsConfiguration = new PointsConfiguration();
-        pointsConfiguration.setRequiredAmount(100);
-        pointsConfiguration.setPointsToEarn(10);
-        PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepository(pointsConfiguration);
-        final QueryAgent queryAgent = createQueryAgent();
-        ThreadContextService threadContextService = createThreadContextService(queryAgent);
-        PointsService pointsService = new PointsService(pointsRepository, pointsConfigurationRepository, null, null, threadContextService, null) {
-            @Override
-            String getTranslation(Translations.Message message) {
-                return message.name();
-            }
-        };
-        PointsAwarding pointsAwarding = new PointsAwarding();
-        pointsAwarding.setCompanyId(1);
-        pointsAwarding.setPhone("12345");
-        pointsAwarding.setSaleAmount(60);
-        pointsAwarding.setSaleKey("A123");
-
-        ServiceResult<Float> serviceResult = pointsService.awardPoints(pointsAwarding);
-        assertNotNull(serviceResult);
-        assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.THE_CLIENT_DID_NOT_GET_POINTS.name(), serviceResult.getMessage());
-        assertEquals(0, serviceResult.getObject(), 0.00);
-        verify(pointsRepository, pointsConfigurationRepository, queryAgent, threadContextService);
-    }
-
-    @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
         PointsRepository pointsRepository = createPointsRepositoryWhenTheSaleKeyExists();
         PointsService pointsService = new PointsService(pointsRepository, null, null, null, null, null) {
@@ -128,7 +99,7 @@ public class PointsServiceTest {
 
     private ClientRepository createClientRepository() throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.insertIfDoesNotExist(anyString())).andReturn(new Client());
+        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(new Client());
         replay(clientRepository);
         return clientRepository;
     }

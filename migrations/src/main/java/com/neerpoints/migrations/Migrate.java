@@ -72,9 +72,13 @@ public class Migrate {
                 @Override
                 public boolean evaluate(File file) {
                     final String fileName = file.getName();
-                    String dateString = fileName.substring(0, fileName.indexOf("_"));
-                    Date date = DateUtil.parseDate(dateString, "yyyyMMddHHmmss");
-                    return date.after(lastRunMigrationDate);
+                    if (fileName.charAt(14) == '_') {
+                        String dateString = fileName.substring(0, fileName.indexOf("_"));
+                        Date date = DateUtil.parseDate(dateString, "yyyyMMddHHmmss");
+                        return date.after(lastRunMigrationDate);
+                    } else {
+                        throw new IllegalArgumentException("The file: " + fileName + " must contain an underscore '_' after the hash number.");
+                    }
                 }
             });
         } finally {

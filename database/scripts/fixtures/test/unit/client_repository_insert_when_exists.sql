@@ -1,1 +1,1 @@
-INSERT INTO client(client_id, phone) VALUES(1, '1234');
+INSERT INTO client(client_id, phone, can_receive_promo_sms) VALUES(1, '1234', TRUE);

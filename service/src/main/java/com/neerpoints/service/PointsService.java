@@ -69,8 +69,7 @@ public class PointsService extends BaseService {
         if (pointsConfiguration == null) {
             throw new IllegalArgumentException("Points configuration doesn't exist");
         }
-        if (pointsAwarding.getSaleAmount() >= pointsConfiguration.getRequiredAmount()) {
-            Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhone());
+            Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhone(), true);
             //Inserting company client mapping if it doesn't exist
             _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), client.getClientId());
 
@@ -81,7 +80,7 @@ public class PointsService extends BaseService {
             points.setRequiredAmount(pointsConfiguration.getRequiredAmount());
             points.setPointsToEarn(pointsConfiguration.getPointsToEarn());
             points.setSaleAmount(pointsAwarding.getSaleAmount());
-            points.setEarnedPoints(calculateEarnedPoints(points));
+            points.setEarnedPoints(calculateEarnedPoints(points, pointsAwarding.getSaleAmount(), pointsConfiguration.getRequiredAmount()));
             points.setDate(DateUtil.dateNow());
 
             //Inserting points for this client
@@ -96,13 +95,14 @@ public class PointsService extends BaseService {
             companyClientMapping.setPoints(companyClientMapping.getPoints() + points.getEarnedPoints());
             _companyClientMappingRepository.updatePoints(companyClientMapping);
             return points.getEarnedPoints();
+    }
+
+    private float calculateEarnedPoints(Points points, float saleAmount, float requiredAmount) {
+        if (saleAmount >= requiredAmount) {
+            return (int) (points.getSaleAmount() / points.getRequiredAmount() * points.getPointsToEarn());
         } else {
             return 0;
         }
-    }
-
-    private float calculateEarnedPoints(Points points) {
-        return (int) (points.getSaleAmount() / points.getRequiredAmount() * points.getPointsToEarn());
     }
 
     private ValidationResult validateRegistration(PointsAwarding pointsAwarding) throws Exception {

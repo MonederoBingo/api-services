@@ -1,12 +1,7 @@
 package com.neerpoints.service;
 
 import javax.mail.MessagingException;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.model.Client;
 import com.neerpoints.model.ClientUser;
@@ -33,14 +28,16 @@ public class ClientUserService extends BaseService {
     private final ClientUserRepository _clientUserRepository;
     private final ClientRepository _clientRepository;
     private final ThreadContextService _threadContextService;
+    private final SMSService _smsService;
 
     @Autowired
     public ClientUserService(ClientUserRepository clientUserRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
-        Translations translations) {
+        Translations translations, SMSService smsService) {
         super(translations, threadContextService);
         _clientUserRepository = clientUserRepository;
         _clientRepository = clientRepository;
         _threadContextService = threadContextService;
+        _smsService = smsService;
     }
 
     public ServiceResult<Long> register(ClientUserRegistration clientUserRegistration) {
@@ -91,7 +88,7 @@ public class ClientUserService extends BaseService {
 
     public ServiceResult<Boolean> resendKey(String phone) {
         try {
-            _clientUserRepository.updateSmsKey(generateAndSendSms(phone), phone);
+            _clientUserRepository.updateSmsKey(generateAndSendRegistrationSMS(phone), phone);
             return new ServiceResult<>(true, "", true);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -100,15 +97,15 @@ public class ClientUserService extends BaseService {
     }
 
     private long registerClientAndClientUser(ClientUserRegistration clientUserRegistration) throws Exception {
-        Client client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhone());
+        Client client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhone(), true);
         ClientUser clientUser = _clientUserRepository.getByClientId(client.getClientId());
         if (clientUser == null) {
             clientUser = new ClientUser();
             clientUser.setClientId(client.getClientId());
-            clientUser.setSmsKey(generateAndSendSms(clientUserRegistration.getPhone()));
+            clientUser.setSmsKey(generateAndSendRegistrationSMS(clientUserRegistration.getPhone()));
             return _clientUserRepository.insert(clientUser);
         } else {
-            _clientUserRepository.updateSmsKey(generateAndSendSms(clientUserRegistration.getPhone()), clientUserRegistration.getPhone());
+            _clientUserRepository.updateSmsKey(generateAndSendRegistrationSMS(clientUserRegistration.getPhone()), clientUserRegistration.getPhone());
             return clientUser.getClientUserId();
         }
     }
@@ -121,40 +118,13 @@ public class ClientUserService extends BaseService {
         return _clientUserRepository.getByEmailAndPassword(clientUserLogin.getEmail(), clientUserLogin.getPassword());
     }
 
-    String generateAndSendSms(String phone) throws MessagingException, IOException {
+    String generateAndSendRegistrationSMS(String phone) throws MessagingException, IOException {
         String key = RandomStringUtils.random(6, false, true);
+        String message = getTranslation(Translations.Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
         if (isProdEnvironment()) {
-            HttpURLConnection connection = null;
-            InputStreamReader in = null;
-            StringBuilder sb = new StringBuilder();
-            try {
-                String keyMessage = getTranslation(Translations.Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
-                keyMessage = keyMessage.replaceAll(" ", "%20");
-                URL url = new URL(
-                    "https://www.masmensajes.com.mx/wss/smsapi11.php?usuario=alayor&password=d48a47&celular=+52" + phone + "&mensaje=" + keyMessage);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                if (connection.getInputStream() != null) {
-                    in = new InputStreamReader(connection.getInputStream(), Charset.defaultCharset());
-                    BufferedReader bufferedReader = new BufferedReader(in);
-                    int cp;
-                    while ((cp = bufferedReader.read()) != -1) {
-                        sb.append((char) cp);
-                    }
-                    bufferedReader.close();
-                }
-                if (!sb.toString().contains("OK")) {
-                    throw new IllegalArgumentException("SMS Message could not be sent. phone: " + phone + ". key: " + key);
-                }
-                assert in != null;
-                in.close();
-                sendKeyToEmail(key, phone);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-            }
+            _smsService.sendSMSMessage(phone, message);
         }
+        sendKeyToEmail(key, phone);
         System.out.println(key);
         return key;
     }

@@ -61,6 +61,20 @@ public class CompanyControllerTest {
         verify(companyService);
     }
 
+    @Test
+    public void testSendMobileAppAdMessage() {
+        CompanyService companyService = createStrictMock(CompanyService.class);
+        expect(companyService.sendMobileAppAdMessage(0, anyString())).andReturn(new ServiceResult(true, ""));
+        replay(companyService);
+        CompanyController clientController = new CompanyController(companyService);
+        final ResponseEntity<ServiceResult> responseEntity = clientController.sendMobileAppAdMessage(0, "6623471507");
+        assertNotNull(responseEntity);
+        ServiceResult serviceResult = responseEntity.getBody();
+        assertNotNull(serviceResult);
+        assertTrue(serviceResult.isSuccess());
+        verify(companyService);
+    }
+
     private CompanyService createCompanyService(ServiceResult<Boolean> serviceResult) {
         CompanyService companyService = createMock(CompanyService.class);
         expect(companyService.updateLogo((List<FileItem>) anyObject(), anyLong())).andReturn(serviceResult);

@@ -3,6 +3,7 @@ package com.neerpoints.repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import com.neerpoints.db.DbBuilder;
+import com.neerpoints.model.Client;
 import com.neerpoints.model.CompanyClientMapping;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +23,15 @@ public class CompanyClientMappingRepository extends BaseRepository {
                 CompanyClientMapping companyClientMapping = new CompanyClientMapping();
                 companyClientMapping.setCompanyClientMappingId(resultSet.getLong("company_client_mapping_id"));
                 companyClientMapping.setCompanyId(resultSet.getLong("company_id"));
-                companyClientMapping.setClientId(resultSet.getLong("client_id"));
+                companyClientMapping.setClient(buildClient(resultSet));
                 companyClientMapping.setPoints(resultSet.getFloat("points"));
                 return companyClientMapping;
+            }
+
+            private Client buildClient(ResultSet resultSet) throws SQLException {
+                Client client = new Client();
+                client.setClientId(resultSet.getLong("client_id"));
+                return client;
             }
         });
     }
@@ -34,7 +41,7 @@ public class CompanyClientMappingRepository extends BaseRepository {
         sql.append("INSERT INTO company_client_mapping(company_id, client_id)");
         sql.append(" VALUES (");
         sql.append(companyClientMapping.getCompanyId()).append(", ");
-        sql.append(companyClientMapping.getClientId()).append(");");
+        sql.append(companyClientMapping.getClient().getClientId()).append(");");
         return getQueryAgent().executeInsert(sql.toString(), "company_client_mapping_id");
     }
 
@@ -43,8 +50,10 @@ public class CompanyClientMappingRepository extends BaseRepository {
         if (companyClientMapping == null) {
             companyClientMapping = new CompanyClientMapping();
             companyClientMapping.setCompanyId(companyId);
-            companyClientMapping.setClientId(clientId);
-            companyClientMapping.setClientId(insert(companyClientMapping));
+            Client client = new Client();
+            client.setClientId(clientId);
+            companyClientMapping.setClient(client);
+            companyClientMapping.setCompanyClientMappingId(insert(companyClientMapping));
         }
         return companyClientMapping;
     }
@@ -54,7 +63,7 @@ public class CompanyClientMappingRepository extends BaseRepository {
         sql.append("UPDATE company_client_mapping");
         sql.append(" SET points = ").append(companyClientMapping.getPoints());
         sql.append(" WHERE company_id = ").append(companyClientMapping.getCompanyId());
-        sql.append(" AND client_id = ").append(companyClientMapping.getClientId());
+        sql.append(" AND client_id = ").append(companyClientMapping.getClient().getClientId());
         return getQueryAgent().executeUpdate(sql.toString());
     }
 }

@@ -1,8 +1,10 @@
 package com.neerpoints.repository;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import com.neerpoints.db.QueryAgent;
+import com.neerpoints.model.Client;
 import com.neerpoints.model.CompanyClientMapping;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,12 +43,14 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
         insertFixture("company_client_mapping_repository_insert.sql");
         CompanyClientMapping expectedCompanyClientMapping = new CompanyClientMapping();
         expectedCompanyClientMapping.setCompanyId(1);
-        expectedCompanyClientMapping.setClientId(1);
+        Client client = new Client();
+        client.setClientId(1);
+        expectedCompanyClientMapping.setClient(client);
         final long companyClientMappingId = _companyClientMappingRepository.insert(expectedCompanyClientMapping);
         CompanyClientMapping actualCompanyClientMapping = getCompanyClientMappingById(companyClientMappingId);
         Assert.assertEquals(companyClientMappingId, actualCompanyClientMapping.getCompanyClientMappingId());
         Assert.assertEquals(expectedCompanyClientMapping.getCompanyId(), actualCompanyClientMapping.getCompanyId());
-        Assert.assertEquals(expectedCompanyClientMapping.getClientId(), actualCompanyClientMapping.getClientId());
+        Assert.assertEquals(expectedCompanyClientMapping.getClient().getClientId(), actualCompanyClientMapping.getClient().getClientId());
     }
 
     @Test(expected = PSQLException.class)
@@ -54,7 +58,9 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
         insertFixture("company_client_mapping_repository_insert.sql");
         CompanyClientMapping expectedCompanyClientMapping = new CompanyClientMapping();
         expectedCompanyClientMapping.setCompanyId(1);
-        expectedCompanyClientMapping.setClientId(1);
+        Client client = new Client();
+        client.setClientId(1);
+        expectedCompanyClientMapping.setClient(client);
         _companyClientMappingRepository.insert(expectedCompanyClientMapping);
         _companyClientMappingRepository.insert(expectedCompanyClientMapping);
     }
@@ -72,7 +78,7 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
         CompanyClientMapping companyClientMapping = _companyClientMappingRepository.insertIfDoesNotExist(1, 1);
         assertNotNull(companyClientMapping);
         Assert.assertEquals(1, companyClientMapping.getCompanyClientMappingId());
-        Assert.assertEquals(1, companyClientMapping.getClientId());
+        Assert.assertEquals(1, companyClientMapping.getClient().getClientId());
         Assert.assertEquals(1, companyClientMapping.getCompanyId());
     }
 
@@ -97,7 +103,7 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
             if (resultSet.next()) {
                 companyClientMapping.setCompanyClientMappingId(resultSet.getLong("company_client_mapping_id"));
                 companyClientMapping.setCompanyId(resultSet.getLong("company_id"));
-                companyClientMapping.setClientId(resultSet.getLong("client_id"));
+                companyClientMapping.setClient(buildClient(resultSet));
                 companyClientMapping.setPoints(resultSet.getFloat("points"));
             }
         } finally {
@@ -106,6 +112,12 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
             }
         }
         return companyClientMapping;
+    }
+
+    private Client buildClient(ResultSet resultSet) throws SQLException {
+        Client client = new Client();
+        client.setClientId(resultSet.getLong("client_id"));
+        return client;
     }
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository(final QueryAgent queryAgent) {

@@ -67,7 +67,7 @@ public class CompanyUserService extends BaseService {
             loginResult.setCompanyId(companyUser.getCompanyId());
             loginResult.setCompanyUserId(companyUser.getCompanyUserId());
             loginResult.setLanguage(companyUser.getLanguage());
-            loginResult.setCompanyName(_companyRepository.getByCompanyId(companyUser.getCompanyId()).getName());
+            loginResult.setCompanyName(_companyRepository.getByCompanyId(companyUser.getCompanyId()).get().getName());
             loginResult.setApiKey(apiKey);
             return new ServiceResult<>(true, "", loginResult);
         } catch (Exception ex) {

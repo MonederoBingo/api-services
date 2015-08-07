@@ -4,7 +4,7 @@ package com.neerpoints.model;
 public class CompanyClientMapping {
     private long companyClientMappingId;
     private long companyId;
-    private long clientId;
+    private Client client;
     private float points;
 
     public long getCompanyClientMappingId() {
@@ -23,12 +23,12 @@ public class CompanyClientMapping {
         this.companyId = companyId;
     }
 
-    public long getClientId() {
-        return clientId;
+    public Client getClient() {
+        return client;
     }
 
-    public void setClientId(long clientId) {
-        this.clientId = clientId;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public float getPoints() {

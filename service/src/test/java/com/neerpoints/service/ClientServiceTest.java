@@ -6,7 +6,6 @@ import java.util.List;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.db.QueryAgent;
 import com.neerpoints.model.Client;
-import com.neerpoints.model.ClientPoints;
 import com.neerpoints.model.CompanyClientMapping;
 import com.neerpoints.repository.ClientRepository;
 import com.neerpoints.repository.CompanyClientMappingRepository;
@@ -82,44 +81,46 @@ public class ClientServiceTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        final List<ClientPoints> expectedClients = new ArrayList<>();
+        final List<CompanyClientMapping> expectedClients = new ArrayList<>();
         expectedClients.add(createClient(100, "6391112233"));
         expectedClients.add(createClient(200, "6141112233"));
         final ClientRepository clientRepository = createClientRepositoryForGet(expectedClients);
         final ClientService clientService = new ClientService(clientRepository, null, null, null);
 
-        ServiceResult<List<ClientPoints>> serviceResult = clientService.getByCompanyId(1);
+        ServiceResult<List<CompanyClientMapping>> serviceResult = clientService.getByCompanyId(1);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
-        List<ClientPoints> actualClients = serviceResult.getObject();
+        List<CompanyClientMapping> actualClients = serviceResult.getObject();
         assertEquals(2, actualClients.size());
         assertEquals(100, actualClients.get(0).getPoints(), 0.00);
-        assertEquals("6391112233", actualClients.get(0).getPhone());
+        assertEquals("6391112233", actualClients.get(0).getClient().getPhone());
         assertEquals(200, actualClients.get(1).getPoints(), 0.00);
-        assertEquals("6141112233", actualClients.get(1).getPhone());
+        assertEquals("6141112233", actualClients.get(1).getClient().getPhone());
         verify(clientRepository);
     }
 
     @Test
     public void testGetByCompanyIdPhone() throws Exception {
-        final ClientPoints clientPoints = new ClientPoints();
-        clientPoints.setPoints(1200);
-        clientPoints.setPhone("1234567890");
-        final ClientRepository clientRepository = createClientRepositoryForGetByCompanyIDPhone(clientPoints);
+        final CompanyClientMapping companyClientMapping = new CompanyClientMapping();
+        companyClientMapping.setPoints(1200);
+        Client client = new Client();
+        client.setPhone("1234567890");
+        companyClientMapping.setClient(client);
+        final ClientRepository clientRepository = createClientRepositoryForGetByCompanyIDPhone(companyClientMapping);
         final ClientService clientService = new ClientService(clientRepository, null, null, null);
 
-        ServiceResult<ClientPoints> serviceResult = clientService.getByCompanyIdPhone(1, "1234567890");
+        ServiceResult<CompanyClientMapping> serviceResult = clientService.getByCompanyIdPhone(1, "1234567890");
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
-        final ClientPoints actualClientPoints = serviceResult.getObject();
-        assertEquals(1200, actualClientPoints.getPoints(), 0.00);
-        assertEquals("1234567890", actualClientPoints.getPhone());
+        final CompanyClientMapping actualCompanyClientMapping = serviceResult.getObject();
+        assertEquals(1200, actualCompanyClientMapping.getPoints(), 0.00);
+        assertEquals("1234567890", actualCompanyClientMapping.getClient().getPhone());
         verify(clientRepository);
     }
 
@@ -141,11 +142,13 @@ public class ClientServiceTest {
         return queryAgent;
     }
 
-    private ClientPoints createClient(float points, String phone) {
-        ClientPoints clientPoints = new ClientPoints();
-        clientPoints.setPoints(points);
-        clientPoints.setPhone(phone);
-        return clientPoints;
+    private CompanyClientMapping createClient(float points, String phone) {
+        CompanyClientMapping companyClientMapping = new CompanyClientMapping();
+        companyClientMapping.setPoints(points);
+        Client client = new Client();
+        client.setPhone(phone);
+        companyClientMapping.setClient(client);
+        return companyClientMapping;
     }
 
     private CompanyClientMappingRepository createCompanyClientMappingRepositoryForInsert() throws Exception {
@@ -165,7 +168,7 @@ public class ClientServiceTest {
 
     private ClientRepository createClientRepository(Client client) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.insertIfDoesNotExist(anyString())).andReturn(client).anyTimes();
+        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(client).anyTimes();
         expect(clientRepository.getByPhone(anyString())).andReturn(client).anyTimes();
         replay(clientRepository);
         return clientRepository;
@@ -178,16 +181,16 @@ public class ClientServiceTest {
         return clientRepository;
     }
 
-    private ClientRepository createClientRepositoryForGet(List<ClientPoints> clientPointsList) throws Exception {
+    private ClientRepository createClientRepositoryForGet(List<CompanyClientMapping> companyClientMappingList) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByCompanyId(anyLong())).andReturn(clientPointsList).anyTimes();
+        expect(clientRepository.getByCompanyId(anyLong())).andReturn(companyClientMappingList).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }
 
-    private ClientRepository createClientRepositoryForGetByCompanyIDPhone(ClientPoints clientPoints) throws Exception {
+    private ClientRepository createClientRepositoryForGetByCompanyIDPhone(CompanyClientMapping companyClientMapping) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByCompanyIdPhone(anyLong(), anyString())).andReturn(clientPoints).anyTimes();
+        expect(clientRepository.getByCompanyIdPhone(anyLong(), anyString())).andReturn(companyClientMapping).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }

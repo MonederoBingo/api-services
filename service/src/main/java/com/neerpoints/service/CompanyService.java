@@ -2,8 +2,10 @@ package com.neerpoints.service;
 
 import javax.mail.MessagingException;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import com.neerpoints.context.ThreadContext;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.model.Client;
@@ -13,6 +15,7 @@ import com.neerpoints.model.NotificationEmail;
 import com.neerpoints.model.PointsConfiguration;
 import com.neerpoints.model.PointsInCompany;
 import com.neerpoints.repository.ClientRepository;
+import com.neerpoints.repository.CompanyClientMappingRepository;
 import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
 import com.neerpoints.repository.PointsConfigurationRepository;
@@ -37,17 +40,21 @@ public class CompanyService extends BaseService {
     private final PointsConfigurationRepository _pointsConfigurationRepository;
     private final ClientRepository _clientRepository;
     private final ThreadContextService _threadContextService;
+    private final SMSService _smsService;
+    private final CompanyClientMappingRepository _companyClientMappingRepository;
 
     @Autowired
     public CompanyService(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
         PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
-        Translations translations) {
+        Translations translations, SMSService smsService, CompanyClientMappingRepository companyClientMappingRepository) {
         super(translations, threadContextService);
         _companyRepository = companyRepository;
         _companyUserRepository = companyUserRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
         _threadContextService = threadContextService;
+        _smsService = smsService;
+        _companyClientMappingRepository = companyClientMappingRepository;
     }
 
     public ServiceResult<Long> register(CompanyRegistration companyRegistration) {
@@ -61,7 +68,6 @@ public class CompanyService extends BaseService {
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());
             }
-
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
@@ -81,9 +87,15 @@ public class CompanyService extends BaseService {
 
     public ServiceResult<Company> getByCompanyId(long companyId) {
         try {
-            final Company company = _companyRepository.getByCompanyId(companyId);
-            company.setUrlImageLogo(company.getUrlImageLogo() + "?" + new Date().getTime());
-            return new ServiceResult<>(true, "", company);
+            final Optional<Company> companyOptional = _companyRepository.getByCompanyId(companyId);
+            if (companyOptional.isPresent()) {
+                final Company company = companyOptional.get();
+                company.setUrlImageLogo(company.getUrlImageLogo() + "?" + new Date().getTime());
+                return new ServiceResult<>(true, "", company);
+            } else{
+                logger.error("None company has the companyId: " + companyId);
+                return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
@@ -108,8 +120,46 @@ public class CompanyService extends BaseService {
             return new ServiceResult<>(true, getTranslation(Translations.Message.YOUR_LOGO_WAS_UPDATED));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
         }
+    }
+
+    @OnlyProduction
+    public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
+        if (isProdEnvironment()) {
+            try {
+                final Optional<Company> company = _companyRepository.getByCompanyId(companyId);
+                long clientId = _clientRepository.getByPhone(phone).getClientId();
+                final double points = _companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
+                if (company.isPresent()) {
+                    _smsService.sendSMSMessage(phone, getSMSMessage(company.get().getName(), points));
+                    _clientRepository.updateCanReceivePromoSms(clientId, false);
+                } else {
+                    logger.error("None company has the companyId: " + companyId);
+                    return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+                }
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+                return new ServiceResult(false, getTranslation(Translations.Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY));
+            }
+            return new ServiceResult(true, getTranslation(Translations.Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY));
+        }
+        return new ServiceResult(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+    }
+
+    String getSMSMessage(String companyName, double points) {
+        final String translation = getTranslation(Translations.Message.MOBILE_APP_AD_MESSAGE);
+        int SMS_MESSAGE_MAX_CHAR = 160;
+        final int formattedMessageLength = String.format(translation, points, "", "http://tinyurl.com/og2b56y").length();
+        if (formattedMessageLength >= SMS_MESSAGE_MAX_CHAR) {
+            throw new IllegalArgumentException("Message length must be less than " + SMS_MESSAGE_MAX_CHAR + " in: " + translation);
+        }
+        final int maxCompanyNameLength = SMS_MESSAGE_MAX_CHAR - formattedMessageLength;
+        String trimmedCompanyName = "";
+        if (maxCompanyNameLength > 0) {
+            trimmedCompanyName = StringUtils.abbreviate(companyName, Math.max(Math.min(maxCompanyNameLength, companyName.length()), 4));
+        }
+        return String.format(translation, new DecimalFormat("#.#").format(points), trimmedCompanyName, "http://tinyurl.com/og2b56y");
     }
 
     private String getImageDir() {
@@ -119,12 +169,17 @@ public class CompanyService extends BaseService {
     public File getLogo(long companyId) {
         try {
             final String imageDir = getImageDir();
-            final Company company = _companyRepository.getByCompanyId(companyId);
-            return new File(imageDir + company.getUrlImageLogo());
+            final Optional<Company> company = _companyRepository.getByCompanyId(companyId);
+            if (company.isPresent()) {
+                return new File(imageDir + company.get().getUrlImageLogo());
+            } else {
+                logger.error("None company has the companyId: " + companyId);
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             return null;
         }
+        return null;
     }
 
     private ThreadContext getThreadContext() {

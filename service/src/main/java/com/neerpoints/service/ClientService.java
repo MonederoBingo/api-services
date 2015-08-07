@@ -3,7 +3,6 @@ package com.neerpoints.service;
 import java.util.List;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.model.Client;
-import com.neerpoints.model.ClientPoints;
 import com.neerpoints.model.CompanyClientMapping;
 import com.neerpoints.repository.ClientRepository;
 import com.neerpoints.repository.CompanyClientMappingRepository;
@@ -49,9 +48,9 @@ public class ClientService extends BaseService {
         }
     }
 
-    public ServiceResult<List<ClientPoints>> getByCompanyId(long companyId) {
+    public ServiceResult<List<CompanyClientMapping>> getByCompanyId(long companyId) {
         try {
-            List<ClientPoints> clientPointsList = _clientRepository.getByCompanyId(companyId);
+            List<CompanyClientMapping> clientPointsList = _clientRepository.getByCompanyId(companyId);
             return new ServiceResult<>(true, "", clientPointsList);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -59,9 +58,9 @@ public class ClientService extends BaseService {
         }
     }
 
-    public ServiceResult<ClientPoints> getByCompanyIdPhone(long companyId, String phone) {
+    public ServiceResult<CompanyClientMapping> getByCompanyIdPhone(long companyId, String phone) {
         try {
-            ClientPoints clientPoints = _clientRepository.getByCompanyIdPhone(companyId, phone);
+            CompanyClientMapping clientPoints = _clientRepository.getByCompanyIdPhone(companyId, phone);
             return new ServiceResult<>(true, "", clientPoints);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -71,11 +70,10 @@ public class ClientService extends BaseService {
 
     private Client registerClientAndCompanyMapping(ClientRegistration clientRegistration) throws Exception {
         //Client could exist for other companies
-        Client client = _clientRepository.insertIfDoesNotExist(clientRegistration.getPhone());
-
+        Client client = _clientRepository.insertIfDoesNotExist(clientRegistration.getPhone(), true);
         CompanyClientMapping companyClientMapping = new CompanyClientMapping();
         companyClientMapping.setCompanyId(clientRegistration.getCompanyId());
-        companyClientMapping.setClientId(client.getClientId());
+        companyClientMapping.setClient(client);
         _companyClientMappingRepository.insert(companyClientMapping);
         return client;
     }

@@ -5,15 +5,18 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import com.neerpoints.context.ThreadContext;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.db.QueryAgent;
 import com.neerpoints.model.Client;
 import com.neerpoints.model.Company;
+import com.neerpoints.model.CompanyClientMapping;
 import com.neerpoints.model.CompanyUser;
 import com.neerpoints.model.PointsConfiguration;
 import com.neerpoints.model.PointsInCompany;
 import com.neerpoints.repository.ClientRepository;
+import com.neerpoints.repository.CompanyClientMappingRepository;
 import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
 import com.neerpoints.repository.PointsConfigurationRepository;
@@ -22,6 +25,7 @@ import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.util.Translations;
 import org.apache.commons.fileupload.FileItem;
 import org.easymock.EasyMock;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -170,11 +174,134 @@ public class CompanyServiceTest {
         assertNotNull(logo);
     }
 
+    @Test
+    public void testSendMobileAppAdMessage() throws Exception {
+        SMSService smsService = createStrictMock(SMSService.class);
+        smsService.sendSMSMessage(anyString(), anyString());
+        expectLastCall();
+
+        CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
+        expect(companyRepository.getByCompanyId(anyLong())).andReturn(Optional.of(new Company()));
+
+        CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+
+        ClientRepository clientRepository = createStrictMock(ClientRepository.class);
+        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
+        expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
+
+        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
+
+        CompanyService companyService =
+            new CompanyService(companyRepository, null, null, clientRepository, null, null, smsService, companyClientMappingRepository) {
+                @Override
+                String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+
+                @Override
+                protected boolean isProdEnvironment() {
+                    return true;
+                }
+            };
+        final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
+        assertTrue(serviceResult.isSuccess());
+        assertEquals(Translations.Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
+        verify(smsService, clientRepository);
+    }
+
+    @Ignore
+    public void testSendMobileAppAdMessageWhenIsNotProdEnv() throws Exception {
+        CompanyService companyService =
+            new CompanyService(null, null, null, null, null, null,  null, null) {
+                @Override
+                String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+
+                @Override
+                protected boolean isProdEnvironment() {
+                    return false;
+                }
+            };
+        final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
+    }
+
+    @Test
+    public void testGetSMSMessage() {
+        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return "You've got %s points at %s. Install Neerpoints to see our promotions. %s";
+            }
+        };
+        String smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name", 1000);
+        assertNotNull(smsMessage);
+        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Neerpoints to see our promotions. " +
+            "http://tinyurl.com/og2b56y", smsMessage);
+
+        companyService = new CompanyService(null, null, null, null, null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return "You've got %s points at %s. Install Neerpoints to see our promotions. %s";
+            }
+        };
+        smsMessage = companyService.getSMSMessage("TG", 1000);
+        assertNotNull(smsMessage);
+        assertEquals("You've got 1000 points at TG. Install Neerpoints to see our promotions. " + "http://tinyurl.com/og2b56y", smsMessage);
+
+        companyService = new CompanyService(null, null, null, null, null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return "You've got %s points at %s. Install Neerpoints to see our promotions. %s";
+            }
+        };
+        smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
+        assertNotNull(smsMessage);
+        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does .... " +
+            "Install Neerpoints to see our promotions. http://tinyurl.com/og2b56y", smsMessage);
+    }
+
+    @Test
+    public void testGetSMSMessageWithInvalidTranslation() {
+        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return "You've got %s points at %s. Install Neerpoints to see our promotions and much much much much much much much much much " +
+                    "much much much much much much more. %s";
+            }
+        };
+        try {
+            companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                "Message length must be less than 160 in: You've got %s points at %s. Install Neerpoints to see our promotions and much much " +
+                    "much much much much much much much much much much much much much more. %s", e.getMessage());
+        }
+
+        companyService = new CompanyService(null, null, null, null, null, null, null, null) {
+            @Override
+            String getTranslation(Translations.Message message) {
+                return "You've got %s points at %s. Install Neerpoints to see our promotions and much much much much much much much much much much " +
+                    "much much much much much much much much much much much much much much much much much much much much more. %s";
+            }
+        };
+        try {
+            companyService.getSMSMessage("TG", 1000);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Message length must be less than 160 in: You've got %s points at %s. Install Neerpoints to see our promotions and much " +
+                "much much much much much much much much much much much much much much much much much much much much much much much much much much " +
+                "much much much more. %s", e.getMessage());
+        }
+    }
+
     private CompanyService createCompanyService(final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
         final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
         ClientRepository clientRepository) {
         return new CompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
-            null) {
+            null, null, null) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
 
@@ -267,7 +394,7 @@ public class CompanyServiceTest {
 
     private CompanyRepository createCompanyRepositoryForGet(Company company) throws Exception {
         CompanyRepository clientRepository = createMock(CompanyRepository.class);
-        expect(clientRepository.getByCompanyId(anyLong())).andReturn(company).anyTimes();
+        expect(clientRepository.getByCompanyId(anyLong())).andReturn(Optional.ofNullable(company)).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }

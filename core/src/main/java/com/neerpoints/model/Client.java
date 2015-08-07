@@ -4,6 +4,7 @@ package com.neerpoints.model;
 public class Client {
     private long clientId;
     private String phone;
+    private boolean canReceivePromotionSms;
 
     public String getPhone() {
         return phone;
@@ -21,4 +22,11 @@ public class Client {
         this.clientId = clientId;
     }
 
+    public boolean canReceivePromotionSms() {
+        return canReceivePromotionSms;
+    }
+
+    public void setCanReceivePromotionSms(boolean canReceivePromotionSms) {
+        this.canReceivePromotionSms = canReceivePromotionSms;
+    }
 }

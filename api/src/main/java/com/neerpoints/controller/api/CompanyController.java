@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @RestController
 @RequestMapping("/companies")
@@ -40,7 +41,7 @@ public class CompanyController extends AbstractApiController {
             ServiceResult<Company> serviceResult = _companyService.getByCompanyId(companyId);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<ServiceResult<Company>>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<ServiceResult<Company>>(new ServiceResult<Company>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -55,6 +56,13 @@ public class CompanyController extends AbstractApiController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @RequestMapping(value = "/{companyId}/{phone}/send_promo_sms", method = PUT)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<ServiceResult> sendMobileAppAdMessage(@PathVariable("companyId") long companyId, @PathVariable("phone") String phone) {
+        ServiceResult serviceResult = _companyService.sendMobileAppAdMessage(companyId, phone);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     ServletFileUpload getServletFileUpload() {

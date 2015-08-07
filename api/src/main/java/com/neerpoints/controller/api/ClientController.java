@@ -3,7 +3,7 @@ package com.neerpoints.controller.api;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import com.neerpoints.model.ClientPoints;
+import com.neerpoints.model.CompanyClientMapping;
 import com.neerpoints.service.ClientService;
 import com.neerpoints.service.model.ClientRegistration;
 import com.neerpoints.service.model.ServiceResult;
@@ -42,16 +42,16 @@ public class ClientController extends AbstractApiController {
 
     @RequestMapping(value = "/{companyId}", method = GET)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<ClientPoints>>> getByCompanyId(@PathVariable("companyId") long companyId) {
-        ServiceResult<List<ClientPoints>> serviceResult = _clientService.getByCompanyId(companyId);
+    public ResponseEntity<ServiceResult<List<CompanyClientMapping>>> getByCompanyId(@PathVariable("companyId") long companyId) {
+        ServiceResult<List<CompanyClientMapping>> serviceResult = _clientService.getByCompanyId(companyId);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{companyId}/{phone}", method = GET)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<ClientPoints>> getByCompanyIdPhone(@PathVariable("companyId") long companyId,
+    public ResponseEntity<ServiceResult<CompanyClientMapping>> getByCompanyIdPhone(@PathVariable("companyId") long companyId,
         @PathVariable("phone") String phone) {
-        ServiceResult<ClientPoints> serviceResult = _clientService.getByCompanyIdPhone(companyId, phone);
+        ServiceResult<CompanyClientMapping> serviceResult = _clientService.getByCompanyIdPhone(companyId, phone);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

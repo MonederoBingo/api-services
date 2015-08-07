@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class AbstractApiController {
     public static final String ACCEPT_HEADER = "Accept=" + MediaType.APPLICATION_JSON;
 
-    @RequestMapping(value = {"", "/*", "/*/*"}, method = RequestMethod.OPTIONS)
+    @RequestMapping(value = {"", "/*", "/*/*", "/*/*/*", "/*/*/*/*"}, method = RequestMethod.OPTIONS)
     public void commonOptions() throws IOException {
     }
 }

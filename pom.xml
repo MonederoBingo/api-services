@@ -9,7 +9,6 @@
         <module>core</module>
         <module>service</module>
         <module>api</module>
-        <module>migrations</module>
     </modules>
     <name>Archetype - backend</name>
   <url>http://maven.apache.org</url>

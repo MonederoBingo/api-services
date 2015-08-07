@@ -1,6 +1,7 @@
 package com.neerpoints.controller.auth;
 
 import com.neerpoints.service.ClientUserService;
+import com.neerpoints.service.model.ClientLoginResult;
 import com.neerpoints.service.model.ClientUserLogin;
 import com.neerpoints.service.model.ClientUserRegistration;
 import com.neerpoints.service.model.ServiceResult;
@@ -42,7 +43,7 @@ public class ClientAuthControllerTest {
         clientUserLogin.setSmsKey("qwerty");
         clientUserLogin.setEmail("a@a.com");
         clientUserLogin.setPassword("password");
-        final ResponseEntity<ServiceResult> actualServiceResult = clientAuthController.loginUser(clientUserLogin);
+        final ResponseEntity<ServiceResult<ClientLoginResult>> actualServiceResult = clientAuthController.loginUser(clientUserLogin);
         assertNotNull(actualServiceResult);
         ServiceResult actualServiceResults = actualServiceResult.getBody();
         assertNotNull(actualServiceResults);
@@ -72,7 +73,7 @@ public class ClientAuthControllerTest {
         return clientUserService;
     }
 
-    private ClientUserService createUserLoginService(ServiceResult<Long> serviceResult) throws Exception {
+    private ClientUserService createUserLoginService(ServiceResult<ClientLoginResult> serviceResult) throws Exception {
         ClientUserService clientUserService = EasyMock.createMock(ClientUserService.class);
         expect(clientUserService.login((ClientUserLogin) anyObject())).andReturn(serviceResult);
         replay(clientUserService);
