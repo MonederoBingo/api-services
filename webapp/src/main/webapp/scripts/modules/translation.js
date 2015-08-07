@@ -49,7 +49,8 @@ angular.module('translation', ['pascalprecht.translate'])
             CHANGE_PASSWORD: 'Change password',
             YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'You need to configure your points awarding strategy. ' +
             'Please go to <strong> Settings -> Points configuration</strong>  or click on <a href="/#/settings/points_configuration"> this link</a>.',
-            YOU_MUST_CHANGE_YOUR_PASSWORD: 'You must change your password.'
+            YOU_MUST_CHANGE_YOUR_PASSWORD: 'You must change your password.',
+            SEND_SMS_WITH_PROMO: 'Send SMS to install Neerpoints.'
 
         })
             .translations('es', {
@@ -101,7 +102,8 @@ angular.module('translation', ['pascalprecht.translate'])
                 CHANGE_PASSWORD: 'Cambiar contraseña',
                 YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'No se ha configurado la cantidad de puntos a otorgar. ' +
                 'Favor de ir a <strong>Configuraciones -> Configuración de puntos</strong> o dar click en <a href="/#/settings/points_configuration"> este link</a>.',
-                YOU_MUST_CHANGE_YOUR_PASSWORD: 'Es necesario que cambie su contraseña.'
+                YOU_MUST_CHANGE_YOUR_PASSWORD: 'Es necesario que cambie su contraseña.',
+                SEND_SMS_WITH_PROMO: 'Enviar SMS para instalar Neerpoints'
             });
         $translateProvider.preferredLanguage('es');
     });

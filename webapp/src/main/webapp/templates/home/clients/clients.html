@@ -7,8 +7,13 @@
     </thead>
     <tbody>
         <tr ng-repeat="client in clients">
-            <td>{{client.phone}}</td>
+            <td>{{client.client.phone}}</td>
             <td>{{client.points}}</td>
+            <td>
+                <button id="send_button_{{$index}}" type="submit" class="btn btn-primary"
+                        ng-show="client.client.canReceivePromotionSms && client.points > 0"
+                        ng-click="sendSMSMessage($index)">{{'SEND_SMS_WITH_PROMO' | translate}}</button>
+            </td>
         </tr>
     </tbody>
 </table>
