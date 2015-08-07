@@ -11,6 +11,6 @@ public class TestController extends AbstractApiController {
 
     @RequestMapping(method = GET)
     public String test() {
-        return "it works!";
+        return "it works! :)";
     }
 }
