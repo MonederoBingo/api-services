@@ -2,7 +2,6 @@ package com.neerpoints.service;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
-import java.util.Optional;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.db.QueryAgent;
 import com.neerpoints.model.Company;
@@ -279,7 +278,7 @@ public class CompanyUserServiceTest {
 
     private CompanyRepository createCompanyRepository() throws Exception {
         CompanyRepository companyRepository = createMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(Optional.of(new Company()));
+        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
         replay(companyRepository);
         return companyRepository;
     }

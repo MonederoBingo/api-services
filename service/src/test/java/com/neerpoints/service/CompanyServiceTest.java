@@ -5,7 +5,6 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import com.neerpoints.context.ThreadContext;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.db.QueryAgent;
@@ -181,7 +180,7 @@ public class CompanyServiceTest {
         expectLastCall();
 
         CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(Optional.of(new Company()));
+        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
 
         CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
@@ -394,7 +393,7 @@ public class CompanyServiceTest {
 
     private CompanyRepository createCompanyRepositoryForGet(Company company) throws Exception {
         CompanyRepository clientRepository = createMock(CompanyRepository.class);
-        expect(clientRepository.getByCompanyId(anyLong())).andReturn(Optional.ofNullable(company)).anyTimes();
+        expect(clientRepository.getByCompanyId(anyLong())).andReturn(company).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }

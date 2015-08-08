@@ -5,7 +5,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import com.neerpoints.context.ThreadContext;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.model.Client;
@@ -87,9 +86,9 @@ public class CompanyService extends BaseService {
 
     public ServiceResult<Company> getByCompanyId(long companyId) {
         try {
-            final Optional<Company> companyOptional = _companyRepository.getByCompanyId(companyId);
-            if (companyOptional.isPresent()) {
-                final Company company = companyOptional.get();
+            final Company companyOptional = _companyRepository.getByCompanyId(companyId);
+            if (companyOptional != null) {
+                final Company company = companyOptional;
                 company.setUrlImageLogo(company.getUrlImageLogo() + "?" + new Date().getTime());
                 return new ServiceResult<>(true, "", company);
             } else{
@@ -128,11 +127,11 @@ public class CompanyService extends BaseService {
     public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
         if (isProdEnvironment()) {
             try {
-                final Optional<Company> company = _companyRepository.getByCompanyId(companyId);
+                final Company company = _companyRepository.getByCompanyId(companyId);
                 long clientId = _clientRepository.getByPhone(phone).getClientId();
                 final double points = _companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
-                if (company.isPresent()) {
-                    _smsService.sendSMSMessage(phone, getSMSMessage(company.get().getName(), points));
+                if (company != null) {
+                    _smsService.sendSMSMessage(phone, getSMSMessage(company.getName(), points));
                     _clientRepository.updateCanReceivePromoSms(clientId, false);
                 } else {
                     logger.error("None company has the companyId: " + companyId);
@@ -169,9 +168,9 @@ public class CompanyService extends BaseService {
     public File getLogo(long companyId) {
         try {
             final String imageDir = getImageDir();
-            final Optional<Company> company = _companyRepository.getByCompanyId(companyId);
-            if (company.isPresent()) {
-                return new File(imageDir + company.get().getUrlImageLogo());
+            final Company company = _companyRepository.getByCompanyId(companyId);
+            if (company != null) {
+                return new File(imageDir + company.getUrlImageLogo());
             } else {
                 logger.error("None company has the companyId: " + companyId);
             }

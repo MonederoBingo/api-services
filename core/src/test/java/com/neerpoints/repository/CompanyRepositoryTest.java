@@ -61,7 +61,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testGetByCompanyId() throws Exception {
         insertFixture("company_repository_test_get.sql");
-        Company company = _companyRepository.getByCompanyId(1).get();
+        Company company = _companyRepository.getByCompanyId(1);
         assertNotNull(company);
         assertEquals("A", company.getName());
         assertEquals("B", company.getUrlImageLogo());

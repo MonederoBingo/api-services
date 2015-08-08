@@ -3,7 +3,6 @@ package com.neerpoints.repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import com.neerpoints.db.DbBuilder;
 import com.neerpoints.model.Company;
 import com.neerpoints.model.PointsInCompany;
@@ -30,7 +29,7 @@ public class CompanyRepository extends BaseRepository {
         return getQueryAgent().executeUpdate(sql.toString());
     }
 
-    public Optional<Company> getByCompanyId(final long companyId) throws Exception {
+    public Company getByCompanyId(final long companyId) throws Exception {
         final Company company = getQueryAgent().selectObject(new DbBuilder<Company>() {
             @Override
             public String sql() {
@@ -46,7 +45,7 @@ public class CompanyRepository extends BaseRepository {
                 return company;
             }
         });
-        return Optional.ofNullable(company);
+        return company;
     }
 
     public List<PointsInCompany> getPointsInCompanyByClientId(final long clientId) throws Exception {
