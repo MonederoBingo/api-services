@@ -4,19 +4,19 @@ angular
         '$http', '$window',  'Session', '$translate', '$location', function($http, $window, Session, $translate, $location) {
             var service = {};
             service.apiUrl = function (){
-                var isProdEnvironment = $location.host() === 'www.neerpoints.com';
-                var url = 'http://localhost:9090/api/';
-                if(isProdEnvironment) {
-                    url = 'http://services-neerpoints.rhcloud.com/api/';
-                }
-                return url;
-            };
-
-            service.authApiUrl = function (){
-                var isProdEnvironment = $location.host() === 'www.neerpoints.com';
-                var url = 'http://localhost:9090/auth/';
-                if(isProdEnvironment) {
-                    url = 'http://services-neerpoints.rhcloud.com/auth/';
+                var url = '';
+                switch($location.host()){
+                    case "test.localhost":
+                        url = "http://test.localhost:9090/";
+                        break;
+                    case "www.neerpoints.com":
+                        url = "http://services.neerpoints.com/";
+                        break;
+                    case "test.neerpoints.com":
+                        url = "http://test.services.neerpoints.com/";
+                        break;
+                    default :
+                        url = "http://localhost:9090/";
                 }
                 return url;
             };
@@ -27,7 +27,7 @@ angular
                 console.log(Session.user);
                 return $http({
                     method: method,
-                    url: service.apiUrl() + path,
+                    url: service.apiUrl() + "api/" + path,
                     data: data,
                     headers: {'Content-Type': 'application/json', 'Api-Key': apiKey, 'User-Id': userId, 'Language': $translate.use()}
                 })
@@ -37,7 +37,7 @@ angular
                 var key = Session.user ? Session.user.apiKey : '';
                 return $http({
                     method: method,
-                    url: service.authApiUrl() + path,
+                    url: service.apiUrl() + "auth/" + path,
                     data: data,
                     headers: {'Content-Type': 'application/json', 'Language': $translate.use()}
                 })
