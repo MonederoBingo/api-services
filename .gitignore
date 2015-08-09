@@ -12,3 +12,5 @@ app.log
 .ant-targets-build.xml
 
 .DS_Store
+
+api/src/main/webapp/images/*
