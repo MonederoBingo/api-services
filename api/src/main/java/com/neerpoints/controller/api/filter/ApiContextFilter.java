@@ -73,6 +73,7 @@ public class ApiContextFilter implements Filter {
 
     private Environment getEnvironment(HttpServletRequest request) {
         switch (request.getServerName()) {
+            case "services-neerpoints.rhcloud.com":
             case "services.neerpoints.com":
                 return Environment.PROD;
             case "test.services.neerpoints.com":
