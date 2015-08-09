@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import com.neerpoints.migrations.db.DevelopmentDatabaseManager;
+import com.neerpoints.migrations.db.FunctionalTestDatabaseManager;
 import com.neerpoints.migrations.db.UnitTestDatabaseManager;
 import com.neerpoints.migrations.util.DBUtil;
 import org.apache.commons.io.FileUtils;
@@ -32,12 +33,11 @@ public class CreateDb {
 
     private void runSetupScripts() throws Exception {
         final File[] scripts = loadSetupScripts();
-        Connection unitTestConnection = new UnitTestDatabaseManager().getConnection();
-        Connection developmentConnection = new DevelopmentDatabaseManager().getConnection();
         for (File script : scripts) {
             System.out.println(script.getName());
-            DBUtil.executeScript(script, unitTestConnection);
-            DBUtil.executeScript(script, developmentConnection);
+            DBUtil.executeScript(script, new DevelopmentDatabaseManager().getConnection());
+            DBUtil.executeScript(script, new UnitTestDatabaseManager().getConnection());
+            DBUtil.executeScript(script, new FunctionalTestDatabaseManager().getConnection());
         }
     }
 

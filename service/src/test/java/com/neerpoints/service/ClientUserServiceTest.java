@@ -2,6 +2,7 @@ package com.neerpoints.service;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
+import com.neerpoints.context.Environment;
 import com.neerpoints.context.ThreadContext;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.db.QueryAgent;
@@ -29,7 +30,7 @@ public class ClientUserServiceTest {
         final QueryAgent queryAgent = createQueryAgent();
 
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setProdEnvironment(false);
+        threadContext.setEnvironment(Environment.DEV);
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserService clientUserService = new ClientUserService(clientUserRepository, clientRepository, threadContextService, null, null) {
             @Override
@@ -58,7 +59,7 @@ public class ClientUserServiceTest {
         ClientRepository clientRepository = createClientRepositoryForRegister();
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setProdEnvironment(false);
+        threadContext.setEnvironment(Environment.DEV);
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserService clientUserService = new ClientUserService(clientUserRepository, clientRepository, threadContextService, null, null){
             @Override
@@ -229,7 +230,7 @@ public class ClientUserServiceTest {
     @Test
     public void testResendKey() throws Exception {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setProdEnvironment(false);
+        threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext);
         ClientUserService clientUserService = new ClientUserService(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
             @Override

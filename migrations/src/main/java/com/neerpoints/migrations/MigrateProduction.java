@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import com.neerpoints.migrations.db.DatabaseManager;
 import com.neerpoints.migrations.db.ProductionDatabaseManager;
+import com.neerpoints.migrations.db.UATDatabaseManager;
 import com.neerpoints.migrations.util.DBUtil;
 import com.neerpoints.migrations.util.DateUtil;
 import org.apache.commons.collections15.CollectionUtils;
@@ -20,6 +21,8 @@ public class MigrateProduction {
     public static void main(String[] args) throws Exception {
         System.out.println("Running migrations for production...");
         new MigrateProduction().run(new ProductionDatabaseManager());
+        System.out.println("Running migrations for UAT...");
+        new MigrateProduction().run(new UATDatabaseManager());
         System.out.println("Process finished successfully.");
     }
 

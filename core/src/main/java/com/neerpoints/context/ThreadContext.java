@@ -3,10 +3,9 @@ package com.neerpoints.context;
 import com.neerpoints.db.QueryAgent;
 
 public class ThreadContext {
-
     private QueryAgent _clientQueryAgent;
     private String _language;
-    private boolean isProdEnvironment;
+    private Environment _environment;
 
     public QueryAgent getClientQueryAgent() {
         return _clientQueryAgent;
@@ -24,11 +23,11 @@ public class ThreadContext {
         _language = language;
     }
 
-    public boolean isProdEnvironment() {
-        return isProdEnvironment;
+    public Environment getEnvironment() {
+        return _environment;
     }
 
-    public void setProdEnvironment(boolean isProdEnvironment) {
-        this.isProdEnvironment = isProdEnvironment;
+    public void setEnvironment(Environment environment) {
+        _environment = environment;
     }
 }

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import com.neerpoints.migrations.db.DatabaseManager;
 import com.neerpoints.migrations.db.DevelopmentDatabaseManager;
+import com.neerpoints.migrations.db.FunctionalTestDatabaseManager;
 import com.neerpoints.migrations.db.UnitTestDatabaseManager;
 import com.neerpoints.migrations.util.DBUtil;
 import com.neerpoints.migrations.util.DateUtil;
@@ -19,10 +20,12 @@ import org.apache.commons.collections15.Predicate;
 
 public class Migrate {
     public static void main(String[] args) throws Exception {
-        System.out.println("Running migrations for production...");
+        System.out.println("Running migrations for development...");
         new Migrate().run(new DevelopmentDatabaseManager());
-        System.out.println("Running migrations for test...");
+        System.out.println("Running migrations for unit test...");
         new Migrate().run(new UnitTestDatabaseManager());
+        System.out.println("Running migrations for functional test...");
+        new Migrate().run(new FunctionalTestDatabaseManager());
         System.out.println("Process finished successfully.");
     }
 

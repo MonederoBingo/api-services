@@ -18,6 +18,7 @@ import com.neerpoints.repository.CompanyClientMappingRepository;
 import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
 import com.neerpoints.repository.PointsConfigurationRepository;
+import com.neerpoints.service.annotation.OnlyProduction;
 import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.service.model.ValidationResult;
@@ -86,9 +87,8 @@ public class CompanyService extends BaseService {
 
     public ServiceResult<Company> getByCompanyId(long companyId) {
         try {
-            final Company companyOptional = _companyRepository.getByCompanyId(companyId);
-            if (companyOptional != null) {
-                final Company company = companyOptional;
+            final Company company = _companyRepository.getByCompanyId(companyId);
+            if (company != null) {
                 company.setUrlImageLogo(company.getUrlImageLogo() + "?" + new Date().getTime());
                 return new ServiceResult<>(true, "", company);
             } else{
@@ -110,8 +110,7 @@ public class CompanyService extends BaseService {
                     return new ServiceResult<>(false, getTranslation(Translations.Message.INVALID_LOGO_FILE));
                 }
                 final String fileName = companyId + "." + getExtensionFromContentType(contentType);
-                final String imageDir = getImageDir();
-                fileItem.write(new File(String.valueOf(imageDir + fileName)));
+                fileItem.write(new File(String.valueOf(getThreadContext().getEnvironment().getImageDir() + fileName)));
                 _companyRepository.updateUrlImageLogo(companyId, fileName);
             } else {
                 return new ServiceResult<>(false, getTranslation(Translations.Message.COULD_NOT_READ_FILE));
@@ -131,7 +130,9 @@ public class CompanyService extends BaseService {
                 long clientId = _clientRepository.getByPhone(phone).getClientId();
                 final double points = _companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
                 if (company != null) {
-                    _smsService.sendSMSMessage(phone, getSMSMessage(company.getName(), points));
+                    final String smsMessage = getSMSMessage(company.getName(), points);
+                    System.out.println(smsMessage);
+                    _smsService.sendSMSMessage(phone, smsMessage);
                     _clientRepository.updateCanReceivePromoSms(clientId, false);
                 } else {
                     logger.error("None company has the companyId: " + companyId);
@@ -161,16 +162,11 @@ public class CompanyService extends BaseService {
         return String.format(translation, new DecimalFormat("#.#").format(points), trimmedCompanyName, "http://tinyurl.com/og2b56y");
     }
 
-    private String getImageDir() {
-        return getThreadContext().isProdEnvironment() ? System.getenv("OPENSHIFT_DATA_DIR") + "images/" : "src/main/webapp/images/";
-    }
-
     public File getLogo(long companyId) {
         try {
-            final String imageDir = getImageDir();
             final Company company = _companyRepository.getByCompanyId(companyId);
             if (company != null) {
-                return new File(imageDir + company.getUrlImageLogo());
+                return new File(getThreadContext().getEnvironment().getImageDir() + company.getUrlImageLogo());
             } else {
                 logger.error("None company has the companyId: " + companyId);
             }
@@ -186,12 +182,9 @@ public class CompanyService extends BaseService {
     }
 
     private boolean isValidContentType(String contentType) {
-        if (contentType.equalsIgnoreCase("image/jpeg") ||
+        return contentType.equalsIgnoreCase("image/jpeg") ||
             contentType.equalsIgnoreCase("image/png") ||
-            contentType.equalsIgnoreCase("image/gif")) {
-            return true;
-        }
-        return false;
+            contentType.equalsIgnoreCase("image/gif");
     }
 
     private String getExtensionFromContentType(String contentType) {
@@ -242,8 +235,7 @@ public class CompanyService extends BaseService {
     void sendActivationEmail(String email, String activationKey) throws MessagingException {
         NotificationEmail notificationEmail = new NotificationEmail();
         notificationEmail.setSubject(getTranslation(Translations.Message.ACTIVATION_EMAIL_SUBJECT));
-        final String activationUrl = isProdEnvironment() ? "http://www.neerpoints.com/#/activate?key=" + activationKey :
-            "http://localhost:8080/#/activate?key=" + activationKey;
+        final String activationUrl = getEnvironment().getClientUrl() + "activate?key=" + activationKey;
         notificationEmail.setBody(getTranslation(Translations.Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
         notificationEmail.setEmailTo(email);
         EmailUtil.sendEmail(notificationEmail);

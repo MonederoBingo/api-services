@@ -26,14 +26,16 @@ public class CompanyUserService extends BaseService {
     private final CompanyUserRepository _companyUserRepository;
     private final CompanyRepository _companyRepository;
     private final ThreadContextService _threadContextService;
+    private final CompanyService _companyService;
 
     @Autowired
     public CompanyUserService(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService, Translations translations,
-        CompanyRepository companyRepository) {
+        CompanyRepository companyRepository, CompanyService companyService) {
         super(translations, threadContextService);
         _companyUserRepository = companyUserRepository;
         _threadContextService = threadContextService;
         _companyRepository = companyRepository;
+        _companyService = companyService;
     }
 
     public ServiceResult<CompanyLoginResult> loginUser(CompanyUserLogin companyUserLogin) {
@@ -100,7 +102,7 @@ public class CompanyUserService extends BaseService {
             if (companyUser == null) {
                 return new ServiceResult(false, getTranslation(Translations.Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
-            sendActivationEmail(email, companyUser.getActivationKey());
+            _companyService.sendActivationEmail(email, companyUser.getActivationKey());
             return new ServiceResult(true, getTranslation(Translations.Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -146,16 +148,6 @@ public class CompanyUserService extends BaseService {
             logger.error(ex.getMessage(), ex);
             return new ServiceResult(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
         }
-    }
-
-    void sendActivationEmail(String email, String activationKey) throws MessagingException {
-        NotificationEmail notificationEmail = new NotificationEmail();
-        notificationEmail.setSubject(getTranslation(Translations.Message.ACTIVATION_EMAIL_SUBJECT));
-        final String activationUrl = isProdEnvironment() ? "http://www.neerpoints.com/#/activate?key=" + activationKey :
-            "http://localhost:8080/#/activate?key=" + activationKey;
-        notificationEmail.setBody(getTranslation(Translations.Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
-        notificationEmail.setEmailTo(email);
-        EmailUtil.sendEmail(notificationEmail);
     }
 
     void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {

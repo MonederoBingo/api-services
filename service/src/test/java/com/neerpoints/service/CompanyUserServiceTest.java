@@ -26,7 +26,7 @@ public class CompanyUserServiceTest {
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository(companyUser);
         CompanyRepository companyRepository = createCompanyRepository();
-        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, companyRepository);
+        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, companyRepository, null);
         replay(companyUserRepository);
 
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
@@ -48,7 +48,7 @@ public class CompanyUserServiceTest {
 
     @Test
     public void testUserLoginWithoutEmail() throws Exception {
-        final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null) {
+        final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null, null) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -66,7 +66,7 @@ public class CompanyUserServiceTest {
 
     @Test
     public void testUserLoginWithoutPassword() throws Exception {
-        final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null) {
+        final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null, null) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -86,7 +86,7 @@ public class CompanyUserServiceTest {
     public void testUserLoginWhenIsNotActive() throws Exception {
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", false, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryIsNotActive(companyUser);
-        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -111,7 +111,7 @@ public class CompanyUserServiceTest {
     public void testUserLoginWhenNotUpdatingApiKey() throws Exception {
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
-        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+        final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -134,7 +134,7 @@ public class CompanyUserServiceTest {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForActivate();
         final QueryAgent queryAgent = createQueryAgent();
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, threadContextService, null, null) {
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, threadContextService, null, null, null) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -148,12 +148,7 @@ public class CompanyUserServiceTest {
     @Test
     public void sendActivationEmail() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendActivation();
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
-            @Override
-            void sendActivationEmail(String email, String activationKey) throws MessagingException {
-
-            }
-
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, createCompanyService()) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -164,15 +159,18 @@ public class CompanyUserServiceTest {
         assertTrue(serviceResult.isSuccess());
     }
 
+    private CompanyService createCompanyService() throws MessagingException {
+        CompanyService companyService = createNiceMock(CompanyService.class);
+        companyService.sendActivationEmail(anyString(), anyString());
+        expectLastCall();
+        replay(companyService);
+        return companyService;
+    }
+
     @Test
     public void testSendActivationEmailWhenEmailDoesNotExist() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingActivationWhenEmailDoesNotExist();
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
-            @Override
-            void sendActivationEmail(String email, String activationKey) throws MessagingException {
-
-            }
-
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, createCompanyService()) {
             @Override
             String getTranslation(Translations.Message message) {
                 return message.name();
@@ -187,7 +185,7 @@ public class CompanyUserServiceTest {
     @Test
     public void testSendTestPasswordEmail() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
 
@@ -208,7 +206,7 @@ public class CompanyUserServiceTest {
     @Test
     public void testChangePassword() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
 
@@ -232,7 +230,7 @@ public class CompanyUserServiceTest {
     @Test
     public void testChangePasswordWithInvalidPasswords() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
 
@@ -256,7 +254,7 @@ public class CompanyUserServiceTest {
     @Test
     public void testChangePasswordWithNotSamePasswords() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null) {
+        CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
             }

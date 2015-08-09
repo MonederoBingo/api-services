@@ -1,8 +1,5 @@
 package com.neerpoints.context;
 
-import com.neerpoints.db.DatabaseManager;
-import com.neerpoints.db.DevelopmentDatabaseManager;
-import com.neerpoints.db.ProductionDatabaseManager;
 import com.neerpoints.db.QueryAgent;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -12,21 +9,14 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.INTERFACES)
 public class ThreadContextServiceImpl implements ThreadContextService {
-
     private static final ThreadLocal<ThreadContext> THREAD_CONTEXT = new ThreadLocal<>();
 
     @Override
-    public void initializeContext(boolean isProdEnvironment, String language) {
+    public void initializeContext(Environment environment, String language) {
         ThreadContext threadContext = new ThreadContext();
-        DatabaseManager databaseManager;
-        if (isProdEnvironment) {
-            databaseManager = new ProductionDatabaseManager();
-        } else {
-            databaseManager = new DevelopmentDatabaseManager();
-        }
-        threadContext.setClientQueryAgent(new QueryAgent(databaseManager));
+        threadContext.setClientQueryAgent(new QueryAgent(environment.getDatabaseManager()));
         threadContext.setLanguage(language);
-        threadContext.setProdEnvironment(isProdEnvironment);
+        threadContext.setEnvironment(environment);
         setThreadContextOnThread(threadContext);
     }
 

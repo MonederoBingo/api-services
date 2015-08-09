@@ -1,5 +1,6 @@
 package com.neerpoints.service;
 
+import com.neerpoints.context.Environment;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.util.Translations;
 
@@ -18,6 +19,10 @@ public class BaseService {
     }
 
     protected boolean isProdEnvironment() {
-        return _threadContextService.getThreadContext().isProdEnvironment();
+        return _threadContextService.getThreadContext().getEnvironment() == Environment.PROD;
+    }
+
+    protected Environment getEnvironment() {
+        return _threadContextService.getThreadContext().getEnvironment();
     }
 }

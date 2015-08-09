@@ -5,6 +5,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import com.neerpoints.context.Environment;
 import com.neerpoints.context.ThreadContext;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.db.QueryAgent;
@@ -24,7 +25,6 @@ import com.neerpoints.service.model.ServiceResult;
 import com.neerpoints.util.Translations;
 import org.apache.commons.fileupload.FileItem;
 import org.easymock.EasyMock;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -38,7 +38,7 @@ public class CompanyServiceTest {
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepository();
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setProdEnvironment(false);
+        threadContext.setEnvironment(Environment.DEV);
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         CompanyService companyService =
             createCompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, threadContextService, null);
@@ -134,7 +134,7 @@ public class CompanyServiceTest {
     public void testUpdateImageLogo() throws Exception {
         CompanyRepository companyRepository = createCompanyRepositoryForUpdate();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setProdEnvironment(false);
+        threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext);
         CompanyService companyService = createCompanyService(companyRepository, null, null, threadContextService, null);
         List<FileItem> fileItems = new ArrayList<>();
@@ -168,7 +168,10 @@ public class CompanyServiceTest {
         company.setName("name");
         company.setUrlImageLogo("logo.png");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
-        CompanyService companyService = createCompanyService(companyRepository, null, null, createThreadContextService(new ThreadContext()), null);
+        ThreadContext threadContext = createMock(ThreadContext.class);
+        expect(threadContext.getEnvironment()).andReturn(Environment.DEV);
+        replay(threadContext);
+        CompanyService companyService = createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null);
         final File logo = companyService.getLogo(1);
         assertNotNull(logo);
     }
@@ -209,7 +212,7 @@ public class CompanyServiceTest {
         verify(smsService, clientRepository);
     }
 
-    @Ignore
+    @Test
     public void testSendMobileAppAdMessageWhenIsNotProdEnv() throws Exception {
         CompanyService companyService =
             new CompanyService(null, null, null, null, null, null,  null, null) {

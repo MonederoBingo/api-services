@@ -4,7 +4,7 @@ import com.neerpoints.db.QueryAgent;
 
 public interface ThreadContextService {
 
-    void initializeContext(boolean isProdEnvironment, String language);
+    void initializeContext(Environment env, String language);
 
     ThreadContext getThreadContext();
 

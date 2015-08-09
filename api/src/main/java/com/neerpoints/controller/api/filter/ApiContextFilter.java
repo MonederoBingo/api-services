@@ -9,6 +9,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import com.neerpoints.context.Environment;
 import com.neerpoints.context.ThreadContextService;
 import com.neerpoints.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,28 +52,35 @@ public class ApiContextFilter implements Filter {
     }
 
     private void initializeContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        final boolean isProdEnvironment = isProdEnvironment(httpServletRequest);
-        _threadContextService.initializeContext(isProdEnvironment, httpServletRequest.getHeader("language"));
-        setHeaders(httpServletResponse, isProdEnvironment);
+        _threadContextService.initializeContext(getEnvironment(httpServletRequest), httpServletRequest.getHeader("language"));
+        setHeaders(httpServletResponse, httpServletRequest);
     }
 
-    private void setHeaders(HttpServletResponse response, boolean isProdEnvironment) {
-        response.addHeader("Access-Control-Allow-Headers", "Content-Type,x-requested-with,Authorization, Api-Key, User-Id, language");
-        response.addHeader("Access-Control-Max-Age", "360");
-        response.addHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT");
-        response.addHeader("Access-Control-Allow-Origin", isProdEnvironment ? "http://www.neerpoints.com" : "http://localhost:8080");
-        response.addHeader("Access-Control-Allow-Credentials", "true");
-        response.addHeader("Access-Control-Allow-Credentials", "true");
+    private void setHeaders(HttpServletResponse response, HttpServletRequest request) {
+        List<String> incomingURLs =
+            Arrays.asList("http://localhost:8080", "http://test.localhost:8080", "http://www.neerpoints.com", "http://test.neerpoints.com");
+        String clientOrigin = request.getHeader("origin") != null ? request.getHeader("origin") : request.getHeader("referrer");
+        int myIndex = incomingURLs.indexOf(clientOrigin);
+        if (myIndex != -1) {
+            response.addHeader("Access-Control-Allow-Headers", "Content-Type,x-requested-with,Authorization,Api-Key,User-Id,language");
+            response.addHeader("Access-Control-Max-Age", "360");
+            response.addHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,PUT");
+            response.addHeader("Access-Control-Allow-Origin", clientOrigin);
+            response.addHeader("Access-Control-Allow-Credentials", "true");
+            response.addHeader("Access-Control-Allow-Credentials", "true");
+        }
     }
 
-    private boolean isProdEnvironment(ServletRequest req) {
-        String serverName = req.getServerName();
-        return serverName.equals("services-neerpoints.rhcloud.com");
+    private Environment getEnvironment(HttpServletRequest request) {
+        switch (request.getServerName()) {
+            case "services.neerpoints.com":
+                return Environment.PROD;
+            case "test.services.neerpoints.com":
+                return Environment.UAT;
+            case "test.localhost":
+                return Environment.DEV_TEST;
+            default:
+                return Environment.DEV;
+        }
     }
-
-//    private boolean isTestEnvironment(ServletRequest req) {
-//        String serverName = req.getServerName();
-//        String[] serverNameParts = serverName.split("\\.");
-//        return serverNameParts.length > 0 && serverNameParts[0].equals("test");
-//    }
 }
