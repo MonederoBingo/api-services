@@ -9,7 +9,7 @@ angular
             $scope.isProcessing = false;
             getLogo();
             function getLogo() {
-                $scope.logoUrl = ApiService.authApiUrl() + "company/logo/" + Session.user.companyId + "?" + new Date().getTime();
+                $scope.logoUrl = ApiService.apiUrl() + "auth/company/logo/" + Session.user.companyId + "?" + new Date().getTime();
             }
 
             $scope.processForm = function() {
@@ -21,7 +21,7 @@ angular
                 $http({
                     transformRequest: angular.identity,
                     method: 'POST',
-                    url: ApiService.apiUrl()  + 'companies/logo/' + Session.user.companyId,
+                    url: ApiService.apiUrl()  + 'api/companies/logo/' + Session.user.companyId,
                     data: fd,
                     headers: {'Content-Type': undefined, 'Api-Key': Session.user.apiKey,  'User-Id': Session.user.companyUserId ,
                         'Language': $translate.use()}
