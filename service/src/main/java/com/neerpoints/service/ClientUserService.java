@@ -123,8 +123,8 @@ public class ClientUserService extends BaseService {
         String message = getTranslation(Translations.Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
         if (isProdEnvironment()) {
             _smsService.sendSMSMessage(phone, message);
+            sendKeyToEmail(key, phone);
         }
-        sendKeyToEmail(key, phone);
         System.out.println(key);
         return key;
     }

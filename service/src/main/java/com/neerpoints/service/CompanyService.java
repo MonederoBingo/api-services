@@ -243,7 +243,7 @@ public class CompanyService extends BaseService {
 
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {
         //Validate user password
-        if (companyRegistration.getPassword().length() < 6) {
+        if (companyRegistration.getPassword() == null || companyRegistration.getPassword().length() < 6) {
             return new ValidationResult(false, getTranslation(Translations.Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
         }
         if (!companyRegistration.getPassword().equals(companyRegistration.getPasswordConfirmation())) {
