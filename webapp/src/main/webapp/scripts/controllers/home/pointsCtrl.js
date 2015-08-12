@@ -7,6 +7,8 @@ angular
                 $window.location.href = "/#/";
             }
             $scope.formData = {};
+            $scope.pointsConfiguration = {};
+            $scope.promotions = {};
             $scope.showMessage = false;
             $scope.isProcessing = false;
 
@@ -17,6 +19,31 @@ angular
                         $scope.showMessage = true;
                         $scope.message = $sce.trustAsHtml($translate.instant('YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY'));
                     }
+                });
+
+            ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
+                .success(function(data) {
+                    console.log(data);
+                    $scope.isProcessing = false;
+                    $scope.pointsConfiguration.pointsToEarn = data.object.pointsToEarn;
+                    $scope.pointsConfiguration.requiredAmount = data.object.requiredAmount;
+                })
+                .error(function(data) {
+                    $scope.isProcessing = false;
+                    $scope.message = $translate.instant('AN_ERROR_OCCURRED');
+                });
+
+            ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId)
+                .success(function(data) {
+                    console.log(data);
+                    $scope.isProcessing = false;
+                    $scope.promotions = data.object;
+                })
+                .error(function() {
+                    $scope.isProcessing = false;
+                    $scope.isError = true;
+                    $scope.message = $translate.instant('AN_ERROR_OCCURRED');
+                    $scope.showMessage = true;
                 });
 
             $scope.processForm = function() {
