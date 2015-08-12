@@ -13,11 +13,13 @@ import com.neerpoints.model.CompanyUser;
 import com.neerpoints.model.NotificationEmail;
 import com.neerpoints.model.PointsConfiguration;
 import com.neerpoints.model.PointsInCompany;
+import com.neerpoints.model.PromotionConfiguration;
 import com.neerpoints.repository.ClientRepository;
 import com.neerpoints.repository.CompanyClientMappingRepository;
 import com.neerpoints.repository.CompanyRepository;
 import com.neerpoints.repository.CompanyUserRepository;
 import com.neerpoints.repository.PointsConfigurationRepository;
+import com.neerpoints.repository.PromotionConfigurationRepository;
 import com.neerpoints.service.annotation.OnlyProduction;
 import com.neerpoints.service.model.CompanyRegistration;
 import com.neerpoints.service.model.ServiceResult;
@@ -42,11 +44,13 @@ public class CompanyService extends BaseService {
     private final ThreadContextService _threadContextService;
     private final SMSService _smsService;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
+    private final PromotionConfigurationRepository _promotionConfigurationRepository;
 
     @Autowired
     public CompanyService(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
         PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
-        Translations translations, SMSService smsService, CompanyClientMappingRepository companyClientMappingRepository) {
+        Translations translations, SMSService smsService, CompanyClientMappingRepository companyClientMappingRepository,
+        PromotionConfigurationRepository promotionConfigurationRepository) {
         super(translations, threadContextService);
         _companyRepository = companyRepository;
         _companyUserRepository = companyUserRepository;
@@ -55,6 +59,7 @@ public class CompanyService extends BaseService {
         _threadContextService = threadContextService;
         _smsService = smsService;
         _companyClientMappingRepository = companyClientMappingRepository;
+        _promotionConfigurationRepository = promotionConfigurationRepository;
     }
 
     public ServiceResult<Long> register(CompanyRegistration companyRegistration) {
@@ -207,9 +212,15 @@ public class CompanyService extends BaseService {
 
         PointsConfiguration pointsConfiguration = new PointsConfiguration();
         pointsConfiguration.setCompanyId(companyId);
-        pointsConfiguration.setPointsToEarn(0);
-        pointsConfiguration.setRequiredAmount(0);
+        pointsConfiguration.setPointsToEarn(1);
+        pointsConfiguration.setRequiredAmount(1);
         _pointsConfigurationRepository.insert(pointsConfiguration);
+
+        PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
+        promotionConfiguration.setCompanyId(companyId);
+        promotionConfiguration.setRequiredPoints(1000);
+        promotionConfiguration.setDescription(getTranslation(Translations.Message.DEFAULT_PROMOTION_MESSAGE));
+        _promotionConfigurationRepository.insert(promotionConfiguration);
 
         final String activationKey = RandomStringUtils.random(60, true, true);
         CompanyUser companyUser = new CompanyUser();
