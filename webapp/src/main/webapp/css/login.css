@@ -53,3 +53,10 @@ img.loading {
 a.to_right {
     float: right;
 }
+
+h1{
+    font-family: 'Lobster', cursive;
+    font-size: 70px;
+    text-align: center;
+    margin-bottom: 50px;
+}

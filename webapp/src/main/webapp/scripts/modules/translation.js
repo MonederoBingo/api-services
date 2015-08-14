@@ -50,7 +50,7 @@ angular.module('translation', ['pascalprecht.translate'])
             YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'You need to configure your points awarding strategy. ' +
             'Please go to <strong> Settings -> Points configuration</strong>  or click on <a href="/#/settings/points_configuration"> this link</a>.',
             YOU_MUST_CHANGE_YOUR_PASSWORD: 'You must change your password.',
-            SEND_SMS_WITH_PROMO: 'Send SMS to install Neerpoints.',
+            SEND_SMS_WITH_PROMO: 'Send SMS to install Leal Points.',
             CHANGE: 'Change'
 
         })
@@ -104,7 +104,7 @@ angular.module('translation', ['pascalprecht.translate'])
                 YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'No se ha configurado la cantidad de puntos a otorgar. ' +
                 'Favor de ir a <strong>Configuraciones -> Configuración de puntos</strong> o dar click en <a href="/#/settings/points_configuration"> este link</a>.',
                 YOU_MUST_CHANGE_YOUR_PASSWORD: 'Es necesario que cambie su contraseña.',
-                SEND_SMS_WITH_PROMO: 'Enviar SMS para instalar Neerpoints',
+                SEND_SMS_WITH_PROMO: 'Enviar SMS para instalar Leal Points',
                 CHANGE: 'Modificar'
             });
         $translateProvider.preferredLanguage('es');

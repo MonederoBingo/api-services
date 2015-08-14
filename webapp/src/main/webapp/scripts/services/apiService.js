@@ -9,11 +9,11 @@ angular
                     case "test.localhost":
                         url = "http://test.localhost:9090/";
                         break;
-                    case "www.neerpoints.com":
-                        url = "http://services.neerpoints.com/";
+                    case "www.lealpoints.com":
+                        url = "http://services.lealpoints.com/";
                         break;
-                    case "test.neerpoints.com":
-                        url = "http://test.services.neerpoints.com/";
+                    case "test.lealpoints.com":
+                        url = "http://test.services.lealpoints.com/";
                         break;
                     default :
                         url = "http://localhost:9090/";

@@ -1,8 +1,8 @@
 angular
     .module('app')
     .controller('promotionsCtrl', [
-        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate', 'PromotionsService',
-        function($scope, $http, ApiService, Session, $window, $translate, PromotionsService) {
+        '$scope', '$http', 'ApiService', 'Session', '$window', '$translate', 'PromotionsService', '$rootScope',
+        function($scope, $http, ApiService, Session, $window, $translate, PromotionsService, $rootScope) {
             if(Session.isClosed()) {
                 $window.location.href = "/#/";
             }
@@ -16,7 +16,6 @@ angular
                 $scope.isProcessing = true;
                 $scope.isError = false;
                 $scope.isWarning = false;
-                $scope.clientPoints = 0;
                 ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId + "/" + $scope.formData.phone, $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;

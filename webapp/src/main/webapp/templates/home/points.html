@@ -19,28 +19,31 @@
 
     <button type="submit" class="btn btn-lg btn-primary btn-block">{{'AWARD_POINTS' | translate}}</button>
 </form>
+
 <div ng-include="'/templates/common/messageHandling.html'"></div>
 
 <div class="info">
-    <div class="alert alert-info">{{'THE_CLIENT_WILL_EARN' | translate}}
+    <div class="strategy-info">
+        {{'THE_CLIENT_WILL_EARN' | translate}}
         <strong> {{pointsConfiguration.pointsToEarn}}</strong>
         {{'POINTS_LOWER' | translate}} {{'FOR_EVERY' | translate}}
         <strong> ${{pointsConfiguration.requiredAmount}}</strong>
-        {{'PURCHASE' | translate}}. [
+        {{'PURCHASE' | translate}}.
+        [
         <a class="alert-link" ui-sref="settings_points_configuration">{{'CHANGE' | translate}}</a>
         ]
     </div>
 
-    <div class="alert alert-info">
-        {{'PROMOTIONS' | translate}}
+    <div class="promotions-info">
+        [
+        <a class="alert-link" ui-sref="settings_promotions">{{'PROMOTIONS' | translate}}</a>
+        ]
         <ul>
             <li ng-repeat="promotion in promotions">
                 {{promotion.description}}
                 <strong>({{promotion.requiredPoints}} {{'REQUIRED_POINTS' | translate}})</strong>
             </li>
         </ul>
-        [
-        <a class="alert-link" ui-sref="settings_promotions">{{'CHANGE' | translate}}</a>
-        ]
     </div>
 </div>
+
