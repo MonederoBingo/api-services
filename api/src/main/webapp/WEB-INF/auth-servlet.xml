@@ -7,7 +7,7 @@
         http://www.springframework.org/schema/context/spring-context-4.0.xsd
         http://www.springframework.org/schema/mvc
         http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
-    <context:component-scan base-package="com.neerpoints.controller.auth, com.neerpoints.controller.auth.filter, com.neerpoints.repository,
-    com.neerpoints.service, com.neerpoints.context, com.neerpoints.util"/>
+    <context:component-scan base-package="com.lealpoints.controller.auth, com.lealpoints.controller.auth.filter, com.lealpoints.repository,
+    com.lealpoints.service, com.lealpoints.context, com.lealpoints.util"/>
     <mvc:annotation-driven />
 </beans>

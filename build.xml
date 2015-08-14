@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="neerpoints_master" default="all" basedir=".">
+<project name="lealpoints_master" default="all" basedir=".">
     <!--
       - Load the user's local build properties first to pick up any overridden values,
       - the load the defaults to set anything that wasn't overridden
@@ -7,9 +7,9 @@
     <property environment="env" />
     <property name="project.other_libs" value="libs/other"/>
     <property name="build" value="build"/>
-    <property name="src.migrations.util" value="migrations/src/main/java/com/neerpoints/migrations/util"/>
-    <property name="src.migrations.db" value="migrations/src/main/java/com/neerpoints/migrations/db"/>
-    <property name="src.migrations" value="migrations/src/main/java/com/neerpoints/migrations"/>
+    <property name="src.migrations.util" value="migrations/src/main/java/com/lealpoints/migrations/util"/>
+    <property name="src.migrations.db" value="migrations/src/main/java/com/lealpoints/migrations/db"/>
+    <property name="src.migrations" value="migrations/src/main/java/com/lealpoints/migrations"/>
 
     <path id="classpath">
         <fileset dir="${env.MAVEN_REPOSITORY}">
@@ -96,17 +96,17 @@
         <antcall target="drop_and_create_db"></antcall>
     </target>
     <target name="drop_and_create_db" description="Creates the database" depends="compile" if="agree_on_createdb">
-        <java classname="com.neerpoints.migrations.CreateDb" classpathref="classpath" />
+        <java classname="com.lealpoints.migrations.CreateDb" classpathref="classpath"/>
     </target>
     <target name="migrate" description="Updates the database" depends="compile">
-        <java classname="com.neerpoints.migrations.Migrate" classpathref="classpath"/>
+        <java classname="com.lealpoints.migrations.Migrate" classpathref="classpath"/>
     </target>
     <target name="prod_migrate" description="Updates the database" depends="compile">
-        <java classname="com.neerpoints.migrations.MigrateProduction" classpathref="classpath"/>
+        <java classname="com.lealpoints.migrations.MigrateProduction" classpathref="classpath"/>
     </target>
     <target name="create-migration" description="Creates a new file into migrations directory" depends="compile">
         <javac srcdir="${src.migrations}/util" destdir="${build}" classpathref="classpath"/>
-        <taskdef name="slugifytask" classname="com.neerpoints.migrations.util.SlugifyTask"
+        <taskdef name="slugifytask" classname="com.lealpoints.migrations.util.SlugifyTask"
                  classpathref="classpath"/>
         <input message="Type a short description of what migration does: " addproperty="migration.description"/>
         <slugifytask string="${migration.description}" propertyName="migration.description.slug"/>
