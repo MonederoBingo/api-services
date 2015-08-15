@@ -16,7 +16,7 @@ angular
                         url = "http://test.services.lealpoints.com/";
                         break;
                     default :
-                        url = "http://localhost:9090/";
+                        url = "http://"+$location.host()+":9090/";
                 }
                 return url;
             };
