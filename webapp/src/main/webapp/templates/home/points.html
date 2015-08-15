@@ -22,28 +22,25 @@
 
 <div ng-include="'/templates/common/messageHandling.html'"></div>
 
-<div class="info">
-    <div class="strategy-info">
-        {{'THE_CLIENT_WILL_EARN' | translate}}
-        <strong> {{pointsConfiguration.pointsToEarn}}</strong>
-        {{'POINTS_LOWER' | translate}} {{'FOR_EVERY' | translate}}
-        <strong> ${{pointsConfiguration.requiredAmount}}</strong>
-        {{'PURCHASE' | translate}}.
-        [
-        <a class="alert-link" ui-sref="settings_points_configuration">{{'CHANGE' | translate}}</a>
-        ]
-    </div>
 
-    <div class="promotions-info">
-        [
-        <a class="alert-link" ui-sref="settings_promotions">{{'PROMOTIONS' | translate}}</a>
-        ]
-        <ul>
-            <li ng-repeat="promotion in promotions">
-                {{promotion.description}}
-                <strong>({{promotion.requiredPoints}} {{'REQUIRED_POINTS' | translate}})</strong>
-            </li>
-        </ul>
+<div class="strategy-info">
+    {{'THE_CLIENT_WILL_EARN' | translate}}
+    <strong> {{pointsConfiguration.pointsToEarn}}</strong>
+    {{'POINTS_LOWER' | translate}} {{'FOR_EVERY' | translate}}
+    <strong> ${{pointsConfiguration.requiredAmount}}</strong>
+    {{'PURCHASE' | translate}}.
+    [
+    <a class="alert-link" ui-sref="settings_points_configuration">{{'CHANGE' | translate}}</a>
+    ]
+</div>
+<div></div>
+<div class="promotions-info">
+    [
+    <a class="alert-link" ui-sref="settings_promotions">{{'PROMOTIONS' | translate}}</a>
+    ]
+    <div ng-repeat="promotion in promotions">
+        * {{promotion.description}}
+        (<i>{{promotion.requiredPoints}} {{'POINTS' | translate}})</i>.
     </div>
 </div>
 
