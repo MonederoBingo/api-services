@@ -28,7 +28,7 @@ angular.module('translation', ['pascalprecht.translate'])
             ADD_NEW_CLIENT: 'Add new client',
             BACK_TO_LIST: 'Back to list',
             REGISTER: 'Register',
-            POINTS_CONFIGURATION: 'Points configuration',
+            POINTS_STRATEGY: 'Points strategy',
             LOGO: 'Logo',
             THE_CLIENT_WILL_EARN: 'The client will earn',
             FOR_EVERY: 'for every',
@@ -50,8 +50,10 @@ angular.module('translation', ['pascalprecht.translate'])
             YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'You need to configure your points awarding strategy. ' +
             'Please go to <strong> Settings -> Points configuration</strong>  or click on <a href="/#/settings/points_configuration"> this link</a>.',
             YOU_MUST_CHANGE_YOUR_PASSWORD: 'You must change your password.',
-            SEND_SMS_WITH_PROMO: 'Send SMS to install Leal Points.',
-            CHANGE: 'Change'
+            SEND_SMS_WITH_PROMO: 'Send SMS to client',
+            CHANGE: 'Change',
+            PROMOTION_LIST: 'Promotion list',
+            ENTER_INFORMATION: 'Enter information'
 
         })
             .translations('es', {
@@ -82,7 +84,7 @@ angular.module('translation', ['pascalprecht.translate'])
                 ADD_NEW_CLIENT: 'Agregar cliente nuevo',
                 BACK_TO_LIST: 'Regresar a la lista',
                 REGISTER: 'Registrar',
-                POINTS_CONFIGURATION: 'Configuración de puntos',
+                POINTS_STRATEGY: 'Estrategia de puntos',
                 LOGO: 'Logotipo',
                 THE_CLIENT_WILL_EARN: 'El cliente obtendrá',
                 FOR_EVERY: 'por cada',
@@ -104,8 +106,10 @@ angular.module('translation', ['pascalprecht.translate'])
                 YOU_HAVE_NOT_CONFIGURED_YOUR_POINTS_AWARDING_STRATEGY: 'No se ha configurado la cantidad de puntos a otorgar. ' +
                 'Favor de ir a <strong>Configuraciones -> Configuración de puntos</strong> o dar click en <a href="/#/settings/points_configuration"> este link</a>.',
                 YOU_MUST_CHANGE_YOUR_PASSWORD: 'Es necesario que cambie su contraseña.',
-                SEND_SMS_WITH_PROMO: 'Enviar SMS para instalar Leal Points',
-                CHANGE: 'Modificar'
+                SEND_SMS_WITH_PROMO: 'Enviar SMS al cliente',
+                CHANGE: 'Modificar',
+                PROMOTION_LIST: 'Lista de promociones',
+                ENTER_INFORMATION: 'Ingrese los datos'
             });
         $translateProvider.preferredLanguage('es');
     });
