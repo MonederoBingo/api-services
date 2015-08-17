@@ -34,7 +34,7 @@ public class ClientUserServiceTest {
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserService clientUserService = new ClientUserService(clientUserRepository, clientRepository, threadContextService, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
 
@@ -79,7 +79,7 @@ public class ClientUserServiceTest {
     public void testRegisterWithInvalidPhone() {
         final ClientUserService clientUserService = new ClientUserService(null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
 
@@ -144,7 +144,7 @@ public class ClientUserServiceTest {
                     return "";
                 }
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -210,7 +210,7 @@ public class ClientUserServiceTest {
                     return "";
                 }
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };

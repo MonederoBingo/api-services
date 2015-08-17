@@ -38,7 +38,7 @@ public class PointsConfigurationServiceTest {
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepositoryForUpdate();
         PointsConfigurationService pointsConfigurationService = new PointsConfigurationService(pointsConfigurationRepository, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };

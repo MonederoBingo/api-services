@@ -21,7 +21,7 @@ public class AuthenticationServiceTest {
         replay((companyUserRepository));
         AuthenticationService authenticationService = new AuthenticationService(null, null, companyUserRepository, null){
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -38,7 +38,7 @@ public class AuthenticationServiceTest {
         replay((companyUserRepository));
         AuthenticationService authenticationService = new AuthenticationService(null, null, companyUserRepository, null){
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -52,7 +52,7 @@ public class AuthenticationServiceTest {
     public void testIsValidCompanyApiKeyWhenWrongApiKey() throws Exception {
         AuthenticationService authenticationService = new AuthenticationService(null, null, null, null){
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -68,7 +68,7 @@ public class AuthenticationServiceTest {
         replay((clientUserRepository));
         AuthenticationService authenticationService = new AuthenticationService(null, null, null, clientUserRepository){
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -86,7 +86,7 @@ public class AuthenticationServiceTest {
         replay((clientUserRepository));
         AuthenticationService authenticationService = new AuthenticationService(null, null, null, clientUserRepository){
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -100,7 +100,7 @@ public class AuthenticationServiceTest {
     public void testIsValidClientApiKeyWhenWrongApiKey() throws Exception {
         AuthenticationService authenticationService = new AuthenticationService(null, null, null, null){
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };

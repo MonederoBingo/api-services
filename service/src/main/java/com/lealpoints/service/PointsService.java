@@ -10,9 +10,11 @@ import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.validation.PhoneValidatorService;
 import com.lealpoints.util.DateUtil;
 import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;
@@ -28,23 +30,25 @@ public class PointsService extends BaseService {
     private final ClientRepository _clientRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final ThreadContextService _threadContextService;
+    private final PhoneValidatorService _phoneValidatorService;
 
     @Autowired
     public PointsService(PointsRepository pointsRepository, PointsConfigurationRepository pointsConfigurationRepository,
         ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
-        Translations translations) {
+        Translations translations, PhoneValidatorService phoneValidatorService) {
         super(translations, threadContextService);
         _pointsRepository = pointsRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
         _threadContextService = threadContextService;
+        _phoneValidatorService = phoneValidatorService;
     }
 
     public ServiceResult<Float> awardPoints(PointsAwarding pointsAwarding) {
         try {
             ValidationResult validationResult = validateRegistration(pointsAwarding);
-            if (validationResult.isSuccess()) {
+            if (validationResult.isValid()) {
                 final QueryAgent queryAgent = _threadContextService.getQueryAgent();
                 queryAgent.beginTransaction();
                 float earnedPoints = awardPointsAndUpdateClientStatus(pointsAwarding);
@@ -106,6 +110,10 @@ public class PointsService extends BaseService {
     }
 
     private ValidationResult validateRegistration(PointsAwarding pointsAwarding) throws Exception {
+        final ValidationResult phoneValidation = _phoneValidatorService.validate(pointsAwarding.getPhone());
+        if (phoneValidation.isInvalid()) {
+            return phoneValidation;
+        }
         Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
         if (points != null) {
             return new ValidationResult(false, getTranslation(Translations.Message.SALE_KEY_ALREADY_EXISTS));

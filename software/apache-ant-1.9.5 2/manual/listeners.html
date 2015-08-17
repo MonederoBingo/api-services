@@ -148,8 +148,8 @@ listeners and loggers.</p>
 
 <h3><a name="MailLogger">MailLogger</a></h3>
 <p>The MailLogger captures all output logged through DefaultLogger (standard Ant
-output) and will send success and failure messages to unique e-mail lists, with
-control for turning off success or failure messages individually.</p>
+    output) and will send _isValid and failure messages to unique e-mail lists, with
+    control for turning off _isValid or failure messages individually.</p>
 
 <p>Properties controlling the operation of MailLogger:</p>
 <table border="1" cellspacing="1" width="100%" id="AutoNumber2">
@@ -203,8 +203,8 @@ control for turning off success or failure messages individually.</p>
     <td width="63%">No, default &quot;true&quot;</td>
   </tr>
   <tr>
-    <td width="337">MailLogger.success.notify </td>
-    <td width="63%">Send build success e-mails?</td>
+      <td width="337">MailLogger._isValid.notify</td>
+      <td width="63%">Send build _isValid e-mails?</td>
     <td width="63%">No, default &quot;true&quot;</td>
   </tr>
   <tr>
@@ -213,9 +213,9 @@ control for turning off success or failure messages individually.</p>
     <td width="63%">Yes, if failure mail is to be sent</td>
   </tr>
   <tr>
-    <td width="337">MailLogger.success.to </td>
-    <td width="63%">Address(es) to send success messages to, comma-separated</td>
-    <td width="63%">Yes, if success mail is to be sent</td>
+      <td width="337">MailLogger._isValid.to</td>
+      <td width="63%">Address(es) to send _isValid messages to, comma-separated</td>
+      <td width="63%">Yes, if _isValid mail is to be sent</td>
   </tr>
   <tr>
     <td width="337">MailLogger.failure.cc </td>
@@ -223,8 +223,8 @@ control for turning off success or failure messages individually.</p>
     <td width="63%">No</td>
   </tr>
   <tr>
-    <td width="337">MailLogger.success.cc </td>
-    <td width="63%">Address(es) to send success messages to carbon copy (cc), comma-separated</td>
+      <td width="337">MailLogger._isValid.cc</td>
+      <td width="63%">Address(es) to send _isValid messages to carbon copy (cc), comma-separated</td>
     <td width="63%">No</td>
   </tr>
   <tr>
@@ -233,8 +233,8 @@ control for turning off success or failure messages individually.</p>
     <td width="63%">No</td>
   </tr>
   <tr>
-    <td width="337">MailLogger.success.bcc </td>
-    <td width="63%">Address(es) to send success messages to blind carbon copy (bcc), comma-separated</td>
+      <td width="337">MailLogger._isValid.bcc</td>
+      <td width="63%">Address(es) to send _isValid messages to blind carbon copy (bcc), comma-separated</td>
     <td width="63%">No</td>
   </tr>
   <tr>
@@ -243,7 +243,7 @@ control for turning off success or failure messages individually.</p>
     <td width="63%">No, default &quot;Build Failure&quot;</td>
   </tr>
   <tr>
-    <td width="337">MailLogger.success.subject </td>
+      <td width="337">MailLogger._isValid.subject</td>
     <td width="63%">Subject of successful build</td>
     <td width="63%">No, default &quot;Build Success&quot;</td>
   </tr>
@@ -254,7 +254,7 @@ control for turning off success or failure messages individually.</p>
     <td width="63%">No, default is to send the full log output.</td>
   </tr>
   <tr>
-    <td width="337">MailLogger.success.body</td>
+      <td width="337">MailLogger._isValid.body</td>
     <td width="63%">Fixed body of the email for a successful
       build.  <em>Since Ant 1.8.0</em></td>
     <td width="63%">No, default is to send the full log output.</td>
@@ -439,7 +439,7 @@ is declared at all.</p>
 
 <h3><a name="TimestampedLogger">TimestampedLogger</a></h3>
 <p>
-  Acts like the default logger, except that the final success/failure message also includes
+    Acts like the default logger, except that the final _isValid/failure message also includes
   the time that the build completed. For example:
 </p>
 <pre>

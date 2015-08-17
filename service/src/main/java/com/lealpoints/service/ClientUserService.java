@@ -8,6 +8,7 @@ import com.lealpoints.model.ClientUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.ClientUserRepository;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.ClientLoginResult;
 import com.lealpoints.service.model.ClientUserLogin;
 import com.lealpoints.service.model.ClientUserRegistration;
@@ -43,7 +44,7 @@ public class ClientUserService extends BaseService {
     public ServiceResult<Long> register(ClientUserRegistration clientUserRegistration) {
         try {
             ValidationResult validationResult = validateRegistration(clientUserRegistration);
-            if (validationResult.isSuccess()) {
+            if (validationResult.isValid()) {
                 _threadContextService.getQueryAgent().beginTransaction();
                 long clientUserId = registerClientAndClientUser(clientUserRegistration);
                 _threadContextService.getQueryAgent().commitTransaction();

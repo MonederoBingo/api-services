@@ -497,7 +497,7 @@ extends <a href="../../../../../org/apache/tools/ant/taskdefs/MatchingTask.html"
 <tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><code><strong><a href="../../../../../org/apache/tools/ant/taskdefs/Javac.html#getTaskSuccess()">getTaskSuccess</a></strong>()</code>
-<div class="block">Get the result of the javac task (success or failure).</div>
+    <div class="block">Get the result of the javac task (_isValid or failure).</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -758,7 +758,7 @@ extends <a href="../../../../../org/apache/tools/ant/taskdefs/MatchingTask.html"
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><strong><a href="../../../../../org/apache/tools/ant/taskdefs/Javac.html#setUpdatedProperty(java.lang.String)">setUpdatedProperty</a></strong>(java.lang.String&nbsp;updatedProperty)</code>
-<div class="block">The property to set on compilation success.</div>
+    <div class="block">The property to set on compilation _isValid.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -1611,7 +1611,7 @@ extends <a href="../../../../../org/apache/tools/ant/taskdefs/MatchingTask.html"
 <li class="blockList">
 <h4>setUpdatedProperty</h4>
 <pre>public&nbsp;void&nbsp;setUpdatedProperty(java.lang.String&nbsp;updatedProperty)</pre>
-<div class="block">The property to set on compilation success.
+    <div class="block">The property to set on compilation _isValid.
  This property will not be set if the compilation
  fails, or if there are no files to compile.</div>
 <dl><dt><span class="strong">Parameters:</span></dt><dd><code>updatedProperty</code> - the property name to use.</dd><dt><span class="strong">Since:</span></dt>
@@ -1664,7 +1664,7 @@ extends <a href="../../../../../org/apache/tools/ant/taskdefs/MatchingTask.html"
 <li class="blockList">
 <h4>getTaskSuccess</h4>
 <pre>public&nbsp;boolean&nbsp;getTaskSuccess()</pre>
-<div class="block">Get the result of the javac task (success or failure).</div>
+    <div class="block">Get the result of the javac task (_isValid or failure).</div>
 <dl><dt><span class="strong">Returns:</span></dt><dd>true if compilation succeeded, or
          was not necessary, false if the compilation failed.</dd></dl>
 </li>

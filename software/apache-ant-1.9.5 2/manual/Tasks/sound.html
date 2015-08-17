@@ -44,14 +44,15 @@ on the classpath (javax.sound).
 
 
 <h3>Nested Elements</h3>
-<h4>success</h4>
+    <h4>_isValid</h4>
 <p>Specifies the sound to be played if the build succeeded.</p>
 <h4>fail</h4>
 <p>Specifies the sound to be played if the build failed.</p>
 
 <h3>Nested Element Parameters</h3>
 <p>
-The following attributes may be used on the <code>&lt;success&gt;</code> 
+    The following attributes may be used on the
+    <code>&lt;_isValid&gt;</code>
 and <code>&lt;fail&gt;</code> elements:</p>
 <table border="1" cellpadding="2" cellspacing="0">
   <tr>
@@ -88,7 +89,7 @@ will be logged.
 <pre>
 &lt;target name=&quot;fun&quot; if=&quot;fun&quot; unless=&quot;fun.done&quot;&gt;
   &lt;sound&gt;
-    &lt;success source=&quot;${user.home}/sounds/bell.wav&quot;/&gt;
+    &lt;_isValid source=&quot;${user.home}/sounds/bell.wav&quot;/&gt;
     &lt;fail source=&quot;${user.home}/sounds/ohno.wav&quot; loops=&quot;2&quot;/&gt;
   &lt;/sound&gt;
   &lt;property name=&quot;fun.done&quot; value=&quot;true&quot;/&gt;
@@ -107,7 +108,7 @@ more than once.
 <pre>
 &lt;target name=&quot;fun&quot; if=&quot;fun&quot; unless=&quot;fun.done&quot;&gt;
   &lt;sound&gt;
-    &lt;success source=&quot;//intranet/sounds/success&quot;/&gt;
+    &lt;_isValid source=&quot;//intranet/sounds/_isValid&quot;/&gt;
     &lt;fail source=&quot;//intranet/sounds/failure&quot;/&gt;
   &lt;/sound&gt;
   &lt;property name=&quot;fun.done&quot; value=&quot;true&quot;/&gt;

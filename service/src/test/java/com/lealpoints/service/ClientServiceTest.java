@@ -11,6 +11,8 @@ import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.validation.PhoneValidatorService;
 import com.lealpoints.util.Translations;
 import org.junit.Test;
 
@@ -26,9 +28,14 @@ public class ClientServiceTest {
         final QueryAgent queryAgent = createQueryAgent();
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         final CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepositoryForInsert();
-        final ClientService clientService = new ClientService(clientRepository, companyClientMappingRepository, threadContextService, null) {
+        PhoneValidatorService phoneValidationService = createStrictMock(PhoneValidatorService.class);
+        expect(phoneValidationService.validate(anyString())).andReturn(new ValidationResult(true));
+        replay(phoneValidationService);
+        final ClientService clientService =
+            new ClientService(clientRepository, companyClientMappingRepository, threadContextService, null, phoneValidationService) {
+
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -39,14 +46,18 @@ public class ClientServiceTest {
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals(1l, serviceResult.getObject());
-        verify(clientRepository, companyClientMappingRepository);
+        verify(clientRepository, companyClientMappingRepository, phoneValidationService);
     }
 
     @Test
     public void testRegisterWithInvalidPhone() {
-        final ClientService clientService = new ClientService(null, null, null, null) {
+        PhoneValidatorService phoneValidatorService = createStrictMock(PhoneValidatorService.class);
+        expect(phoneValidatorService.validate(anyString()))
+            .andReturn(new ValidationResult(false, Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name()));
+        replay(phoneValidatorService);
+        final ClientService clientService = new ClientService(null, null, null, null, phoneValidatorService) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -55,6 +66,7 @@ public class ClientServiceTest {
         ServiceResult<Long> serviceResult = clientService.register(clientRegistration);
         assertNotNull(serviceResult);
         assertEquals(Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
+        verify(phoneValidatorService);
     }
 
 
@@ -62,9 +74,12 @@ public class ClientServiceTest {
     public void testRegisterWhenThereIsAnExistentMapping() throws Exception {
         final ClientRepository clientRepository = createClientRepositoryWhenThereIsAnExistentMapping();
         final CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepositoryWhenThereIsAnExistentMapping();
-        final ClientService clientService = new ClientService(clientRepository, companyClientMappingRepository, null, null) {
+        final PhoneValidatorService phoneValidatorService = createNiceMock(PhoneValidatorService.class);
+        expect(phoneValidatorService.validate(anyString())).andReturn(new ValidationResult(true));
+        replay(phoneValidatorService);
+        final ClientService clientService = new ClientService(clientRepository, companyClientMappingRepository, null, null, phoneValidatorService) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -85,7 +100,7 @@ public class ClientServiceTest {
         expectedClients.add(createClient(100, "6391112233"));
         expectedClients.add(createClient(200, "6141112233"));
         final ClientRepository clientRepository = createClientRepositoryForGet(expectedClients);
-        final ClientService clientService = new ClientService(clientRepository, null, null, null);
+        final ClientService clientService = new ClientService(clientRepository, null, null, null, null);
 
         ServiceResult<List<CompanyClientMapping>> serviceResult = clientService.getByCompanyId(1);
         assertNotNull(serviceResult);
@@ -110,7 +125,7 @@ public class ClientServiceTest {
         client.setPhone("1234567890");
         companyClientMapping.setClient(client);
         final ClientRepository clientRepository = createClientRepositoryForGetByCompanyIDPhone(companyClientMapping);
-        final ClientService clientService = new ClientService(clientRepository, null, null, null);
+        final ClientService clientService = new ClientService(clientRepository, null, null, null, null);
 
         ServiceResult<CompanyClientMapping> serviceResult = clientService.getByCompanyIdPhone(1, "1234567890");
         assertNotNull(serviceResult);

@@ -6,9 +6,11 @@ import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.validation.PhoneValidatorService;
 import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,20 +23,22 @@ public class ClientService extends BaseService {
     private final ClientRepository _clientRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final ThreadContextService _threadContextService;
+    private final PhoneValidatorService _phoneValidatorService;
 
     @Autowired
     public ClientService(ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository,
-        ThreadContextService threadContextService, Translations translations) {
+        ThreadContextService threadContextService, Translations translations, PhoneValidatorService phoneValidatorService) {
         super(translations, threadContextService);
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
         _threadContextService = threadContextService;
+        _phoneValidatorService = phoneValidatorService;
     }
 
     public ServiceResult<Long> register(ClientRegistration clientRegistration) {
         try {
             ValidationResult validationResult = validateRegistration(clientRegistration);
-            if (validationResult.isSuccess()) {
+            if (validationResult.isValid()) {
                 _threadContextService.getQueryAgent().beginTransaction();
                 Client client = registerClientAndCompanyMapping(clientRegistration);
                 _threadContextService.getQueryAgent().commitTransaction();
@@ -79,8 +83,9 @@ public class ClientService extends BaseService {
     }
 
     private ValidationResult validateRegistration(ClientRegistration clientRegistration) throws Exception {
-        if (clientRegistration.getPhone().length() != 10) {
-            return new ValidationResult(false, getTranslation(Translations.Message.PHONE_MUST_HAVE_10_DIGITS));
+        final ValidationResult phoneValidation = _phoneValidatorService.validate(clientRegistration.getPhone());
+        if (phoneValidation.isInvalid()) {
+            return phoneValidation;
         }
         Client client = _clientRepository.getByPhone(clientRegistration.getPhone());
         if (client != null) {
@@ -90,6 +95,6 @@ public class ClientService extends BaseService {
                 return new ValidationResult(false, getTranslation(Translations.Message.THE_CLIENT_ALREADY_EXISTS));
             }
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true);
     }
 }

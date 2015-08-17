@@ -34,7 +34,7 @@ public class PromotionServiceTest {
             new PromotionService(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
                 threadContextService, null) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };

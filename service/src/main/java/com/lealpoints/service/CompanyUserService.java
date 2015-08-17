@@ -6,6 +6,7 @@ import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.repository.CompanyUserRepository;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyUserLogin;
 import com.lealpoints.service.model.CompanyUserPasswordChanging;
@@ -133,7 +134,7 @@ public class CompanyUserService extends BaseService {
     public ServiceResult changePassword(CompanyUserPasswordChanging passwordChanging) {
         try {
             final ValidationResult validationResult = validatePassword(passwordChanging);
-            if (validationResult.isSuccess()) {
+            if (validationResult.isValid()) {
                 final int updatedRows =
                     _companyUserRepository.updatePasswordByEmail(passwordChanging.getEmail(), passwordChanging.getNewPassword(), false);
                 if (updatedRows > 0) {

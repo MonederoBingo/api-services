@@ -55,7 +55,7 @@ public class PromotionConfigurationServiceTest {
         PromotionConfigurationService promotionConfigurationService =
             new PromotionConfigurationService(promotionConfigurationRepository, null, null, null, null) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -112,7 +112,7 @@ public class PromotionConfigurationServiceTest {
         ClientRepository clientRepository = createClientRepository(null);
         PromotionConfigurationService promotionConfigurationService = new PromotionConfigurationService(null, null, clientRepository, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -132,7 +132,7 @@ public class PromotionConfigurationServiceTest {
         PromotionConfigurationService promotionConfigurationService =
             new PromotionConfigurationService(null, companyClientMappingRepository, clientRepository, null, null) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -161,7 +161,7 @@ public class PromotionConfigurationServiceTest {
         PromotionConfigurationService promotionConfigurationService =
             new PromotionConfigurationService(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -184,7 +184,7 @@ public class PromotionConfigurationServiceTest {
         PromotionConfigurationService promotionConfigurationService =
             new PromotionConfigurationService(promotionConfigurationRepository, null, null, null, null) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };

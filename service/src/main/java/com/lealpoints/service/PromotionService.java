@@ -10,6 +10,7 @@ import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.repository.PromotionRepository;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.PromotionApplying;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.util.DateUtil;

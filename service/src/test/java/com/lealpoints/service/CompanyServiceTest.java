@@ -203,7 +203,7 @@ public class CompanyServiceTest {
         CompanyService companyService =
             new CompanyService(companyRepository, null, null, clientRepository, null, null, smsService, companyClientMappingRepository, null) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
 
@@ -222,7 +222,7 @@ public class CompanyServiceTest {
     public void testSendMobileAppAdMessageWhenIsNotProdEnv() throws Exception {
         CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
 
@@ -240,7 +240,7 @@ public class CompanyServiceTest {
     public void testGetSMSMessage() {
         CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
             }
         };
@@ -251,7 +251,7 @@ public class CompanyServiceTest {
 
         companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
             }
         };
@@ -261,7 +261,7 @@ public class CompanyServiceTest {
 
         companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
             }
         };
@@ -275,7 +275,7 @@ public class CompanyServiceTest {
     public void testGetSMSMessageWithInvalidTranslation() {
         CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
                     "much much much much much much more. %s";
             }
@@ -290,7 +290,7 @@ public class CompanyServiceTest {
 
         companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return
                     "You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much much " +
                     "much much much much much much much much much much much much much much much much much much much much more. %s";
@@ -316,7 +316,7 @@ public class CompanyServiceTest {
             }
 
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };

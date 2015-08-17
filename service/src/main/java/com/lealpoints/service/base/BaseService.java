@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.base;
 
 import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContextService;
@@ -14,7 +14,7 @@ public class BaseService {
         _threadContextService = threadContextService;
     }
 
-    String getTranslation(Translations.Message message) {
+    protected String getTranslation(Translations.Message message) {
         return _translations.getMessage(message);
     }
 

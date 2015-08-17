@@ -122,27 +122,30 @@ extends <a href="../../../../../org/apache/tools/ant/DefaultLogger.html" title="
     comma-separated</li>
     <li> MailLogger.failure.notify [default: true] - Send build failure
     e-mails?</li>
-    <li> MailLogger.success.notify [default: true] - Send build success
+      <li> MailLogger._isValid.notify [default: true] - Send build _isValid
     e-mails?</li>
     <li> MailLogger.failure.to [required if failure mail to be sent] - Address
     to send failure messages to</li>
-    <li> MailLogger.success.to [required if success mail to be sent] - Address
-    to send success messages to</li>
+      <li> MailLogger._isValid.to [required if _isValid mail to be sent] - Address
+          to send _isValid messages to
+      </li>
     <li> MailLogger.failure.cc [no default] - Address
     to send failure messages to carbon copy (cc)</li>
-    <li> MailLogger.success.to [no default] - Address
-    to send success messages to carbon copy (cc)</li>
+      <li> MailLogger._isValid.to [no default] - Address
+          to send _isValid messages to carbon copy (cc)
+      </li>
     <li> MailLogger.failure.bcc [no default] - Address
     to send failure messages to blind carbon copy (bcc)</li>
-    <li> MailLogger.success.bcc [no default] - Address
-    to send success messages to blind carbon copy (bcc)</li>
+      <li> MailLogger._isValid.bcc [no default] - Address
+          to send _isValid messages to blind carbon copy (bcc)
+      </li>
     <li> MailLogger.failure.subject [default: "Build Failure"] - Subject of
     failed build</li>
-    <li> MailLogger.success.subject [default: "Build Success"] - Subject of
+      <li> MailLogger._isValid.subject [default: "Build Success"] - Subject of
     successful build</li>
     <li> MailLogger.failure.body [default: none] - fixed text of
     mail body for a failed build, default is to send the logfile</li>
-    <li> MailLogger.success.body [default: none] - fixed text of
+      <li> MailLogger._isValid.body [default: none] - fixed text of
     mail body for a successful build, default is to send the logfile</li>
     <li> MailLogger.mimeType [default: text/plain] - MIME-Type of email</li>
     <li> MailLogger.charset [no default] - character set of email</li>

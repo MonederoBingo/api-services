@@ -13,33 +13,29 @@ import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.validation.PhoneValidatorService;
 import com.lealpoints.util.Translations;
+import org.easymock.EasyMockSupport;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-public class PointsServiceTest {
+public class PointsServiceTest extends EasyMockSupport {
 
     @Test
     public void testAwardPoints() throws Exception {
-        PointsRepository pointsRepository = createPointsRepository();
-        final PointsConfiguration pointsConfiguration = new PointsConfiguration();
-        pointsConfiguration.setRequiredAmount(100);
-        pointsConfiguration.setPointsToEarn(10);
-        PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepository(pointsConfiguration);
-        ClientRepository clientRepository = createClientRepository();
-        CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository();
-        final QueryAgent queryAgent = createQueryAgent();
-        ThreadContextService threadContextService = createThreadContextService(queryAgent);
         PointsService pointsService =
-            new PointsService(pointsRepository, pointsConfigurationRepository, clientRepository, companyClientMappingRepository, threadContextService,
-                null) {
+            new PointsService(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
+                createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()), null,
+                createPhoneValidatorService(true, "")) {
                 @Override
-                String getTranslation(Translations.Message message) {
+                protected String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
+        replayAll();
         PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setCompanyId(1);
         pointsAwarding.setPhone("12345");
@@ -51,30 +47,61 @@ public class PointsServiceTest {
         assertTrue(serviceResult.isSuccess());
         assertEquals(Translations.Message.POINTS_AWARDED.name() + ": " + 10.0, serviceResult.getMessage());
         assertEquals(10, serviceResult.getObject(), 0.00);
-        verify(pointsRepository, pointsConfigurationRepository, clientRepository, companyClientMappingRepository, queryAgent, threadContextService);
+        verifyAll();
     }
 
     @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
-        PointsRepository pointsRepository = createPointsRepositoryWhenTheSaleKeyExists();
-        PointsService pointsService = new PointsService(pointsRepository, null, null, null, null, null) {
+        PointsService pointsService = new PointsService(null, null, null, null, null, null,
+            createPhoneValidatorService(false, Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name())) {
+
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
+        replayAll();
+        ServiceResult<Float> serviceResult = pointsService.awardPoints(new PointsAwarding());
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
+        verifyAll();
+    }
+
+    @Test
+    public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
+        PointsService pointsService =
+            new PointsService(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null, null, createPhoneValidatorService(true, "")) {
+
+                @Override
+                protected String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+            };
+        replayAll();
         ServiceResult<Float> serviceResult = pointsService.awardPoints(new PointsAwarding());
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Translations.Message.SALE_KEY_ALREADY_EXISTS.name(), serviceResult.getMessage());
-        verify(pointsRepository);
+        verifyAll();
+    }
+
+    private PhoneValidatorService createPhoneValidatorService(boolean isValid, String message) {
+        PhoneValidatorService phoneValidatorService = createStrictMock(PhoneValidatorService.class);
+        expect(phoneValidatorService.validate(anyString())).andReturn(new ValidationResult(isValid, message));
+        return phoneValidatorService;
+    }
+
+    private PointsConfiguration createPointsConfiguration(int pointsToEarn, int requiredAmount) {
+        final PointsConfiguration pointsConfiguration = new PointsConfiguration();
+        pointsConfiguration.setRequiredAmount(requiredAmount);
+        pointsConfiguration.setPointsToEarn(pointsToEarn);
+        return pointsConfiguration;
     }
 
     private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
-
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(1);
-        replay(threadContextService);
         return threadContextService;
     }
 
@@ -84,7 +111,6 @@ public class PointsServiceTest {
         expectLastCall().times(1);
         queryAgent.commitTransaction();
         expectLastCall().times(1);
-        replay(queryAgent);
         return queryAgent;
     }
 
@@ -93,21 +119,18 @@ public class PointsServiceTest {
         expect(companyClientMappingRepository.insertIfDoesNotExist(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
         expect(companyClientMappingRepository.updatePoints((CompanyClientMapping) anyObject())).andReturn(1);
-        replay(companyClientMappingRepository);
         return companyClientMappingRepository;
     }
 
     private ClientRepository createClientRepository() throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
         expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(new Client());
-        replay(clientRepository);
         return clientRepository;
     }
 
     private PointsConfigurationRepository createPointsConfigurationRepository(PointsConfiguration pointsConfiguration) throws Exception {
         PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
         expect(pointsConfigurationRepository.getByCompanyId(anyLong())).andReturn(pointsConfiguration);
-        replay(pointsConfigurationRepository);
         return pointsConfigurationRepository;
     }
 
@@ -115,21 +138,12 @@ public class PointsServiceTest {
         PointsRepository pointsRepository = createMock(PointsRepository.class);
         expect(pointsRepository.insert((Points) anyObject())).andReturn(1l);
         expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString())).andReturn(null);
-        replay(pointsRepository);
         return pointsRepository;
     }
 
     private PointsRepository createPointsRepositoryWhenTheSaleKeyExists() throws Exception {
         PointsRepository pointsRepository = createMock(PointsRepository.class);
         expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString())).andReturn(new Points());
-        replay(pointsRepository);
-        return pointsRepository;
-    }
-
-    private PointsRepository createPointsRepositoryWhenNotEnoughSaleAmount() throws Exception {
-        PointsRepository pointsRepository = createMock(PointsRepository.class);
-        expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString())).andReturn(null);
-        replay(pointsRepository);
         return pointsRepository;
     }
 }

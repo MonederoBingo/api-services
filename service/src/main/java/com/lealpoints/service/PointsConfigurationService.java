@@ -3,6 +3,7 @@ package com.lealpoints.service;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.PointsConfigurationRepository;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;

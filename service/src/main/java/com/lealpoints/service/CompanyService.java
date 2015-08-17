@@ -21,6 +21,7 @@ import com.lealpoints.repository.CompanyUserRepository;
 import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.service.annotation.OnlyProduction;
+import com.lealpoints.service.base.BaseService;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
@@ -65,7 +66,7 @@ public class CompanyService extends BaseService {
     public ServiceResult<Long> register(CompanyRegistration companyRegistration) {
         try {
             ValidationResult validationResult = validateRegistration(companyRegistration);
-            if (validationResult.isSuccess()) {
+            if (validationResult.isValid()) {
                 _threadContextService.getQueryAgent().beginTransaction();
                 long companyId = registerAndInitializeCompany(companyRegistration);
                 _threadContextService.getQueryAgent().commitTransaction();

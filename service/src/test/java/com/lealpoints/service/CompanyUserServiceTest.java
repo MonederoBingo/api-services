@@ -50,7 +50,7 @@ public class CompanyUserServiceTest {
     public void testUserLoginWithoutEmail() throws Exception {
         final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -68,7 +68,7 @@ public class CompanyUserServiceTest {
     public void testUserLoginWithoutPassword() throws Exception {
         final CompanyUserService companyUserService = new CompanyUserService(null, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -88,7 +88,7 @@ public class CompanyUserServiceTest {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryIsNotActive(companyUser);
         final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -113,7 +113,7 @@ public class CompanyUserServiceTest {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
         final CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -136,7 +136,7 @@ public class CompanyUserServiceTest {
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, threadContextService, null, null, null) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -150,7 +150,7 @@ public class CompanyUserServiceTest {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendActivation();
         CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, createCompanyService()) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -172,7 +172,7 @@ public class CompanyUserServiceTest {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingActivationWhenEmailDoesNotExist();
         CompanyUserService companyUserService = new CompanyUserService(companyUserRepository, null, null, null, createCompanyService()) {
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -192,7 +192,7 @@ public class CompanyUserServiceTest {
             }
 
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -213,7 +213,7 @@ public class CompanyUserServiceTest {
             }
 
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -237,7 +237,7 @@ public class CompanyUserServiceTest {
             }
 
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -260,7 +260,7 @@ public class CompanyUserServiceTest {
             }
 
             @Override
-            String getTranslation(Translations.Message message) {
+            protected String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
