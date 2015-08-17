@@ -26,7 +26,6 @@ angular
                 $scope.isProcessing = true;
                 ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId)
                     .success(function(data) {
-                        console.log(data);
                         $scope.isProcessing = false;
                         $scope.promotions = data.object;
                     })

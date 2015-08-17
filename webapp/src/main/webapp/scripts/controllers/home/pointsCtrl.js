@@ -11,7 +11,8 @@ angular
             $scope.promotions = {};
             $scope.showMessage = false;
             $scope.isProcessing = false;
-
+            $scope.points = 0;
+            $scope.mapping = {};
             ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     if(data.object.pointsToEarn == 0 ) {
@@ -47,6 +48,7 @@ angular
                 });
 
             $scope.processForm = function() {
+                $("#send_button").show();
                 $scope.isWarning = false;
                 $scope.isError = false;
                 $scope.formData.companyId = Session.user.companyId;
@@ -61,13 +63,46 @@ angular
                             if(data.object <= 0) {
                                 $scope.isWarning = true;
                             }
+                            getClient();
+                            $scope.formData.phone = '';
+                            $scope.formData.saleAmount = '';
+                            $scope.formData.saleKey = '';
                         } else {
                             $scope.message = data.message;
                             $scope.isError = true;
                         }
-                        $scope.formData.phone = '';
-                        $scope.formData.saleAmount = '';
-                        $scope.formData.saleKey = '';
+                        $scope.showMessage = true;
+                    })
+                    .error(function() {
+                        $scope.isProcessing = false;
+                        $scope.isError = true;
+                        $scope.message = $translate.instant('AN_ERROR_OCCURRED');
+                        $scope.showMessage = true;
+                    });
+            };
+
+            function getClient() {
+                ApiService.callApi('GET', 'clients/' + Session.user.companyId + '/' + $scope.formData.phone)
+                    .success(function(data) {
+                        $scope.mapping = data.object;
+                    });
+            }
+
+            $scope.sendSMSMessage = function() {
+                $scope.showMessage = false;
+                $scope.isProcessing = true;
+                $scope.isError = false;
+                $("#send_button").hide();
+                ApiService.callApi('PUT', 'companies/' + Session.user.companyId + "/" + $scope.mapping.client.phone + '/send_promo_sms')
+                    .success(function(data) {
+                        console.log(data);
+                        $scope.isProcessing = false;
+                        if (data.success) {
+                            $scope.message = data.message;
+                        } else {
+                            $scope.message = data.message;
+                            $scope.isError = true;
+                        }
                         $scope.showMessage = true;
                     })
                     .error(function() {

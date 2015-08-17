@@ -1,6 +1,6 @@
 <!--scripts/controllers/home/pointsCtrl.js-->
 <form class="form-login" ng-submit="processForm()">
-    <h4 class="form-login-heading">{{'AWARD_POINTS' | translate}}</h4>
+    <center><h4 class="form-login-heading">{{'ENTER_INFORMATION' | translate}}</h4></center>
 
     <label for="phone" class="sr-only">{{'PHONE_NUMBER' | translate}}</label>
     <input type="text" name="phone" id="phone" class="form-control" placeholder="{{'PHONE_NUMBER' | translate}}"
@@ -22,6 +22,9 @@
 
 <div ng-include="'/templates/common/messageHandling.html'"></div>
 
+<form class="form-login" ng-show="mapping.client.canReceivePromotionSms && mapping.points > 0" ng-submit="sendSMSMessage()">
+    <button id="send_button" type="submit" class="btn btn-lg btn-success btn-block">{{'SEND_SMS_WITH_PROMO' | translate}}</button>
+</form>
 
 <div class="strategy-info">
     {{'THE_CLIENT_WILL_EARN' | translate}}
@@ -40,7 +43,9 @@
     ]
     <div ng-repeat="promotion in promotions">
         * {{promotion.description}}
-        (<i>{{promotion.requiredPoints}} {{'POINTS' | translate}})</i>.
+        (
+        <i>{{promotion.requiredPoints}} {{'POINTS' | translate}})</i>
+        .
     </div>
 </div>
 
