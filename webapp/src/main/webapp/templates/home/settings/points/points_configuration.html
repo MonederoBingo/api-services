@@ -1,30 +1,32 @@
-<ul class="nav nav-tabs">
-    <li role="presentation" class="active">
-        <a ui-sref="settings_points_configuration">{{'POINTS_STRATEGY' | translate}}</a>
-    </li>
-    <li role="presentation">
-        <a ui-sref="settings_promotions">{{'PROMOTION_LIST' | translate}}</a>
-    </li>
-    <li role="presentation">
-        <a ui-sref="settings_my_logo">{{'LOGO' | translate}}</a>
-    </li>
-</ul>
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="active">
+            <a ui-sref="settings_points_configuration">{{'POINTS_STRATEGY' | translate}}</a>
+        </li>
+        <li role="presentation">
+            <a ui-sref="settings_promotions">{{'PROMOTION_LIST' | translate}}</a>
+        </li>
+        <li role="presentation">
+            <a ui-sref="settings_my_logo">{{'LOGO' | translate}}</a>
+        </li>
+    </ul>
 
-<form class="form-login" ng-submit="processForm()">
-    <label for="points_to_earn">{{'THE_CLIENT_WILL_EARN' | translate}}</label>
-    <div class="input-group">
-        <input type="text" name="points_to_earn" id="points_to_earn" class="form-control" placeholder="# {{'POINTS_LOWER' | translate}}"
-                required="" autofocus="" ng-model="formData.pointsToEarn">
-        <span class="input-group-addon">{{'POINTS_LOWER' | translate}}</span>
-    </div>
-    <label for="required_amount">{{'FOR_EVERY' | translate}}</label>
-    <div class="input-group">
-        <span class="input-group-addon">$</span>
-        <input type="text" name="required_amount" id="required_amount" class="form-control" placeholder="$ purchase"
-                required="" ng-model="formData.requiredAmount">
-        <span class="input-group-addon">{{'PURCHASE' | translate}}</span>
-    </div>
-    <button type="submit" class="btn btn-lg btn-primary btn-block">{{'SAVE' | translate}}</button>
-</form>
-<br />
-<div ng-include="'/templates/common/messageHandling.html'"></div>
+    <form class="form-login" ng-submit="processForm()">
+        <label for="points_to_earn">{{'THE_CLIENT_WILL_EARN' | translate}}</label>
+        <div class="input-group">
+            <input type="text" name="points_to_earn" id="points_to_earn" class="form-control" placeholder="# {{'POINTS_LOWER' | translate}}"
+                    required="" autofocus="" ng-model="formData.pointsToEarn">
+            <span class="input-group-addon">{{'POINTS_LOWER' | translate}}</span>
+        </div>
+        <label for="required_amount">{{'FOR_EVERY' | translate}}</label>
+        <div class="input-group">
+            <span class="input-group-addon">$</span>
+            <input type="text" name="required_amount" id="required_amount" class="form-control" placeholder="$ purchase"
+                    required="" ng-model="formData.requiredAmount">
+            <span class="input-group-addon">{{'PURCHASE' | translate}}</span>
+        </div>
+        <button type="submit" class="btn btn-lg btn-primary btn-block">{{'SAVE' | translate}}</button>
+    </form>
+    <br />
+    <div ng-include="'/templates/common/messageHandling.html'"></div>
+</div>

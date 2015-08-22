@@ -1,51 +1,53 @@
-<!--scripts/controllers/home/pointsCtrl.js-->
-<form class="form-login" ng-submit="processForm()">
-    <center><h4 class="form-login-heading">{{'ENTER_INFORMATION' | translate}}</h4></center>
+<div class="container">
+    <!--scripts/controllers/home/pointsCtrl.js-->
+    <form class="form-login" ng-submit="processForm()">
+        <center><h4 class="form-login-heading">{{'ENTER_INFORMATION' | translate}}</h4></center>
 
-    <label for="phone" class="sr-only">{{'PHONE_NUMBER' | translate}}</label>
-    <input type="text" name="phone" id="phone" class="form-control" placeholder="{{'PHONE_NUMBER' | translate}}"
-            required title="{{'PHONE_NUMBER' | translate}}" autofocus ng-model="formData.phone" />
+        <label for="phone" class="sr-only">{{'PHONE_NUMBER' | translate}}</label>
+        <input type="text" name="phone" id="phone" class="form-control" placeholder="{{'PHONE_NUMBER' | translate}}"
+                required title="{{'PHONE_NUMBER' | translate}}" autofocus ng-model="formData.phone" />
 
-    <label for="sale_amount" class="sr-only">{{'SALE_AMOUNT' | translate}}</label>
-    <div class="input-group">
-        <span class="input-group-addon">$</span>
-        <input type="text" name="sale_amount" id="sale_amount" class="form-control" placeholder="{{'SALE_AMOUNT' | translate}}"
-                required title="{{'SALE_AMOUNT' | translate}}" ng-model="formData.saleAmount" />
+        <label for="sale_amount" class="sr-only">{{'SALE_AMOUNT' | translate}}</label>
+        <div class="input-group">
+            <span class="input-group-addon">$</span>
+            <input type="text" name="sale_amount" id="sale_amount" class="form-control" placeholder="{{'SALE_AMOUNT' | translate}}"
+                    required title="{{'SALE_AMOUNT' | translate}}" ng-model="formData.saleAmount" />
+        </div>
+
+        <label for="sale_key" class="sr-only">{{'SALE_KEY' | translate}}</label>
+        <input type="text" name="sale_key" id="sale_key" class="form-control" placeholder="{{'SALE_KEY' | translate}}"
+                required title="{{'SALE_KEY' | translate}}" ng-model="formData.saleKey" />
+
+        <button type="submit" class="btn btn-lg btn-primary btn-block">{{'AWARD_POINTS' | translate}}</button>
+    </form>
+
+    <div ng-include="'/templates/common/messageHandling.html'"></div>
+
+    <form class="form-login" ng-show="mapping.client.canReceivePromotionSms && mapping.points > 0" ng-submit="sendSMSMessage()">
+        <button id="send_button" type="submit" class="btn btn-lg btn-success btn-block">{{'SEND_SMS_WITH_PROMO' | translate}}</button>
+    </form>
+
+    <div class="strategy-info">
+        {{'THE_CLIENT_WILL_EARN' | translate}}
+        <strong> {{pointsConfiguration.pointsToEarn}}</strong>
+        {{'POINTS_LOWER' | translate}} {{'FOR_EVERY' | translate}}
+        <strong> ${{pointsConfiguration.requiredAmount}}</strong>
+        {{'PURCHASE' | translate}}.
+        [
+        <a class="alert-link" ui-sref="settings_points_configuration">{{'CHANGE' | translate}}</a>
+        ]
+    </div>
+    <div></div>
+    <div class="promotions-info">
+        [
+        <a class="alert-link" ui-sref="settings_promotions">{{'PROMOTIONS' | translate}}</a>
+        ]
+        <div ng-repeat="promotion in promotions">
+            * {{promotion.description}}
+            (
+            <i>{{promotion.requiredPoints}} {{'POINTS' | translate}})</i>
+            .
+        </div>
     </div>
 
-    <label for="sale_key" class="sr-only">{{'SALE_KEY' | translate}}</label>
-    <input type="text" name="sale_key" id="sale_key" class="form-control" placeholder="{{'SALE_KEY' | translate}}"
-            required title="{{'SALE_KEY' | translate}}" ng-model="formData.saleKey" />
-
-    <button type="submit" class="btn btn-lg btn-primary btn-block">{{'AWARD_POINTS' | translate}}</button>
-</form>
-
-<div ng-include="'/templates/common/messageHandling.html'"></div>
-
-<form class="form-login" ng-show="mapping.client.canReceivePromotionSms && mapping.points > 0" ng-submit="sendSMSMessage()">
-    <button id="send_button" type="submit" class="btn btn-lg btn-success btn-block">{{'SEND_SMS_WITH_PROMO' | translate}}</button>
-</form>
-
-<div class="strategy-info">
-    {{'THE_CLIENT_WILL_EARN' | translate}}
-    <strong> {{pointsConfiguration.pointsToEarn}}</strong>
-    {{'POINTS_LOWER' | translate}} {{'FOR_EVERY' | translate}}
-    <strong> ${{pointsConfiguration.requiredAmount}}</strong>
-    {{'PURCHASE' | translate}}.
-    [
-    <a class="alert-link" ui-sref="settings_points_configuration">{{'CHANGE' | translate}}</a>
-    ]
 </div>
-<div></div>
-<div class="promotions-info">
-    [
-    <a class="alert-link" ui-sref="settings_promotions">{{'PROMOTIONS' | translate}}</a>
-    ]
-    <div ng-repeat="promotion in promotions">
-        * {{promotion.description}}
-        (
-        <i>{{promotion.requiredPoints}} {{'POINTS' | translate}})</i>
-        .
-    </div>
-</div>
-

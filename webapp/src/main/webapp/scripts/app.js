@@ -7,8 +7,21 @@ angular
             $urlRouteProvider.otherwise('/');
 
             $stateProvider
-                .state('signin', {
+                .state('welcome', {
                     url: '/',
+                    views: {
+                        content: {
+                            templateUrl: '/templates/login/welcome.html',
+                            controller: 'signinCtrl'
+                        },
+                        footer: {
+                            templateUrl: '/templates/home/footer.html',
+                            controller: 'footerCtrl'
+                        }
+                    }
+                })
+                .state('signin', {
+                    url: '/signin',
                     views: {
                         content: {
                             templateUrl: '/templates/login/signin.html',
