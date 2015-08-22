@@ -61,7 +61,7 @@ angular.module('translation', ['pascalprecht.translate'])
                 PLEASE_SIGNIN: 'Inicio sesión',
                 SIGNUP: 'Registrarse',
                 PLEASE_SIGNUP: 'Favor de registrarse',
-                COMPANY_NAME: 'Nombre de la empresa',
+                COMPANY_NAME: 'Nombre de su empresa',
                 EMAIL: 'Correo electrónico',
                 NEW_PASSWORD: 'Nueva contraseña',
                 CONFIRM_PASSWORD: 'Confirmar contraseña',
