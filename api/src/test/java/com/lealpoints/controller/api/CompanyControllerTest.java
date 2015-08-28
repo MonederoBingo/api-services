@@ -39,6 +39,7 @@ public class CompanyControllerTest {
         assertTrue(serviceResult.isSuccess());
         assertEquals(Translations.Message.YOUR_LOGO_WAS_UPDATED.name(), serviceResult.getMessage());
         verify(companyService);
+        throw new RuntimeException();
     }
 
     @Test

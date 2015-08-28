@@ -41,14 +41,14 @@ public class ClientUserService extends BaseService {
         _smsService = smsService;
     }
 
-    public ServiceResult<Long> register(ClientUserRegistration clientUserRegistration) {
+    public ServiceResult<String> register(ClientUserRegistration clientUserRegistration) {
         try {
             ValidationResult validationResult = validateRegistration(clientUserRegistration);
             if (validationResult.isValid()) {
                 _threadContextService.getQueryAgent().beginTransaction();
-                long clientUserId = registerClientAndClientUser(clientUserRegistration);
+                String key = registerClientAndClientUser(clientUserRegistration);
                 _threadContextService.getQueryAgent().commitTransaction();
-                return new ServiceResult<>(true, "", clientUserId);
+                return new ServiceResult<>(true, "", key);
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());
             }
@@ -97,18 +97,19 @@ public class ClientUserService extends BaseService {
         }
     }
 
-    private long registerClientAndClientUser(ClientUserRegistration clientUserRegistration) throws Exception {
+    private String registerClientAndClientUser(ClientUserRegistration clientUserRegistration) throws Exception {
         Client client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhone(), true);
         ClientUser clientUser = _clientUserRepository.getByClientId(client.getClientId());
+        final String smsKey = generateAndSendRegistrationSMS(clientUserRegistration.getPhone());
         if (clientUser == null) {
             clientUser = new ClientUser();
             clientUser.setClientId(client.getClientId());
-            clientUser.setSmsKey(generateAndSendRegistrationSMS(clientUserRegistration.getPhone()));
-            return _clientUserRepository.insert(clientUser);
+            clientUser.setSmsKey(smsKey);
+            _clientUserRepository.insert(clientUser);
         } else {
-            _clientUserRepository.updateSmsKey(generateAndSendRegistrationSMS(clientUserRegistration.getPhone()), clientUserRegistration.getPhone());
-            return clientUser.getClientUserId();
+            _clientUserRepository.updateSmsKey(smsKey, clientUserRegistration.getPhone());
         }
+        return smsKey;
     }
 
     private ClientUser authenticateUsingPhone(ClientUserLogin clientUserLogin) throws Exception {

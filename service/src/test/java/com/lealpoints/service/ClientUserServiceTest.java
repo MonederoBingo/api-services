@@ -40,14 +40,14 @@ public class ClientUserServiceTest {
 
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
-                return "";
+                return "123456";
             }
         };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
         clientUserRegistration.setPhone("1234567890");
-        ServiceResult<Long> serviceResult = clientUserService.register(clientUserRegistration);
+        ServiceResult<String> serviceResult = clientUserService.register(clientUserRegistration);
         assertNotNull(serviceResult);
-        assertTrue(serviceResult.getObject() > 0);
+        assertEquals("123456", serviceResult.getObject());
         verify(clientRepository, clientRepository);
     }
 
@@ -64,14 +64,14 @@ public class ClientUserServiceTest {
         ClientUserService clientUserService = new ClientUserService(clientUserRepository, clientRepository, threadContextService, null, null){
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
-                return "";
+                return "123456";
             }
         };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
         clientUserRegistration.setPhone("1234567890");
-        ServiceResult<Long> serviceResult = clientUserService.register(new ClientUserRegistration());
+        ServiceResult<String> serviceResult = clientUserService.register(new ClientUserRegistration());
         assertNotNull(serviceResult);
-        assertEquals(2, (long) serviceResult.getObject());
+        assertEquals("123456", serviceResult.getObject());
         verify(clientRepository, clientRepository);
     }
 
@@ -85,12 +85,12 @@ public class ClientUserServiceTest {
 
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
-                return "";
+                return "123456";
             }
         };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
         clientUserRegistration.setPhone("123");
-        ServiceResult<Long> serviceResult = clientUserService.register(clientUserRegistration);
+        ServiceResult<String> serviceResult = clientUserService.register(clientUserRegistration);
         assertNotNull(serviceResult);
         assertEquals(Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
     }

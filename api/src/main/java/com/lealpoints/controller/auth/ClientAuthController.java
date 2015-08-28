@@ -31,12 +31,13 @@ public class ClientAuthController extends AbstractApiController{
 
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult> register(@RequestBody ClientUserRegistration clientUserRegistration, HttpServletRequest servletRequest) {
+    public ResponseEntity<ServiceResult<String>> register(@RequestBody ClientUserRegistration clientUserRegistration,
+        HttpServletRequest servletRequest) {
         try {
-            ServiceResult serviceResult = _clientUserService.register(clientUserRegistration);
+            ServiceResult<String> serviceResult = _clientUserService.register(clientUserRegistration);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<String>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

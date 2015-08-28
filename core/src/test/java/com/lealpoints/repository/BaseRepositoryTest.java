@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.Statement;
+import com.lealpoints.context.PropertyManager;
+import com.lealpoints.db.DataSourceFactory;
 import com.lealpoints.db.QueryAgent;
-import com.lealpoints.db.UnitTestDatabaseManager;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -17,9 +18,13 @@ public class BaseRepositoryTest {
 
     private QueryAgent _queryAgent;
 
+    static {
+        PropertyManager.reloadConfiguration();
+    }
+
     @Before
     public void setUpBase() throws Exception {
-        _queryAgent = new QueryAgent(new UnitTestDatabaseManager());
+        _queryAgent = new QueryAgent(DataSourceFactory.getUnitTestDataSource());
         _queryAgent.beginTransaction();
     }
 

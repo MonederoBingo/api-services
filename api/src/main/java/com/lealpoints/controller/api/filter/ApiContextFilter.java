@@ -78,7 +78,7 @@ public class ApiContextFilter implements Filter {
             case "test.services.lealpoints.com":
                 return Environment.UAT;
             case "test.localhost":
-                return Environment.DEV_TEST;
+                return Environment.FUNCTIONAL_TEST;
             default:
                 return Environment.DEV;
         }

@@ -17,13 +17,13 @@ public class ClientAuthControllerTest {
 
     @Test
     public void testRegisterClient() throws Exception {
-        final ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "1");
+        final ServiceResult<String> expectedServiceResult = new ServiceResult<>(true, "1");
         final ClientUserService clientUserService =  createClientUserServiceForRegister(expectedServiceResult);
         final ClientAuthController clientAuthController = new ClientAuthController(clientUserService);
 
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
         clientUserRegistration.setPhone("6141112233");
-        ResponseEntity<ServiceResult> responseEntity = clientAuthController.register(clientUserRegistration, null);
+        ResponseEntity<ServiceResult<String>> responseEntity = clientAuthController.register(clientUserRegistration, null);
         assertNotNull(responseEntity);
         ServiceResult actualServiceResults = responseEntity.getBody();
         assertNotNull(actualServiceResults);
@@ -80,7 +80,7 @@ public class ClientAuthControllerTest {
         return clientUserService;
     }
 
-    private ClientUserService createClientUserServiceForRegister(ServiceResult<Long> expectedServiceResult) throws Exception {
+    private ClientUserService createClientUserServiceForRegister(ServiceResult<String> expectedServiceResult) throws Exception {
         final ClientUserService clientUserService = EasyMock.createMock(ClientUserService.class);
         expect(clientUserService.register((ClientUserRegistration) anyObject())).andReturn(expectedServiceResult);
         replay(clientUserService);
