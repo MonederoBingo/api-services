@@ -2,9 +2,7 @@ package com.lealpoints.context;
 
 import javax.sql.DataSource;
 import com.lealpoints.db.DataSourceFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 public enum Environment {
     DEV(DataSourceFactory.getDevDataSource(), "src/main/webapp/images/dev/", "http://localhost:8080/#/"),
     FUNCTIONAL_TEST(DataSourceFactory.getFunctionalTestDataSource(), "src/main/webapp/images/test/", "http://test.localhost:8080/#/"),
