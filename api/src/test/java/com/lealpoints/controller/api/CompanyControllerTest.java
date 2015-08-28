@@ -64,7 +64,7 @@ public class CompanyControllerTest {
     @Test
     public void testSendMobileAppAdMessage() {
         CompanyService companyService = createStrictMock(CompanyService.class);
-        expect(companyService.sendMobileAppAdMessage(0, anyString())).andReturn(new ServiceResult(true, ""));
+        expect(companyService.sendMobileAppAdMessage(anyInt(), anyString())).andReturn(new ServiceResult(true, ""));
         replay(companyService);
         CompanyController clientController = new CompanyController(companyService);
         final ResponseEntity<ServiceResult> responseEntity = clientController.sendMobileAppAdMessage(0, "6623471507");
