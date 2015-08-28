@@ -1,7 +1,7 @@
 package com.lealpoints.db;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,37 +11,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueryAgent {
-    private final DatabaseManager _databaseManager;
+    private final transient DataSource _dataSource;
     private transient Connection _connection = null;
     private boolean _isInTransaction;
 
-    public QueryAgent(DatabaseManager databaseManager) {
-        _databaseManager = databaseManager;
+    public QueryAgent(DataSource dataSource) {
+        _dataSource = dataSource;
     }
 
     /**
      * Creates a new connection to a postgres database
-     * @param withDataBase if it's going to connect to a specific database
      * @return The established connection.
      * @throws Exception
      */
-    public Connection getConnection(boolean withDataBase) throws Exception {
+    public Connection getConnection() throws Exception {
         if (_connection == null) {
-            String url = withDataBase ? _databaseManager.getUrl() : _databaseManager.getUrlWithoutDatabase();
-            Class.forName(_databaseManager.getDriver());
-            _connection = DriverManager.getConnection(url, _databaseManager.getUser(), _databaseManager.getPassword());
+            _connection = _dataSource.getConnection();
         }
         return _connection;
-    }
-
-    /**
-     * Creates a new connection to a postgres server on a specific database
-     *
-     * @return The postgres database connection created
-     * @throws Exception
-     */
-    public Connection getConnection() throws Exception {
-        return getConnection(true);
     }
 
     /**

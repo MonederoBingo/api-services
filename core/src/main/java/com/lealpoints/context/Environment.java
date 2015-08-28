@@ -1,29 +1,28 @@
 package com.lealpoints.context;
 
-import com.lealpoints.db.DatabaseManager;
-import com.lealpoints.db.DevelopmentDatabaseManager;
-import com.lealpoints.db.FunctionalTestDatabaseManager;
-import com.lealpoints.db.ProductionDatabaseManager;
-import com.lealpoints.db.UATDatabaseManager;
+import javax.sql.DataSource;
+import com.lealpoints.db.DataSourceFactory;
+import org.springframework.stereotype.Component;
 
+@Component
 public enum Environment {
-    DEV(new DevelopmentDatabaseManager(), "src/main/webapp/images/dev/", "http://localhost:8080/#/"),
-    DEV_TEST(new FunctionalTestDatabaseManager(), "src/main/webapp/images/test/", "http://test.localhost:8080/#/"),
-    UAT(new UATDatabaseManager(), System.getenv("OPENSHIFT_DATA_DIR") + "images/uat/", "http://test.lealpoints.com/#/"),
-    PROD(new ProductionDatabaseManager(), System.getenv("OPENSHIFT_DATA_DIR") + "images/prod/", "http://www.lealpoints.com/#/");
+    DEV(DataSourceFactory.getDevDataSource(), "src/main/webapp/images/dev/", "http://localhost:8080/#/"),
+    FUNCTIONAL_TEST(DataSourceFactory.getFunctionalTestDataSource(), "src/main/webapp/images/test/", "http://test.localhost:8080/#/"),
+    UAT(DataSourceFactory.getUATDataSource(), System.getenv("OPENSHIFT_DATA_DIR") + "images/uat/", "http://test.lealpoints.com/#/"),
+    PROD(DataSourceFactory.getProdDataSource(), System.getenv("OPENSHIFT_DATA_DIR") + "images/prod/", "http://www.lealpoints.com/#/");
 
-    private DatabaseManager _databaseManager;
+    private DataSource _dataSource;
     private String _imageDir;
     private String _clientUrl;
 
-    private Environment(DatabaseManager databaseManager, String imageDir, String clientUrl) {
-        _databaseManager = databaseManager;
+    private Environment(DataSource dataSource, String imageDir, String clientUrl) {
+        _dataSource = dataSource;
         _imageDir = imageDir;
         _clientUrl = clientUrl;
     }
 
-    public DatabaseManager getDatabaseManager() {
-        return _databaseManager;
+    public DataSource getDataSource() {
+        return _dataSource;
     }
 
     public String getImageDir() {
