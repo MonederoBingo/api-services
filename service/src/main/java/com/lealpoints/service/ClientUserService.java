@@ -127,7 +127,7 @@ public class ClientUserService extends BaseService {
             _smsService.sendSMSMessage(phone, message);
             sendKeyToEmail(key, phone);
         }
-        System.out.println(key);
+        logger.info("Env: " + getEnvironment().name() + ". New phone number: " + phone + ". New key: " + key);
         return key;
     }
 
