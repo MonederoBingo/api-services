@@ -231,7 +231,7 @@ public class ClientUserServiceTest {
     public void testResendKey() throws Exception {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(Environment.DEV);
-        ThreadContextService threadContextService = createThreadContextService(threadContext);
+        ThreadContextService threadContextService = createThreadContextService(threadContext, 1);
         ClientUserService clientUserService = new ClientUserService(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
@@ -245,6 +245,24 @@ public class ClientUserServiceTest {
         assertTrue(serviceResult.getObject());
     }
 
+    @Test
+    public void testGenerateAndSendRegistrationSMS() throws Exception {
+        ThreadContext threadContext = new ThreadContext();
+        threadContext.setEnvironment(Environment.DEV);
+        ThreadContextService threadContextService = createThreadContextService(threadContext, 2);
+        ClientUserService clientUserService =
+            new ClientUserService(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
+
+                @Override
+                protected String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+            };
+        final String key = clientUserService.generateAndSendRegistrationSMS("1234567890");
+        assertNotNull(key);
+        assertNotEquals("", key);
+    }
+
     private ThreadContextService createThreadContextService(QueryAgent queryAgent, ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
@@ -253,9 +271,9 @@ public class ClientUserServiceTest {
         return threadContextService;
     }
 
-    private ThreadContextService createThreadContextService(ThreadContext threadContext) throws SQLException {
+    private ThreadContextService createThreadContextService(ThreadContext threadContext, int times) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(1);
+        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(times);
         replay(threadContextService);
         return threadContextService;
     }
