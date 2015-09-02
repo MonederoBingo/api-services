@@ -1,6 +1,7 @@
 package com.lealpoints.migrations;
 
 import java.io.File;
+import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,11 +25,14 @@ public class CreateDb {
     }
 
     private void run() throws Exception {
-        File file = new File("./database/scripts/createdb.sql");
-        String sql = FileUtils.readFileToString(file);
-        Connection connection = _developmentDatabaseManager.getConnection(false);
-        DBUtil.executeSql(sql, connection);
-        runSetupScripts();
+        ClassLoader classLoader = getClass().getClassLoader();
+        final URL resource = classLoader.getResource("scripts/createdb.sql");
+        if (resource != null) {
+            String sql = FileUtils.readFileToString(new File(resource.getFile()));
+            Connection connection = _developmentDatabaseManager.getConnection(false);
+            DBUtil.executeSql(sql, connection);
+            runSetupScripts();
+        }
     }
 
     private void runSetupScripts() throws Exception {
@@ -42,7 +46,12 @@ public class CreateDb {
     }
 
     private File[] loadSetupScripts() {
-        File dir = new File("./database/scripts/setup");
+        ClassLoader classLoader = getClass().getClassLoader();
+        final URL resource = classLoader.getResource("scripts/setup/");
+        if (resource == null) {
+            return new File[0];
+        }
+        File dir = new File(resource.getFile());
         File[] filesArray = dir.listFiles();
         List<File> filesFromSetup = new ArrayList<>();
         if (filesArray != null) {

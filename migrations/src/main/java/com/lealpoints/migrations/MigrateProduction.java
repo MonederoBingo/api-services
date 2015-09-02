@@ -1,6 +1,7 @@
 package com.lealpoints.migrations;
 
 import java.io.File;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -41,7 +42,12 @@ public class MigrateProduction {
     }
 
     private File[] loadMigrationScripts(DatabaseManager databaseManager) throws Exception {
-        File dir = new File("../database/scripts/migration");
+        ClassLoader classLoader = getClass().getClassLoader();
+        final URL resource = classLoader.getResource("scripts/migrations/");
+        if (resource == null) {
+            return new File[0];
+        }
+        File dir = new File(resource.getFile());
         File[] filesArray = dir.listFiles();
         List<File> filesFromMigration = new ArrayList<>();
         if (filesArray != null) {

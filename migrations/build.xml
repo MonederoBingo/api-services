@@ -10,7 +10,6 @@
         <fileset dir="${env.MAVEN_REPOSITORY}">
             <include name="**/*.jar" />
         </fileset>
-        <pathelement location="${build}"/>
     </path>
 
     <target name="init">
@@ -61,10 +60,8 @@
         </tstamp>
         <echo message="Finished build at ${buildtime}"/>
     </target>
-    <target name="compile" depends="init" description="Builds sub-project dao">
-        <javac srcdir="${src.migrations.util}" destdir="${build}" includeantruntime="false" classpathref="classpath" />
-        <javac srcdir="${src.migrations.db}" destdir="${build}" includeantruntime="false" classpathref="classpath" />
-        <javac srcdir="${src.migrations}" destdir="${build}" includeantruntime="false" classpathref="classpath" />
+    <target name="compile" depends="init" description="Builds sub-project">
+        <!--<javac srcdir="${src.migrations.util}" destdir="${build}" includeantruntime="false" classpathref="classpath" />--><!--<javac srcdir="${src.migrations.db}" destdir="${build}" includeantruntime="false" classpathref="classpath" />--><!--<javac srcdir="${src.migrations}" destdir="${build}" includeantruntime="false" classpathref="classpath" />-->
     </target>
     <target name="createdb" description="Creates the database" depends="compile">
         <echo message="  *** THIS WILL DROP THE LOCALHOST COPY OF YOUR EXISTING DATABASE! ***  "/>
@@ -98,7 +95,7 @@
         </tstamp>
 
         <property name="migration.filename" value="${migration.prefix}_${migration.description.slug}.sql"/>
-        <touch file="../database/scripts/migration/${migration.filename}"/>
+        <touch file="src/main/resources/scripts/migrations/${migration.filename}"/>
         <echo>File ${migration.filename} was created!</echo>
     </target>
     <target name="clean">
