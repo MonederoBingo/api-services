@@ -5,6 +5,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import com.lealpoints.common.ConfigurationManager;
 import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
@@ -198,10 +199,15 @@ public class CompanyServiceTest {
         expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
         expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
 
-        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
+        ConfigurationManager configurationManager = createStrictMock(ConfigurationManager.class);
+        expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("false");
+
+        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository, configurationManager);
 
         CompanyService companyService =
-            new CompanyService(companyRepository, null, null, clientRepository, null, null, smsService, companyClientMappingRepository, null) {
+            new CompanyService(companyRepository, null, null, clientRepository, null, null, smsService, companyClientMappingRepository, null,
+                configurationManager) {
+
                 @Override
                 protected String getTranslation(Translations.Message message) {
                     return message.name();
@@ -215,12 +221,15 @@ public class CompanyServiceTest {
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertTrue(serviceResult.isSuccess());
         assertEquals(Translations.Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
-        verify(smsService, clientRepository);
+        verify(smsService, clientRepository, configurationManager);
     }
 
     @Test
     public void testSendMobileAppAdMessageWhenIsNotProdEnv() throws Exception {
-        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
+        ConfigurationManager configurationManager = createStrictMock(ConfigurationManager.class);
+        expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("false");
+        replay(configurationManager);
+        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null, configurationManager) {
             @Override
             protected String getTranslation(Translations.Message message) {
                 return message.name();
@@ -234,11 +243,53 @@ public class CompanyServiceTest {
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertFalse(serviceResult.isSuccess());
         assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
+        verify(configurationManager);
+    }
+
+    @Test
+    public void testSendMobileAppAdMessageWhenConfIsEnabled() throws Exception {
+        SMSService smsService = createStrictMock(SMSService.class);
+        smsService.sendSMSMessage(anyString(), anyString());
+        expectLastCall();
+
+        CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
+        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
+
+        CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+
+        ClientRepository clientRepository = createStrictMock(ClientRepository.class);
+        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
+        expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
+
+        ConfigurationManager configurationManager = createStrictMock(ConfigurationManager.class);
+        expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("true");
+
+        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository, configurationManager);
+
+        CompanyService companyService =
+            new CompanyService(companyRepository, null, null, clientRepository, null, null, smsService, companyClientMappingRepository, null,
+                configurationManager) {
+
+                @Override
+                protected String getTranslation(Translations.Message message) {
+                    return message.name();
+                }
+
+                @Override
+                protected boolean isProdEnvironment() {
+                    return false;
+                }
+            };
+        final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
+        assertTrue(serviceResult.isSuccess());
+        assertEquals(Translations.Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
+        verify(smsService, clientRepository, configurationManager);
     }
 
     @Test
     public void testGetSMSMessage() {
-        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
+        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
             protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
@@ -249,7 +300,7 @@ public class CompanyServiceTest {
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Leal Points to see our promotions. " +
             "http://tinyurl.com/og2b56y", smsMessage);
 
-        companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
             protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
@@ -259,7 +310,7 @@ public class CompanyServiceTest {
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at TG. Install Leal Points to see our promotions. " + "http://tinyurl.com/og2b56y", smsMessage);
 
-        companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
             protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
@@ -273,7 +324,7 @@ public class CompanyServiceTest {
 
     @Test
     public void testGetSMSMessageWithInvalidTranslation() {
-        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
+        CompanyService companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
             protected String getTranslation(Translations.Message message) {
                 return "You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
@@ -288,7 +339,7 @@ public class CompanyServiceTest {
                     "much much much much much much much much much much much much much more. %s", e.getMessage());
         }
 
-        companyService = new CompanyService(null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
             protected String getTranslation(Translations.Message message) {
                 return
@@ -309,7 +360,7 @@ public class CompanyServiceTest {
         final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
         ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
         return new CompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
-            null, null, null, promotionConfigurationRepository) {
+            null, null, null, promotionConfigurationRepository, null) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
 

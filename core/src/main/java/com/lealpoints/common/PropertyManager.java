@@ -1,4 +1,4 @@
-package com.lealpoints.context;
+package com.lealpoints.common;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -2,7 +2,7 @@ package com.lealpoints.controller.service;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import com.lealpoints.context.PropertyManager;
+import com.lealpoints.common.PropertyManager;
 import org.springframework.web.WebApplicationInitializer;
 
 public class WebAppInitializer implements WebApplicationInitializer {

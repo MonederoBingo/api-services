@@ -1,15 +1,10 @@
 <?xml version="1.0"?>
-<project name="lealpoints_master" default="all" basedir=".">
-    <!--
-      - Load the user's local build properties first to pick up any overridden values,
-      - the load the defaults to set anything that wasn't overridden
-    -->
+<project name="lealpoints_master" default="all">
     <property environment="env" />
-    <property name="project.other_libs" value="libs/other"/>
-    <property name="build" value="build"/>
-    <property name="src.migrations.util" value="migrations/src/main/java/com/lealpoints/migrations/util"/>
-    <property name="src.migrations.db" value="migrations/src/main/java/com/lealpoints/migrations/db"/>
-    <property name="src.migrations" value="migrations/src/main/java/com/lealpoints/migrations"/>
+    <property name="build" value="target/classes"/>
+    <property name="src.migrations.util" value="src/main/java/com/lealpoints/migrations/util"/>
+    <property name="src.migrations.db" value="src/main/java/com/lealpoints/migrations/db"/>
+    <property name="src.migrations" value="src/main/java/com/lealpoints/migrations"/>
 
     <path id="classpath">
         <fileset dir="${env.MAVEN_REPOSITORY}">
@@ -18,20 +13,8 @@
         <pathelement location="${build}"/>
     </path>
 
-    <!-- Enable <xmltask> task -->
-    <path id="xmltask.classpath">
-        <pathelement location="${project.other_libs}/xmltask.jar"/>
-    </path>
-
-    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="xmltask.classpath"/>
-
     <target name="init">
         <tstamp/>
-        <mkdir dir="${build}"/>
-        <!--Retrieve release version from pom.xml-->
-        <xmltask source="${basedir}/pom.xml">
-            <copy path="/*[name()='project']/*[name()='version']/text()" property="release.version"/>
-        </xmltask>
     </target>
     <target name="maven-windows" depends="maven.properties" if="isWindows">
         <property name="runFrom" value="${basedir}"/>
@@ -115,7 +98,7 @@
         </tstamp>
 
         <property name="migration.filename" value="${migration.prefix}_${migration.description.slug}.sql"/>
-        <touch file="database/scripts/migration/${migration.filename}"/>
+        <touch file="../database/scripts/migration/${migration.filename}"/>
         <echo>File ${migration.filename} was created!</echo>
     </target>
     <target name="clean">

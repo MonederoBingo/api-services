@@ -2,7 +2,7 @@ package com.lealpoints.db;
 
 import javax.sql.DataSource;
 import java.util.Properties;
-import com.lealpoints.context.PropertyManager;
+import com.lealpoints.common.PropertyManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 public class DataSourceFactory {

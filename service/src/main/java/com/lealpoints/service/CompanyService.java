@@ -5,6 +5,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
+import com.lealpoints.common.ConfigurationManager;
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.model.Client;
@@ -46,12 +47,13 @@ public class CompanyService extends BaseService {
     private final SMSService _smsService;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
+    private final ConfigurationManager _configurationManager;
 
     @Autowired
     public CompanyService(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
         PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
         Translations translations, SMSService smsService, CompanyClientMappingRepository companyClientMappingRepository,
-        PromotionConfigurationRepository promotionConfigurationRepository) {
+        PromotionConfigurationRepository promotionConfigurationRepository, ConfigurationManager configurationManager) {
         super(translations, threadContextService);
         _companyRepository = companyRepository;
         _companyUserRepository = companyUserRepository;
@@ -61,6 +63,7 @@ public class CompanyService extends BaseService {
         _smsService = smsService;
         _companyClientMappingRepository = companyClientMappingRepository;
         _promotionConfigurationRepository = promotionConfigurationRepository;
+        _configurationManager = configurationManager;
     }
 
     public ServiceResult<Long> register(CompanyRegistration companyRegistration) {
@@ -130,14 +133,15 @@ public class CompanyService extends BaseService {
 
     @OnlyProduction
     public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
-        if (isProdEnvironment()) {
+        final boolean sendPromoSmsInUat = Boolean.parseBoolean(_configurationManager.getUncachedConfiguration("send_promo_sms_in_uat"));
+        if (isProdEnvironment() || sendPromoSmsInUat) {
             try {
                 final Company company = _companyRepository.getByCompanyId(companyId);
                 long clientId = _clientRepository.getByPhone(phone).getClientId();
                 final double points = _companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
                 if (company != null) {
                     final String smsMessage = getSMSMessage(company.getName(), points);
-                    System.out.println(smsMessage);
+                    logger.info("Promo SMS sent to: " + phone);
                     _smsService.sendSMSMessage(phone, smsMessage);
                     _clientRepository.updateCanReceivePromoSms(clientId, false);
                 } else {

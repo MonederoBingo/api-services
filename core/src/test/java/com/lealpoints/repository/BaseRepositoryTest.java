@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.Statement;
-import com.lealpoints.context.PropertyManager;
+import com.lealpoints.common.PropertyManager;
 import com.lealpoints.db.DataSourceFactory;
 import com.lealpoints.db.QueryAgent;
 import org.apache.commons.io.FileUtils;
