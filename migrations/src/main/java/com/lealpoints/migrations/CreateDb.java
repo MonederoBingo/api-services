@@ -21,7 +21,7 @@ public class CreateDb {
         CreateDb createDb = new CreateDb();
         createDb.run();
         System.out.println("Database create successfully.");
-        Migrate.main(null);
+        Migrate2.main(null);
     }
 
     private void run() throws Exception {

@@ -11,19 +11,22 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import com.lealpoints.migrations.db.DatabaseManager;
-import com.lealpoints.migrations.db.ProductionDatabaseManager;
-import com.lealpoints.migrations.db.UATDatabaseManager;
+import com.lealpoints.migrations.db.DevelopmentDatabaseManager;
+import com.lealpoints.migrations.db.FunctionalTestDatabaseManager;
+import com.lealpoints.migrations.db.UnitTestDatabaseManager;
 import com.lealpoints.migrations.util.DBUtil;
 import com.lealpoints.migrations.util.DateUtil;
 import org.apache.commons.collections15.CollectionUtils;
 import org.apache.commons.collections15.Predicate;
 
-public class MigrateProduction {
+public class Migrate2 {
     public static void main(String[] args) throws Exception {
-        System.out.println("Running migrations for production...");
-        new MigrateProduction().run(new ProductionDatabaseManager());
-        System.out.println("Running migrations for UAT...");
-        new MigrateProduction().run(new UATDatabaseManager());
+        System.out.println("Running migrations for development...");
+        new Migrate2().run(new DevelopmentDatabaseManager());
+        System.out.println("Running migrations for unit test...");
+        new Migrate2().run(new UnitTestDatabaseManager());
+        System.out.println("Running migrations for functional test...");
+        new Migrate2().run(new FunctionalTestDatabaseManager());
         System.out.println("Process finished successfully.");
     }
 
@@ -78,9 +81,13 @@ public class MigrateProduction {
                 @Override
                 public boolean evaluate(File file) {
                     final String fileName = file.getName();
-                    String dateString = fileName.substring(0, fileName.indexOf("_"));
-                    Date date = DateUtil.parseDate(dateString, "yyyyMMddHHmmss");
-                    return date.after(lastRunMigrationDate);
+                    if (fileName.charAt(14) == '_') {
+                        String dateString = fileName.substring(0, fileName.indexOf("_"));
+                        Date date = DateUtil.parseDate(dateString, "yyyyMMddHHmmss");
+                        return date.after(lastRunMigrationDate);
+                    } else {
+                        throw new IllegalArgumentException("The file: " + fileName + " must contain an underscore '_' after the hash number.");
+                    }
                 }
             });
         } finally {

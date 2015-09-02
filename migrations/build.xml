@@ -10,6 +10,7 @@
         <fileset dir="${env.MAVEN_REPOSITORY}">
             <include name="**/*.jar" />
         </fileset>
+        <pathelement location="${build}"/>
     </path>
 
     <target name="init">
@@ -79,10 +80,10 @@
         <java classname="com.lealpoints.migrations.CreateDb" classpathref="classpath"/>
     </target>
     <target name="migrate" description="Updates the database" depends="compile">
-        <java classname="com.lealpoints.migrations.Migrate" classpathref="classpath"/>
+        <java classname="com.lealpoints.migrations.Migrate2" classpathref="classpath"/>
     </target>
     <target name="prod_migrate" description="Updates the database" depends="compile">
-        <java classname="com.lealpoints.migrations.MigrateProduction" classpathref="classpath"/>
+        <java classname="com.lealpoints.migrations.MigrateProduction2" classpathref="classpath"/>
     </target>
     <target name="create-migration" description="Creates a new file into migrations directory" depends="compile">
         <javac srcdir="${src.migrations}/util" destdir="${build}" classpathref="classpath"/>
