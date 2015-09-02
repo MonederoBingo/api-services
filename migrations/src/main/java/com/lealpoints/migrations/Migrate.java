@@ -44,7 +44,7 @@ public class Migrate {
     }
 
     private File[] loadMigrationScripts(DatabaseManager databaseManager) throws Exception {
-        File dir = new File("./database/scripts/migration");
+        File dir = new File("../database/scripts/migration");
         File[] filesArray = dir.listFiles();
         List<File> filesFromMigration = new ArrayList<>();
         if (filesArray != null) {
