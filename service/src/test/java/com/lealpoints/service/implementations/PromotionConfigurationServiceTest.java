@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +25,8 @@ public class PromotionConfigurationServiceTest {
         expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "20% off", 2400));
         PromotionConfigurationRepository promotionConfigurationRepository =
             createPromotionConfigurationRepositoryForGet(expectedPromotionConfigurations);
-        PromotionConfigurationService promotionConfigurationService =
-            new PromotionConfigurationService(promotionConfigurationRepository, null, null, null, null);
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null, null);
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyId(1);
         assertNotNull(serviceResult);
@@ -52,10 +52,10 @@ public class PromotionConfigurationServiceTest {
     @Test
     public void testInsert() throws Exception {
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepositoryForInsert();
-        PromotionConfigurationService promotionConfigurationService =
-            new PromotionConfigurationService(promotionConfigurationRepository, null, null, null, null) {
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null, null) {
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -83,8 +83,8 @@ public class PromotionConfigurationServiceTest {
         companyClientMapping.setPoints(1200);
         ClientRepository clientRepository = createClientRepository(new Client());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
-        PromotionConfigurationService promotionConfigurationService =
-            new PromotionConfigurationService(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null);
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null);
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
         assertNotNull(serviceResult);
@@ -110,9 +110,10 @@ public class PromotionConfigurationServiceTest {
     @Test
     public void testGetByCompanyIdRequiredPointsWhenClientDoesNotExist() throws Exception {
         ClientRepository clientRepository = createClientRepository(null);
-        PromotionConfigurationService promotionConfigurationService = new PromotionConfigurationService(null, null, clientRepository, null, null) {
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(null, null, clientRepository, null, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -129,10 +130,10 @@ public class PromotionConfigurationServiceTest {
     public void testGetByCompanyIdRequiredPointsWhenMappingDoesNotExist() throws Exception {
         ClientRepository clientRepository = createClientRepository(new Client());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(null);
-        PromotionConfigurationService promotionConfigurationService =
-            new PromotionConfigurationService(null, companyClientMappingRepository, clientRepository, null, null) {
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(null, companyClientMappingRepository, clientRepository, null, null) {
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -158,10 +159,10 @@ public class PromotionConfigurationServiceTest {
         companyClientMapping.setPoints(300);
         ClientRepository clientRepository = createClientRepository(new Client());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
-        PromotionConfigurationService promotionConfigurationService =
-            new PromotionConfigurationService(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null) {
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null) {
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -181,10 +182,10 @@ public class PromotionConfigurationServiceTest {
     public void testDeletePromotionConfiguration() throws Exception {
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepositoryForDelete();
 
-        PromotionConfigurationService promotionConfigurationService =
-            new PromotionConfigurationService(promotionConfigurationRepository, null, null, null, null) {
+        PromotionConfigurationServiceImpl promotionConfigurationService =
+            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null, null) {
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };

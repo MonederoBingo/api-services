@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.service.AuthenticationService;
+import com.lealpoints.service.implementations.AuthenticationServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ public class ApiContextFilter implements Filter {
     @Autowired
     private ThreadContextService _threadContextService;
     @Autowired
-    private AuthenticationService _authenticationService;
+    private AuthenticationServiceImpl _authenticationService;
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final HttpServletRequest httpServletRequest = (HttpServletRequest) request;

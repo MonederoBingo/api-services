@@ -1,4 +1,4 @@
-package com.lealpoints.common;
+package com.lealpoints.service.implementations;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,13 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ConfigurationManager {
-    private final Logger logger = LogManager.getLogger(ConfigurationManager.class.getName());
+public class ConfigurationServiceImpl {
+    private final Logger logger = LogManager.getLogger(ConfigurationServiceImpl.class.getName());
     private final Map<String, String> _configurationMap = new HashMap<>();
     private final ConfigurationRepository _configurationRepository;
 
     @Autowired
-    private ConfigurationManager(ConfigurationRepository configurationRepository) {
+    private ConfigurationServiceImpl(ConfigurationRepository configurationRepository) {
         _configurationRepository = configurationRepository;
     }
 

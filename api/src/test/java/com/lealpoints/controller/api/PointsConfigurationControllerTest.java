@@ -1,7 +1,7 @@
 package com.lealpoints.controller.api;
 
 import com.lealpoints.model.PointsConfiguration;
-import com.lealpoints.service.PointsConfigurationService;
+import com.lealpoints.service.implementations.PointsConfigurationServiceImpl;
 import com.lealpoints.service.model.ServiceResult;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class PointsConfigurationControllerTest {
         expectedPointsConfiguration.setPointsToEarn(10);
         expectedPointsConfiguration.setRequiredAmount(100);
         ServiceResult<PointsConfiguration> expectedServiceResult = new ServiceResult<>(true, "", expectedPointsConfiguration);
-        PointsConfigurationService pointsConfigurationService = createPointsConfigurationServiceForGet(expectedServiceResult);
+        PointsConfigurationServiceImpl pointsConfigurationService = createPointsConfigurationServiceForGet(expectedServiceResult);
         PointsConfigurationController pointsConfigurationController = new PointsConfigurationController(pointsConfigurationService);
 
         ResponseEntity<ServiceResult<PointsConfiguration>> responseEntity = pointsConfigurationController.get(1);
@@ -41,7 +41,7 @@ public class PointsConfigurationControllerTest {
     @Test
     public void testUpdate() throws Exception {
         ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, "", true);
-        PointsConfigurationService pointsConfigurationService = createPointsConfigurationServiceForUpdate(expectedServiceResult);
+        PointsConfigurationServiceImpl pointsConfigurationService = createPointsConfigurationServiceForUpdate(expectedServiceResult);
         PointsConfigurationController pointsConfigurationController = new PointsConfigurationController(pointsConfigurationService);
 
         ResponseEntity<ServiceResult<Boolean>> responseEntity = pointsConfigurationController.update(new PointsConfiguration());
@@ -55,15 +55,15 @@ public class PointsConfigurationControllerTest {
         verify(pointsConfigurationService);
     }
 
-    private PointsConfigurationService createPointsConfigurationServiceForGet(ServiceResult<PointsConfiguration> serviceResult) throws Exception {
-        PointsConfigurationService pointsConfigurationService = createMock(PointsConfigurationService.class);
+    private PointsConfigurationServiceImpl createPointsConfigurationServiceForGet(ServiceResult<PointsConfiguration> serviceResult) throws Exception {
+        PointsConfigurationServiceImpl pointsConfigurationService = createMock(PointsConfigurationServiceImpl.class);
         expect(pointsConfigurationService.getByCompanyId(anyLong())).andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;
     }
 
-    private PointsConfigurationService createPointsConfigurationServiceForUpdate(ServiceResult<Boolean> serviceResult) throws Exception {
-        PointsConfigurationService pointsConfigurationService = createMock(PointsConfigurationService.class);
+    private PointsConfigurationServiceImpl createPointsConfigurationServiceForUpdate(ServiceResult<Boolean> serviceResult) throws Exception {
+        PointsConfigurationServiceImpl pointsConfigurationService = createMock(PointsConfigurationServiceImpl.class);
         expect(pointsConfigurationService.update((PointsConfiguration) anyObject())).andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;

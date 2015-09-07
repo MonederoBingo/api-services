@@ -17,6 +17,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RestController
 @RequestMapping("/points")
 public class PointsController extends AbstractApiController {
+
     private PointsService _pointsService;
 
     @Autowired

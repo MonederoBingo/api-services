@@ -1,6 +1,6 @@
 package com.lealpoints.controller.auth;
 
-import com.lealpoints.service.ClientUserService;
+import com.lealpoints.service.implementations.ClientUserServiceImpl;
 import com.lealpoints.service.model.ClientLoginResult;
 import com.lealpoints.service.model.ClientUserLogin;
 import com.lealpoints.service.model.ClientUserRegistration;
@@ -18,7 +18,7 @@ public class ClientAuthControllerTest {
     @Test
     public void testRegisterClient() throws Exception {
         final ServiceResult<String> expectedServiceResult = new ServiceResult<>(true, "1");
-        final ClientUserService clientUserService =  createClientUserServiceForRegister(expectedServiceResult);
+        final ClientUserServiceImpl clientUserService = createClientUserServiceForRegister(expectedServiceResult);
         final ClientAuthController clientAuthController = new ClientAuthController(clientUserService);
 
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
@@ -35,7 +35,7 @@ public class ClientAuthControllerTest {
     @Test
     public void testLoginUser() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, "name");
-        final ClientUserService clientUserService = createUserLoginService(expectedServiceResult);
+        final ClientUserServiceImpl clientUserService = createUserLoginService(expectedServiceResult);
         final ClientAuthController clientAuthController = new ClientAuthController(clientUserService);
 
         ClientUserLogin clientUserLogin = new ClientUserLogin();
@@ -55,7 +55,7 @@ public class ClientAuthControllerTest {
     @Test
     public void testResendKey() throws Exception {
         ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, "", true);
-        ClientUserService clientUserService = createUserService(expectedServiceResult);
+        ClientUserServiceImpl clientUserService = createUserService(expectedServiceResult);
         ClientAuthController clientAuthController = new ClientAuthController(clientUserService);
         ResponseEntity<ServiceResult<Boolean>> actualServiceResult = clientAuthController.resendKey(new ClientUserRegistration());
         assertNotNull(actualServiceResult);
@@ -66,22 +66,22 @@ public class ClientAuthControllerTest {
         verify(clientUserService);
     }
 
-    private ClientUserService createUserService(ServiceResult<Boolean> serviceResult) throws Exception {
-        ClientUserService clientUserService = createMock(ClientUserService.class);
+    private ClientUserServiceImpl createUserService(ServiceResult<Boolean> serviceResult) throws Exception {
+        ClientUserServiceImpl clientUserService = createMock(ClientUserServiceImpl.class);
         expect((clientUserService.resendKey(anyString()))).andReturn(serviceResult);
         replay(clientUserService);
         return clientUserService;
     }
 
-    private ClientUserService createUserLoginService(ServiceResult<ClientLoginResult> serviceResult) throws Exception {
-        ClientUserService clientUserService = EasyMock.createMock(ClientUserService.class);
+    private ClientUserServiceImpl createUserLoginService(ServiceResult<ClientLoginResult> serviceResult) throws Exception {
+        ClientUserServiceImpl clientUserService = EasyMock.createMock(ClientUserServiceImpl.class);
         expect(clientUserService.login((ClientUserLogin) anyObject())).andReturn(serviceResult);
         replay(clientUserService);
         return clientUserService;
     }
 
-    private ClientUserService createClientUserServiceForRegister(ServiceResult<String> expectedServiceResult) throws Exception {
-        final ClientUserService clientUserService = EasyMock.createMock(ClientUserService.class);
+    private ClientUserServiceImpl createClientUserServiceForRegister(ServiceResult<String> expectedServiceResult) throws Exception {
+        final ClientUserServiceImpl clientUserService = EasyMock.createMock(ClientUserServiceImpl.class);
         expect(clientUserService.register((ClientUserRegistration) anyObject())).andReturn(expectedServiceResult);
         replay(clientUserService);
         return clientUserService;

@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.lealpoints.controller.api.AbstractApiController;
-import com.lealpoints.service.ClientUserService;
+import com.lealpoints.service.implementations.ClientUserServiceImpl;
 import com.lealpoints.service.model.ClientLoginResult;
 import com.lealpoints.service.model.ClientUserLogin;
 import com.lealpoints.service.model.ClientUserRegistration;
@@ -22,10 +22,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/client")
 public class ClientAuthController extends AbstractApiController{
 
-    private final ClientUserService _clientUserService;
+    private final ClientUserServiceImpl _clientUserService;
 
     @Autowired
-    public ClientAuthController(ClientUserService clientUserService) {
+    public ClientAuthController(ClientUserServiceImpl clientUserService) {
         _clientUserService = clientUserService;
     }
 

@@ -1,6 +1,6 @@
 package com.lealpoints.controller.api;
 
-import com.lealpoints.service.PointsService;
+import com.lealpoints.service.implementations.PointsServiceImpl;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ServiceResult;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class PointsControllerTest {
     @Test
     public void testAwardPoints() throws Exception {
         ServiceResult<Float> expectedServiceResult = new ServiceResult<>(true, "", 10.0f);
-        PointsService pointsService = createPointsService(expectedServiceResult);
+        PointsServiceImpl pointsService = createPointsService(expectedServiceResult);
         PointsController pointsController = new PointsController(pointsService);
         PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setSaleKey("A1234");
@@ -33,8 +33,8 @@ public class PointsControllerTest {
         verify(pointsService);
     }
 
-    private PointsService createPointsService(ServiceResult<Float> serviceResult) throws Exception {
-        PointsService pointsService = createMock(PointsService.class);
+    private PointsServiceImpl createPointsService(ServiceResult<Float> serviceResult) throws Exception {
+        PointsServiceImpl pointsService = createMock(PointsServiceImpl.class);
         expect(pointsService.awardPoints((PointsAwarding) anyObject())).andReturn(serviceResult);
         replay(pointsService);
         return pointsService;

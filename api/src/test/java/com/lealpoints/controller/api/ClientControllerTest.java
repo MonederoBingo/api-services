@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
-import com.lealpoints.service.ClientService;
+import com.lealpoints.service.implementations.ClientServiceImpl;
 import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.model.ServiceResult;
 import org.easymock.EasyMock;
@@ -19,7 +19,7 @@ public class ClientControllerTest {
     @Test
     public void testRegisterClient() throws Exception {
         final ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "1");
-        final ClientService clientService = createClientServiceForRegister(expectedServiceResult);
+        final ClientServiceImpl clientService = createClientServiceForRegister(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
         ClientRegistration clientRegistration = new ClientRegistration();
@@ -40,7 +40,7 @@ public class ClientControllerTest {
         expectedClients.add(createCompanyClientMapping(100, "123"));
         expectedClients.add(createCompanyClientMapping(200, "456"));
         final ServiceResult<List<CompanyClientMapping>> expectedServiceResult = new ServiceResult<>(true, "1", expectedClients);
-        final ClientService clientService = createClientServiceForGet(expectedServiceResult);
+        final ClientServiceImpl clientService = createClientServiceForGet(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
         ResponseEntity<ServiceResult<List<CompanyClientMapping>>> responseEntity = clientController.getByCompanyId(1);
@@ -66,7 +66,7 @@ public class ClientControllerTest {
         client.setPhone("1234567890");
         companyClientMapping.setClient(client);
         final ServiceResult<CompanyClientMapping> expectedServiceResult = new ServiceResult<>(true, "1", companyClientMapping);
-        final ClientService clientService = createClientServiceForGetByCompanyIdPhone(expectedServiceResult);
+        final ClientServiceImpl clientService = createClientServiceForGetByCompanyIdPhone(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
         ResponseEntity<ServiceResult<CompanyClientMapping>> responseEntity = clientController.getByCompanyIdPhone(1, "1234567890");
@@ -90,22 +90,22 @@ public class ClientControllerTest {
         return companyClientMapping;
     }
 
-    private ClientService createClientServiceForRegister(ServiceResult<Long> serviceResult) throws Exception {
-        final ClientService clientService = EasyMock.createMock(ClientService.class);
+    private ClientServiceImpl createClientServiceForRegister(ServiceResult<Long> serviceResult) throws Exception {
+        final ClientServiceImpl clientService = EasyMock.createMock(ClientServiceImpl.class);
         expect(clientService.register((ClientRegistration) anyObject())).andReturn(serviceResult).times(1);
         replay(clientService);
         return clientService;
     }
 
-    private ClientService createClientServiceForGet(ServiceResult<List<CompanyClientMapping>> serviceResult) throws Exception {
-        final ClientService clientService = EasyMock.createMock(ClientService.class);
+    private ClientServiceImpl createClientServiceForGet(ServiceResult<List<CompanyClientMapping>> serviceResult) throws Exception {
+        final ClientServiceImpl clientService = EasyMock.createMock(ClientServiceImpl.class);
         expect(clientService.getByCompanyId(anyLong())).andReturn(serviceResult);
         replay(clientService);
         return clientService;
     }
 
-    private ClientService createClientServiceForGetByCompanyIdPhone(ServiceResult<CompanyClientMapping> serviceResult) throws Exception {
-        final ClientService clientService = EasyMock.createMock(ClientService.class);
+    private ClientServiceImpl createClientServiceForGetByCompanyIdPhone(ServiceResult<CompanyClientMapping> serviceResult) throws Exception {
+        final ClientServiceImpl clientService = EasyMock.createMock(ClientServiceImpl.class);
         expect(clientService.getByCompanyIdPhone(anyLong(), anyString())).andReturn(serviceResult);
         replay(clientService);
         return clientService;

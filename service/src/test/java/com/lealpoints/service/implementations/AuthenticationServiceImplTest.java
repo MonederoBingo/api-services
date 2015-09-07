@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import com.lealpoints.model.ClientUser;
 import com.lealpoints.model.CompanyUser;
@@ -12,16 +12,16 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class AuthenticationServiceTest {
+public class AuthenticationServiceImplTest {
 
     @Test
     public void testIsValidCompanyApiKey() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
         expect(companyUserRepository.getByCompanyUserIdApiKey(anyString(), anyString())).andReturn(new CompanyUser());
         replay((companyUserRepository));
-        AuthenticationService authenticationService = new AuthenticationService(null, null, companyUserRepository, null){
+        AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, companyUserRepository, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -36,9 +36,9 @@ public class AuthenticationServiceTest {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
         expect(companyUserRepository.getByCompanyUserIdApiKey(anyString(), anyString())).andReturn(null);
         replay((companyUserRepository));
-        AuthenticationService authenticationService = new AuthenticationService(null, null, companyUserRepository, null){
+        AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, companyUserRepository, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -50,9 +50,9 @@ public class AuthenticationServiceTest {
 
     @Test
     public void testIsValidCompanyApiKeyWhenWrongApiKey() throws Exception {
-        AuthenticationService authenticationService = new AuthenticationService(null, null, null, null){
+        AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, null, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -66,9 +66,9 @@ public class AuthenticationServiceTest {
         ClientUserRepository clientUserRepository = createMock(ClientUserRepository.class);
         expect(clientUserRepository.getByClientUserIdApiKey(anyString(), anyString())).andReturn(new ClientUser());
         replay((clientUserRepository));
-        AuthenticationService authenticationService = new AuthenticationService(null, null, null, clientUserRepository){
+        AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, null, clientUserRepository) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -84,9 +84,9 @@ public class AuthenticationServiceTest {
         ClientUserRepository clientUserRepository = createMock(ClientUserRepository.class);
         expect(clientUserRepository.getByClientUserIdApiKey(anyString(), anyString())).andReturn(null);
         replay((clientUserRepository));
-        AuthenticationService authenticationService = new AuthenticationService(null, null, null, clientUserRepository){
+        AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, null, clientUserRepository) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -98,9 +98,9 @@ public class AuthenticationServiceTest {
 
     @Test
     public void testIsValidClientApiKeyWhenWrongApiKey() throws Exception {
-        AuthenticationService authenticationService = new AuthenticationService(null, null, null, null){
+        AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, null, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };

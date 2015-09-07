@@ -3,7 +3,7 @@ package com.lealpoints.controller.api;
 import java.util.ArrayList;
 import java.util.List;
 import com.lealpoints.model.PromotionConfiguration;
-import com.lealpoints.service.PromotionConfigurationService;
+import com.lealpoints.service.implementations.PromotionConfigurationServiceImpl;
 import com.lealpoints.service.model.ServiceResult;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class PromotionConfigurationControllerTest {
         expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "10% off", 1200));
         expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "20% off", 2400));
         ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, "", expectedPromotionConfigurations);
-        PromotionConfigurationService pointsConfigurationService = createPromotionConfigurationServiceForGet(expectedServiceResult);
+        PromotionConfigurationServiceImpl pointsConfigurationService = createPromotionConfigurationServiceForGet(expectedServiceResult);
         PromotionConfigurationController pointsConfigurationController = new PromotionConfigurationController(pointsConfigurationService);
 
         ResponseEntity<ServiceResult<List<PromotionConfiguration>>> responseEntity = pointsConfigurationController.get(1);
@@ -49,7 +49,7 @@ public class PromotionConfigurationControllerTest {
     public void testInsert() throws Exception {
 
         ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "Promotion updated", 1l);
-        PromotionConfigurationService promotionConfigurationService = createPromotionConfigurationService(expectedServiceResult);
+        PromotionConfigurationServiceImpl promotionConfigurationService = createPromotionConfigurationService(expectedServiceResult);
         PromotionConfigurationController promotionConfigurationController = new PromotionConfigurationController(promotionConfigurationService);
 
         ResponseEntity<ServiceResult<Long>> responseEntity = promotionConfigurationController.insert(new PromotionConfiguration());
@@ -69,7 +69,8 @@ public class PromotionConfigurationControllerTest {
         expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "5% off", 600));
         expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "10% off", 1000));
         ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, "", expectedPromotionConfigurations);
-        PromotionConfigurationService pointsConfigurationService = createPromotionConfigurationServiceForGetByRequiredPoints(expectedServiceResult);
+        PromotionConfigurationServiceImpl pointsConfigurationService =
+            createPromotionConfigurationServiceForGetByRequiredPoints(expectedServiceResult);
         PromotionConfigurationController pointsConfigurationController = new PromotionConfigurationController(pointsConfigurationService);
 
         ResponseEntity<ServiceResult<List<PromotionConfiguration>>> responseEntity =
@@ -98,7 +99,7 @@ public class PromotionConfigurationControllerTest {
 
     @Test
     public void testDelete() throws Exception {
-        PromotionConfigurationService promotionConfigurationService =
+        PromotionConfigurationServiceImpl promotionConfigurationService =
             createPromotionConfigurationServiceForDelete(new ServiceResult<Boolean>(true, ""));
         PromotionConfigurationController promotionConfigurationController = new PromotionConfigurationController(promotionConfigurationService);
         final ResponseEntity<ServiceResult<Boolean>> responseEntity = promotionConfigurationController.delete(1);
@@ -108,8 +109,8 @@ public class PromotionConfigurationControllerTest {
         assertTrue(serviceResult.isSuccess());
     }
 
-    private PromotionConfigurationService createPromotionConfigurationService(ServiceResult<Long> serviceResult) throws Exception {
-        PromotionConfigurationService promotionConfigurationService = createMock(PromotionConfigurationService.class);
+    private PromotionConfigurationServiceImpl createPromotionConfigurationService(ServiceResult<Long> serviceResult) throws Exception {
+        PromotionConfigurationServiceImpl promotionConfigurationService = createMock(PromotionConfigurationServiceImpl.class);
         expect(promotionConfigurationService.insert((PromotionConfiguration) anyObject())).andReturn(serviceResult);
         replay(promotionConfigurationService);
         return promotionConfigurationService;
@@ -125,24 +126,24 @@ public class PromotionConfigurationControllerTest {
         return promotionConfiguration;
     }
 
-    private PromotionConfigurationService createPromotionConfigurationServiceForGet(ServiceResult<List<PromotionConfiguration>> serviceResult)
+    private PromotionConfigurationServiceImpl createPromotionConfigurationServiceForGet(ServiceResult<List<PromotionConfiguration>> serviceResult)
         throws Exception {
-        PromotionConfigurationService pointsConfigurationService = createMock(PromotionConfigurationService.class);
+        PromotionConfigurationServiceImpl pointsConfigurationService = createMock(PromotionConfigurationServiceImpl.class);
         expect(pointsConfigurationService.getByCompanyId(anyLong())).andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;
     }
 
-    private PromotionConfigurationService createPromotionConfigurationServiceForGetByRequiredPoints(
+    private PromotionConfigurationServiceImpl createPromotionConfigurationServiceForGetByRequiredPoints(
         ServiceResult<List<PromotionConfiguration>> serviceResult) throws Exception {
-        PromotionConfigurationService pointsConfigurationService = createMock(PromotionConfigurationService.class);
+        PromotionConfigurationServiceImpl pointsConfigurationService = createMock(PromotionConfigurationServiceImpl.class);
         expect(pointsConfigurationService.getByCompanyIdRequiredPoints(anyLong(), anyString())).andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;
     }
 
-    private PromotionConfigurationService createPromotionConfigurationServiceForDelete(ServiceResult<Boolean> serviceResult) throws Exception {
-        PromotionConfigurationService pointsConfigurationService = createMock(PromotionConfigurationService.class);
+    private PromotionConfigurationServiceImpl createPromotionConfigurationServiceForDelete(ServiceResult<Boolean> serviceResult) throws Exception {
+        PromotionConfigurationServiceImpl pointsConfigurationService = createMock(PromotionConfigurationServiceImpl.class);
         expect(pointsConfigurationService.deletePromotionConfiguration(anyLong())).andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;

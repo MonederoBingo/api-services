@@ -1,7 +1,7 @@
 package com.lealpoints.controller.auth;
 
-import com.lealpoints.service.CompanyService;
-import com.lealpoints.service.CompanyUserService;
+import com.lealpoints.service.implementations.CompanyServiceImpl;
+import com.lealpoints.service.implementations.CompanyUserServiceImpl;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.CompanyUserLogin;
@@ -19,8 +19,8 @@ public class CompanyAuthControllerTest {
     @Test
     public void testRegister() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, "1");
-        final CompanyService companyService = createCompanyServiceForRegister(expectedServiceResult);
-        final CompanyUserService companyUserService = createMock(CompanyUserService.class);
+        final CompanyServiceImpl companyService = createCompanyServiceForRegister(expectedServiceResult);
+        final CompanyUserServiceImpl companyUserService = createMock(CompanyUserServiceImpl.class);
         final CompanyAuthController companyController = new CompanyAuthController(companyUserService, companyService);
 
         final CompanyRegistration companyRegistration = new CompanyRegistration();
@@ -44,8 +44,8 @@ public class CompanyAuthControllerTest {
         CompanyLoginResult loginResult = new CompanyLoginResult();
         loginResult.setActive(true);
         final ServiceResult<CompanyLoginResult> expectedServiceResult = new ServiceResult<>(true, "name", loginResult);
-        final CompanyUserService companyUserService = createCompanyUserForLogin(expectedServiceResult);
-        final CompanyService companyService = createMock(CompanyService.class);
+        final CompanyUserServiceImpl companyUserService = createCompanyUserForLogin(expectedServiceResult);
+        final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         final CompanyAuthController companyUserController = new CompanyAuthController(companyUserService, companyService);
 
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
@@ -66,8 +66,8 @@ public class CompanyAuthControllerTest {
     @Test
     public void testSendActivationEmail() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, "");
-        CompanyUserService companyUserService = createCompanyUserForSendingActivation(expectedServiceResult);
-        final CompanyService companyService = createMock(CompanyService.class);
+        CompanyUserServiceImpl companyUserService = createCompanyUserForSendingActivation(expectedServiceResult);
+        final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyAuthController companyUserController = new CompanyAuthController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.sendActivationEmail("");
         assertNotNull(serviceResultResponseEntity);
@@ -81,8 +81,8 @@ public class CompanyAuthControllerTest {
     @Test
     public void testActivate() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, "");
-        CompanyUserService companyUserService = createCompanyUserForActivate(expectedServiceResult);
-        final CompanyService companyService = createMock(CompanyService.class);
+        CompanyUserServiceImpl companyUserService = createCompanyUserForActivate(expectedServiceResult);
+        final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyAuthController companyUserController = new CompanyAuthController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.activate("");
         assertNotNull(serviceResultResponseEntity);
@@ -96,8 +96,8 @@ public class CompanyAuthControllerTest {
     @Test
     public void testSendTempPasswordEmail() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, "");
-        CompanyUserService companyUserService = createCompanyUserForSendingTempPassword(expectedServiceResult);
-        final CompanyService companyService = createMock(CompanyService.class);
+        CompanyUserServiceImpl companyUserService = createCompanyUserForSendingTempPassword(expectedServiceResult);
+        final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyAuthController companyUserController = new CompanyAuthController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.sendTempPasswordEmail("");
         assertNotNull(serviceResultResponseEntity);
@@ -111,8 +111,8 @@ public class CompanyAuthControllerTest {
     @Test
     public void testChangePassword() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, "");
-        CompanyUserService companyUserService = createCompanyUserForChangingPassword(expectedServiceResult);
-        final CompanyService companyService = createMock(CompanyService.class);
+        CompanyUserServiceImpl companyUserService = createCompanyUserForChangingPassword(expectedServiceResult);
+        final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyAuthController companyUserController = new CompanyAuthController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.changePassword(new CompanyUserPasswordChanging());
         assertNotNull(serviceResultResponseEntity);
@@ -123,43 +123,43 @@ public class CompanyAuthControllerTest {
         verify(companyUserService);
     }
 
-    private CompanyUserService createCompanyUserForLogin(ServiceResult<CompanyLoginResult> serviceResult) throws Exception {
-        CompanyUserService companyUserService = EasyMock.createMock(CompanyUserService.class);
+    private CompanyUserServiceImpl createCompanyUserForLogin(ServiceResult<CompanyLoginResult> serviceResult) throws Exception {
+        CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
         expect(companyUserService.loginUser((CompanyUserLogin) anyObject())).andReturn(serviceResult);
         replay(companyUserService);
         return companyUserService;
     }
 
-    private CompanyUserService createCompanyUserForSendingActivation(ServiceResult serviceResult) throws Exception {
-        CompanyUserService companyUserService = EasyMock.createMock(CompanyUserService.class);
+    private CompanyUserServiceImpl createCompanyUserForSendingActivation(ServiceResult serviceResult) throws Exception {
+        CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
         expect(companyUserService.sendActivationEmail(anyString())).andReturn(serviceResult);
         replay(companyUserService);
         return companyUserService;
     }
 
-    private CompanyUserService createCompanyUserForSendingTempPassword(ServiceResult serviceResult) throws Exception {
-        CompanyUserService companyUserService = EasyMock.createMock(CompanyUserService.class);
+    private CompanyUserServiceImpl createCompanyUserForSendingTempPassword(ServiceResult serviceResult) throws Exception {
+        CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
         expect(companyUserService.sendTempPasswordEmail(anyString())).andReturn(serviceResult);
         replay(companyUserService);
         return companyUserService;
     }
 
-    private CompanyUserService createCompanyUserForChangingPassword(ServiceResult serviceResult) throws Exception {
-        CompanyUserService companyUserService = EasyMock.createMock(CompanyUserService.class);
+    private CompanyUserServiceImpl createCompanyUserForChangingPassword(ServiceResult serviceResult) throws Exception {
+        CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
         expect(companyUserService.changePassword(EasyMock.<CompanyUserPasswordChanging>anyObject())).andReturn(serviceResult);
         replay(companyUserService);
         return companyUserService;
     }
 
-    private CompanyUserService createCompanyUserForActivate(ServiceResult serviceResult) throws Exception {
-        CompanyUserService companyUserService = EasyMock.createMock(CompanyUserService.class);
+    private CompanyUserServiceImpl createCompanyUserForActivate(ServiceResult serviceResult) throws Exception {
+        CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
         expect(companyUserService.activateUser(anyString())).andReturn(serviceResult);
         replay(companyUserService);
         return companyUserService;
     }
 
-    private CompanyService createCompanyServiceForRegister(ServiceResult serviceResult) throws Exception {
-        final CompanyService companyService = EasyMock.createMock(CompanyService.class);
+    private CompanyServiceImpl createCompanyServiceForRegister(ServiceResult serviceResult) throws Exception {
+        final CompanyServiceImpl companyService = EasyMock.createMock(CompanyServiceImpl.class);
         expect(companyService.register((CompanyRegistration) anyObject())).andReturn(serviceResult).times(1);
         replay(companyService);
         return companyService;

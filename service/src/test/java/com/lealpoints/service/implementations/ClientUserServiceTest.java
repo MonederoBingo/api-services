@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
@@ -32,9 +32,10 @@ public class ClientUserServiceTest {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(Environment.DEV);
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
-        ClientUserService clientUserService = new ClientUserService(clientUserRepository, clientRepository, threadContextService, null, null) {
+        ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
 
@@ -61,7 +62,8 @@ public class ClientUserServiceTest {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(Environment.DEV);
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
-        ClientUserService clientUserService = new ClientUserService(clientUserRepository, clientRepository, threadContextService, null, null){
+        ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null, null) {
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                 return "123456";
@@ -77,9 +79,9 @@ public class ClientUserServiceTest {
 
     @Test
     public void testRegisterWithInvalidPhone() {
-        final ClientUserService clientUserService = new ClientUserService(null, null, null, null, null) {
+        final ClientUserServiceImpl clientUserService = new ClientUserServiceImpl(null, null, null, null, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
 
@@ -106,8 +108,8 @@ public class ClientUserServiceTest {
         clientUser.setSmsKey("qwerty");
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForPhone(clientUser);
         final ClientRepository clientRepository = createClientRepository();
-        final ClientUserService clientUserService =
-            new ClientUserService(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null){
+        final ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
@@ -137,14 +139,14 @@ public class ClientUserServiceTest {
         clientUser.setSmsKey("qwerty");
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForPhoneWhenNotUpdatingApiKey(clientUser);
         final ClientRepository clientRepository = createClientRepository();
-        final ClientUserService clientUserService =
-            new ClientUserService(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
+        final ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
                 }
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -172,8 +174,8 @@ public class ClientUserServiceTest {
         clientUser.setSmsKey("qwerty");
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForEmail(clientUser);
         final ClientRepository clientRepository = createClientRepository();
-        final ClientUserService clientUserService =
-            new ClientUserService(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null){
+        final ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
@@ -203,14 +205,14 @@ public class ClientUserServiceTest {
         clientUser.setSmsKey("qwerty");
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForEmailWhenNotUpdatingApiKey(clientUser);
         final ClientRepository clientRepository = createClientRepository();
-        final ClientUserService clientUserService =
-            new ClientUserService(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null){
+        final ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
                 }
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -232,7 +234,8 @@ public class ClientUserServiceTest {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext, 1);
-        ClientUserService clientUserService = new ClientUserService(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
+        ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                 return "";
@@ -250,11 +253,11 @@ public class ClientUserServiceTest {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext, 2);
-        ClientUserService clientUserService =
-            new ClientUserService(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
+        ClientUserServiceImpl clientUserService =
+            new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
 
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };

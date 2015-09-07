@@ -1,6 +1,6 @@
 package com.lealpoints.controller.api;
 
-import com.lealpoints.service.PromotionService;
+import com.lealpoints.service.implementations.PromotionServiceImpl;
 import com.lealpoints.service.model.PromotionApplying;
 import com.lealpoints.service.model.ServiceResult;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class PromotionControllerTest {
     @Test
     public void testAwardPoints() throws Exception {
         ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "", 1l);
-        PromotionService promotionService = createPromotionService(expectedServiceResult);
+        PromotionServiceImpl promotionService = createPromotionService(expectedServiceResult);
         PromotionController pointsController = new PromotionController(promotionService);
         PromotionApplying pointsAwarding = new PromotionApplying();
         pointsAwarding.setPromotionConfigurationId(1);
@@ -33,8 +33,8 @@ public class PromotionControllerTest {
         verify(promotionService);
     }
 
-    private PromotionService createPromotionService(ServiceResult<Long> serviceResult) throws Exception {
-        PromotionService pointsService = createMock(PromotionService.class);
+    private PromotionServiceImpl createPromotionService(ServiceResult<Long> serviceResult) throws Exception {
+        PromotionServiceImpl pointsService = createMock(PromotionServiceImpl.class);
         expect(pointsService.applyPromotion((PromotionApplying) anyObject())).andReturn(serviceResult);
         replay(pointsService);
         return pointsService;

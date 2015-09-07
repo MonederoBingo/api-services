@@ -3,7 +3,7 @@ package com.lealpoints.controller.api;
 import java.util.ArrayList;
 import java.util.List;
 import com.lealpoints.model.PointsInCompany;
-import com.lealpoints.service.CompanyService;
+import com.lealpoints.service.implementations.CompanyServiceImpl;
 import com.lealpoints.service.model.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class PointsInCompanyControllerTest {
         expectedPointsInCompanies.add(createCompany(1, "name1", "logo1", 100));
         expectedPointsInCompanies.add(createCompany(2, "name2", "logo2", 200));
         final ServiceResult<List<PointsInCompany>> expectedServiceResult = new ServiceResult<>(true, "1", expectedPointsInCompanies);
-        final CompanyService clientService = createCompanyServiceForGetPoints(expectedServiceResult);
+        final CompanyServiceImpl clientService = createCompanyServiceForGetPoints(expectedServiceResult);
         final PointsInCompanyController pointsInCompanyController = new PointsInCompanyController(clientService);
 
         ResponseEntity<ServiceResult<List<PointsInCompany>>> responseEntity = pointsInCompanyController.getByClientId("1234567890");
@@ -43,8 +43,8 @@ public class PointsInCompanyControllerTest {
         verify(clientService);
     }
 
-    private CompanyService createCompanyServiceForGetPoints(ServiceResult<List<PointsInCompany>> serviceResult) throws Exception {
-        final CompanyService companyService = EasyMock.createMock(CompanyService.class);
+    private CompanyServiceImpl createCompanyServiceForGetPoints(ServiceResult<List<PointsInCompany>> serviceResult) throws Exception {
+        final CompanyServiceImpl companyService = EasyMock.createMock(CompanyServiceImpl.class);
         expect(companyService.getPointsInCompanyByPhone(anyString())).andReturn(serviceResult).times(1);
         replay(companyService);
         return companyService;

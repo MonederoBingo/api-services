@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import com.lealpoints.model.Company;
-import com.lealpoints.service.CompanyService;
+import com.lealpoints.service.implementations.CompanyServiceImpl;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.util.Translations;
 import org.apache.commons.fileupload.FileItem;
@@ -21,7 +21,7 @@ public class CompanyControllerTest {
 
     @Test
     public void testUpdateLogo() throws FileUploadException {
-        CompanyService companyService = createCompanyService(new ServiceResult<Boolean>(true, Translations.Message.YOUR_LOGO_WAS_UPDATED.name()));
+        CompanyServiceImpl companyService = createCompanyService(new ServiceResult<Boolean>(true, Translations.Message.YOUR_LOGO_WAS_UPDATED.name()));
         final ServletFileUpload servletFileUpload = createMock(ServletFileUpload.class);
         expect(servletFileUpload.parseRequest((HttpServletRequest) anyObject())).andReturn(new ArrayList<FileItem>());
         replay(servletFileUpload);
@@ -47,7 +47,7 @@ public class CompanyControllerTest {
         company.setName("name");
         company.setUrlImageLogo("logo.png");
         ServiceResult<Company> serviceResult = new ServiceResult<>(true, "", company);
-        CompanyService companyService = createCompanyServiceForGet(serviceResult);
+        CompanyServiceImpl companyService = createCompanyServiceForGet(serviceResult);
         CompanyController companyController = new CompanyController(companyService);
         ResponseEntity<ServiceResult<Company>> responseEntity = companyController.get(1);
         assertNotNull(responseEntity);
@@ -63,7 +63,7 @@ public class CompanyControllerTest {
 
     @Test
     public void testSendMobileAppAdMessage() {
-        CompanyService companyService = createStrictMock(CompanyService.class);
+        CompanyServiceImpl companyService = createStrictMock(CompanyServiceImpl.class);
         expect(companyService.sendMobileAppAdMessage(anyInt(), anyString())).andReturn(new ServiceResult(true, ""));
         replay(companyService);
         CompanyController clientController = new CompanyController(companyService);
@@ -75,15 +75,15 @@ public class CompanyControllerTest {
         verify(companyService);
     }
 
-    private CompanyService createCompanyService(ServiceResult<Boolean> serviceResult) {
-        CompanyService companyService = createMock(CompanyService.class);
+    private CompanyServiceImpl createCompanyService(ServiceResult<Boolean> serviceResult) {
+        CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         expect(companyService.updateLogo((List<FileItem>) anyObject(), anyLong())).andReturn(serviceResult);
         replay(companyService);
         return companyService;
     }
 
-    private CompanyService createCompanyServiceForGet(ServiceResult<Company> company) throws Exception {
-        final CompanyService companyService = EasyMock.createMock(CompanyService.class);
+    private CompanyServiceImpl createCompanyServiceForGet(ServiceResult<Company> company) throws Exception {
+        final CompanyServiceImpl companyService = EasyMock.createMock(CompanyServiceImpl.class);
         expect(companyService.getByCompanyId(anyLong())).andReturn(company).times(1);
         replay(companyService);
         return companyService;

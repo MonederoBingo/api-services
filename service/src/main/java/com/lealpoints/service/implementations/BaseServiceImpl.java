@@ -1,28 +1,29 @@
-package com.lealpoints.service.base;
+package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.service.BaseService;
 import com.lealpoints.util.Translations;
 
-public class BaseService {
+public class BaseServiceImpl implements BaseService {
 
     private final Translations _translations;
     private final ThreadContextService _threadContextService;
 
-    public BaseService(Translations translations, ThreadContextService threadContextService) {
+    public BaseServiceImpl(Translations translations, ThreadContextService threadContextService) {
         _translations = translations;
         _threadContextService = threadContextService;
     }
 
-    protected String getTranslation(Translations.Message message) {
+    public String getTranslation(Translations.Message message) {
         return _translations.getMessage(message);
     }
 
-    protected boolean isProdEnvironment() {
+    public boolean isProdEnvironment() {
         return _threadContextService.getThreadContext().getEnvironment() == Environment.PROD;
     }
 
-    protected Environment getEnvironment() {
+    public Environment getEnvironment() {
         return _threadContextService.getThreadContext().getEnvironment();
     }
 }

@@ -1,4 +1,4 @@
-package com.lealpoints.service.validation;
+package com.lealpoints.service.implementations;
 
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.util.Translations;
@@ -11,10 +11,10 @@ public class PhoneValidatorServiceTest {
 
     @Test
     public void testValidate() {
-        PhoneValidatorService phoneValidatorService = new PhoneValidatorService(null, null) {
+        PhoneValidatorServiceImpl phoneValidatorService = new PhoneValidatorServiceImpl(null, null) {
 
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };

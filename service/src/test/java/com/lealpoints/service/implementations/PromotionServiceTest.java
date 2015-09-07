@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import java.sql.SQLException;
 import com.lealpoints.context.ThreadContextService;
@@ -30,11 +30,11 @@ public class PromotionServiceTest {
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContextService threadContextService = createThreadContextService(queryAgent);
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository();
-        PromotionService promotionService =
-            new PromotionService(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
+        PromotionServiceImpl promotionService =
+            new PromotionServiceImpl(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
                 threadContextService, null) {
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };

@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import java.sql.SQLException;
 import com.lealpoints.context.ThreadContextService;
@@ -14,7 +14,6 @@ import com.lealpoints.repository.PointsRepository;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
-import com.lealpoints.service.validation.PhoneValidatorService;
 import com.lealpoints.util.Translations;
 import org.easymock.EasyMockSupport;
 import org.junit.Test;
@@ -26,12 +25,12 @@ public class PointsServiceTest extends EasyMockSupport {
 
     @Test
     public void testAwardPoints() throws Exception {
-        PointsService pointsService =
-            new PointsService(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
+        PointsServiceImpl pointsService =
+            new PointsServiceImpl(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
                 createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()), null,
                 createPhoneValidatorService(true, "")) {
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -52,11 +51,11 @@ public class PointsServiceTest extends EasyMockSupport {
 
     @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
-        PointsService pointsService = new PointsService(null, null, null, null, null, null,
+        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null, null,
             createPhoneValidatorService(false, Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name())) {
 
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };
@@ -70,11 +69,11 @@ public class PointsServiceTest extends EasyMockSupport {
 
     @Test
     public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
-        PointsService pointsService =
-            new PointsService(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null, null, createPhoneValidatorService(true, "")) {
+        PointsServiceImpl pointsService =
+            new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null, null, createPhoneValidatorService(true, "")) {
 
                 @Override
-                protected String getTranslation(Translations.Message message) {
+                public String getTranslation(Translations.Message message) {
                     return message.name();
                 }
             };
@@ -86,8 +85,8 @@ public class PointsServiceTest extends EasyMockSupport {
         verifyAll();
     }
 
-    private PhoneValidatorService createPhoneValidatorService(boolean isValid, String message) {
-        PhoneValidatorService phoneValidatorService = createStrictMock(PhoneValidatorService.class);
+    private PhoneValidatorServiceImpl createPhoneValidatorService(boolean isValid, String message) {
+        PhoneValidatorServiceImpl phoneValidatorService = createStrictMock(PhoneValidatorServiceImpl.class);
         expect(phoneValidatorService.validate(anyString())).andReturn(new ValidationResult(isValid, message));
         return phoneValidatorService;
     }

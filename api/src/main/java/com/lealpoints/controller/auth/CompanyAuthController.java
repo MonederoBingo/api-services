@@ -7,8 +7,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import com.lealpoints.service.CompanyService;
-import com.lealpoints.service.CompanyUserService;
+import com.lealpoints.service.implementations.CompanyServiceImpl;
+import com.lealpoints.service.implementations.CompanyUserServiceImpl;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.CompanyUserLogin;
@@ -32,11 +32,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/company")
 public class CompanyAuthController extends AbstractAuthController {
 
-    private final CompanyUserService _companyUserService;
-    private final CompanyService _companyService;
+    private final CompanyUserServiceImpl _companyUserService;
+    private final CompanyServiceImpl _companyService;
 
     @Autowired
-    public CompanyAuthController(CompanyUserService companyUserService, CompanyService companyService) {
+    public CompanyAuthController(CompanyUserServiceImpl companyUserService, CompanyServiceImpl companyService) {
         _companyUserService = companyUserService;
         _companyService = companyService;
     }

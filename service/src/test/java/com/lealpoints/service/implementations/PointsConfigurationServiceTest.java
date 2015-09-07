@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.PointsConfigurationRepository;
@@ -18,7 +18,7 @@ public class PointsConfigurationServiceTest {
         expectedPointsConfiguration.setPointsToEarn(10);
         expectedPointsConfiguration.setRequiredAmount(100);
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepositoryForGet(expectedPointsConfiguration);
-        PointsConfigurationService pointsConfigurationService = new PointsConfigurationService(pointsConfigurationRepository, null, null);
+        PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null, null);
 
         ServiceResult<PointsConfiguration> serviceResult = pointsConfigurationService.getByCompanyId(1);
         assertNotNull(serviceResult);
@@ -36,9 +36,9 @@ public class PointsConfigurationServiceTest {
     @Test
     public void testUpdate() throws Exception {
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepositoryForUpdate();
-        PointsConfigurationService pointsConfigurationService = new PointsConfigurationService(pointsConfigurationRepository, null, null) {
+        PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null, null) {
             @Override
-            protected String getTranslation(Translations.Message message) {
+            public String getTranslation(Translations.Message message) {
                 return message.name();
             }
         };

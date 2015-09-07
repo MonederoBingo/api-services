@@ -1,4 +1,4 @@
-package com.lealpoints.service;
+package com.lealpoints.service.implementations;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class SMSServiceTest {
 
         final HttpURLConnection httpURLConnection = creteHttpURLConnection();
 
-        SMSService smsService = new SMSService() {
+        SMSServiceImpl smsService = new SMSServiceImpl(null, null) {
 
             @Override
             URL getUrl(String phone, String message) throws MalformedURLException {
@@ -37,7 +37,7 @@ public class SMSServiceTest {
             }
 
             @Override
-            String getResponse(HttpURLConnection connection) throws IOException {
+            public String getResponse(HttpURLConnection connection) throws IOException {
                 return "OK";
             }
         };
