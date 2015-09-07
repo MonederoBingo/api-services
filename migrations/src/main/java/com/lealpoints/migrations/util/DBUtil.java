@@ -7,19 +7,19 @@ import java.sql.Statement;
 import org.apache.commons.io.FileUtils;
 
 public class DBUtil {
-    public static void executeSql(String sql, Connection conn) throws MigrationException {
+    public static void executeSql(String sql, Connection conn) {
         Statement st = null;
         try {
             st = conn.createStatement();
             st.execute(sql);
         } catch (SQLException e) {
-            throw new MigrationException("Failed to execute SQL statement: " + sql);
+            throw new RuntimeException("Failed to execute SQL statement: " + sql);
         } finally {
             if (st != null) {
                 try {
                     st.close();
                 } catch (SQLException e) {
-                    throw new MigrationException(e.getMessage());
+                    throw new RuntimeException(e.getMessage());
                 }
             }
         }

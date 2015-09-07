@@ -160,7 +160,8 @@ public class CompanyService extends BaseService {
     String getSMSMessage(String companyName, double points) {
         final String translation = getTranslation(Translations.Message.MOBILE_APP_AD_MESSAGE);
         int SMS_MESSAGE_MAX_CHAR = 160;
-        final int formattedMessageLength = String.format(translation, points, "", "http://tinyurl.com/og2b56y").length();
+        final String appUrl = "https://goo.gl/JRssA6";
+        final int formattedMessageLength = String.format(translation, points, "", appUrl).length();
         if (formattedMessageLength >= SMS_MESSAGE_MAX_CHAR) {
             throw new IllegalArgumentException("Message length must be less than " + SMS_MESSAGE_MAX_CHAR + " in: " + translation);
         }
@@ -169,7 +170,7 @@ public class CompanyService extends BaseService {
         if (maxCompanyNameLength > 0) {
             trimmedCompanyName = StringUtils.abbreviate(companyName, Math.max(Math.min(maxCompanyNameLength, companyName.length()), 4));
         }
-        return String.format(translation, new DecimalFormat("#.#").format(points), trimmedCompanyName, "http://tinyurl.com/og2b56y");
+        return String.format(translation, new DecimalFormat("#.#").format(points), trimmedCompanyName, appUrl);
     }
 
     public File getLogo(long companyId) {

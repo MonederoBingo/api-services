@@ -298,7 +298,7 @@ public class CompanyServiceTest {
         String smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name", 1000);
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Leal Points to see our promotions. " +
-            "http://tinyurl.com/og2b56y", smsMessage);
+            "https://goo.gl/JRssA6", smsMessage);
 
         companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
@@ -308,7 +308,7 @@ public class CompanyServiceTest {
         };
         smsMessage = companyService.getSMSMessage("TG", 1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at TG. Install Leal Points to see our promotions. " + "http://tinyurl.com/og2b56y", smsMessage);
+        assertEquals("You've got 1000 points at TG. Install Leal Points to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
 
         companyService = new CompanyService(null, null, null, null, null, null, null, null, null, null) {
             @Override
@@ -318,8 +318,8 @@ public class CompanyServiceTest {
         };
         smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does.... " +
-            "Install Leal Points to see our promotions. http://tinyurl.com/og2b56y", smsMessage);
+        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does not .... " +
+            "Install Leal Points to see our promotions. https://goo.gl/JRssA6", smsMessage);
     }
 
     @Test

@@ -135,7 +135,7 @@ public class ClientUserService extends BaseService {
         NotificationEmail notificationEmail = new NotificationEmail();
         notificationEmail.setSubject(getTranslation(Translations.Message.ACTIVATION_EMAIL_SUBJECT));
         notificationEmail.setBody("Phone: " + phone + ", Key:" + key);
-        notificationEmail.setEmailTo("alayor3@gmail.com");
+        notificationEmail.setEmailTo("aayala@lealpoints.com");
         EmailUtil.sendEmail(notificationEmail);
     }
 

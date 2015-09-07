@@ -1,7 +1,7 @@
 package com.lealpoints.migrations;
 
+import javax.sql.DataSource;
 import java.io.File;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,29 +10,44 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import com.lealpoints.migrations.db.DatabaseManager;
-import com.lealpoints.migrations.db.DevelopmentDatabaseManager;
-import com.lealpoints.migrations.db.FunctionalTestDatabaseManager;
-import com.lealpoints.migrations.db.UnitTestDatabaseManager;
+import com.lealpoints.db.DataSourceFactory;
 import com.lealpoints.migrations.util.DBUtil;
-import com.lealpoints.migrations.util.DateUtil;
+import com.lealpoints.util.DateUtil;
 import org.apache.commons.collections15.CollectionUtils;
 import org.apache.commons.collections15.Predicate;
 
-public class Migrate2 {
+public class Migrate {
     public static void main(String[] args) throws Exception {
-        System.out.println("Running migrations for development...");
-        new Migrate2().run(new DevelopmentDatabaseManager());
-        System.out.println("Running migrations for unit test...");
-        new Migrate2().run(new UnitTestDatabaseManager());
-        System.out.println("Running migrations for functional test...");
-        new Migrate2().run(new FunctionalTestDatabaseManager());
+        for (String arg : args) {
+            switch (arg) {
+                case "dev":
+                    System.out.println("Running migrations for development...");
+                    Migrate.run(DataSourceFactory.getDevDataSource());
+                    break;
+                case "unit_test":
+                    System.out.println("Running migrations for unit test...");
+                    Migrate.run(DataSourceFactory.getUnitTestDataSource());
+                    break;
+                case "functional_test":
+                    System.out.println("Running migrations for functional test...");
+                    Migrate.run(DataSourceFactory.getFunctionalTestDataSource());
+                    break;
+                case "prod":
+                    System.out.println("Running migrations for production...");
+                    Migrate.run(DataSourceFactory.getProdDataSource());
+                    break;
+                case "uat":
+                    System.out.println("Running migrations for uat...");
+                    Migrate.run(DataSourceFactory.getUATDataSource());
+                    break;
+            }
+        }
         System.out.println("Process finished successfully.");
     }
 
-    private void run(DatabaseManager abstractDatabaseManager) throws Exception {
-        File[] files = loadMigrationScripts(abstractDatabaseManager);
-        Connection connection = abstractDatabaseManager.getConnection();
+    private static void run(DataSource dataSource) throws Exception {
+        File[] files = loadMigrationScripts(dataSource);
+        Connection connection = dataSource.getConnection();
         String lastFileExecuted = "";
         for (File file : files) {
             DBUtil.executeScript(file, connection);
@@ -44,17 +59,12 @@ public class Migrate2 {
         }
     }
 
-    private File[] loadMigrationScripts(DatabaseManager databaseManager) throws Exception {
-        ClassLoader classLoader = getClass().getClassLoader();
-        final URL resource = classLoader.getResource("scripts/migrations/");
-        if (resource == null) {
-            return new File[0];
-        }
-        File dir = new File(resource.getFile());
+    private static File[] loadMigrationScripts(DataSource dataSource) throws Exception {
+        File dir = new File("scripts/migrations");
         File[] filesArray = dir.listFiles();
         List<File> filesFromMigration = new ArrayList<>();
         if (filesArray != null) {
-            filesFromMigration = filterMigrationsByDate(Arrays.asList(filesArray), databaseManager);
+            filesFromMigration = filterMigrationsByDate(Arrays.asList(filesArray), dataSource);
         }
 
         List<File> totalListFiles = new ArrayList<>();
@@ -65,8 +75,8 @@ public class Migrate2 {
         return totalArrayFiles;
     }
 
-    private List<File> filterMigrationsByDate(List<File> filesFromSetup, DatabaseManager abstractDatabaseManager) throws Exception {
-        final Connection connection = abstractDatabaseManager.getConnection();
+    private static List<File> filterMigrationsByDate(List<File> filesFromSetup, DataSource dataSource) throws Exception {
+        final Connection connection = dataSource.getConnection();
         Statement st = null;
         Collection<File> filteredFiles = filesFromSetup;
         try {

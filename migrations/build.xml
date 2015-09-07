@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <project name="lealpoints_master" default="all">
     <property environment="env" />
-    <property name="build" value="target/classes"/>
     <property name="src.migrations.util" value="src/main/java/com/lealpoints/migrations/util"/>
     <property name="src.migrations.db" value="src/main/java/com/lealpoints/migrations/db"/>
     <property name="src.migrations" value="src/main/java/com/lealpoints/migrations"/>
@@ -10,7 +9,6 @@
         <fileset dir="${env.MAVEN_REPOSITORY}">
             <include name="**/*.jar" />
         </fileset>
-        <pathelement location="${build}"/>
     </path>
 
     <target name="init">
@@ -80,15 +78,20 @@
         <java classname="com.lealpoints.migrations.CreateDb" classpathref="classpath"/>
     </target>
     <target name="migrate" description="Updates the database" depends="compile">
-        <java classname="com.lealpoints.migrations.Migrate2" classpathref="classpath"/>
+        <java classname="com.lealpoints.migrations.Migrate" classpathref="classpath">
+            <arg value="dev"/>
+            <arg value="unit_test"/>
+            <arg value="functional_test"/>
+        </java>
     </target>
     <target name="prod_migrate" description="Updates the database" depends="compile">
-        <java classname="com.lealpoints.migrations.MigrateProduction2" classpathref="classpath"/>
+        <java classname="com.lealpoints.migrations.Migrate" classpathref="classpath">
+            <arg value="prod"/>
+            <arg value="uat"/>
+        </java>
     </target>
     <target name="create-migration" description="Creates a new file into migrations directory" depends="compile">
-        <javac srcdir="${src.migrations}/util" destdir="${build}" classpathref="classpath"/>
-        <taskdef name="slugifytask" classname="com.lealpoints.migrations.util.SlugifyTask"
-                 classpathref="classpath"/>
+        <taskdef name="slugifytask" classname="com.lealpoints.migrations.util.SlugifyTask" classpathref="classpath"/>
         <input message="Type a short description of what migration does: " addproperty="migration.description"/>
         <slugifytask string="${migration.description}" propertyName="migration.description.slug"/>
         <tstamp>
@@ -96,7 +99,7 @@
         </tstamp>
 
         <property name="migration.filename" value="${migration.prefix}_${migration.description.slug}.sql"/>
-        <touch file="src/main/resources/scripts/migrations/${migration.filename}"/>
+        <touch file="scripts/migrations/${migration.filename}"/>
         <echo>File ${migration.filename} was created!</echo>
     </target>
     <target name="clean">

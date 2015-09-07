@@ -1,57 +1,43 @@
 package com.lealpoints.migrations;
 
 import java.io.File;
-import java.net.URL;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.lealpoints.migrations.db.DevelopmentDatabaseManager;
-import com.lealpoints.migrations.db.FunctionalTestDatabaseManager;
-import com.lealpoints.migrations.db.UnitTestDatabaseManager;
+import com.lealpoints.db.DataSourceFactory;
 import com.lealpoints.migrations.util.DBUtil;
 import org.apache.commons.io.FileUtils;
 
 public class CreateDb {
 
-    private DevelopmentDatabaseManager _developmentDatabaseManager = new DevelopmentDatabaseManager();
-
     public static void main(String[] args) throws Exception {
         System.out.println("Creating database...");
-        CreateDb createDb = new CreateDb();
-        createDb.run();
+        CreateDb.run();
         System.out.println("Database create successfully.");
-        Migrate2.main(null);
+        Migrate.main(null);
     }
 
-    private void run() throws Exception {
-        ClassLoader classLoader = getClass().getClassLoader();
-        final URL resource = classLoader.getResource("scripts/createdb.sql");
-        if (resource != null) {
-            String sql = FileUtils.readFileToString(new File(resource.getFile()));
-            Connection connection = _developmentDatabaseManager.getConnection(false);
-            DBUtil.executeSql(sql, connection);
-            runSetupScripts();
-        }
+    private static void run() throws Exception {
+        File file = new File("scripts/createdb.sql");
+        String sql = FileUtils.readFileToString(file);
+        Connection connection = DataSourceFactory.getDevDataSource().getConnection();
+        DBUtil.executeSql(sql, connection);
+        runSetupScripts();
     }
 
-    private void runSetupScripts() throws Exception {
+    private static void runSetupScripts() throws Exception {
         final File[] scripts = loadSetupScripts();
         for (File script : scripts) {
             System.out.println(script.getName());
-            DBUtil.executeScript(script, new DevelopmentDatabaseManager().getConnection());
-            DBUtil.executeScript(script, new UnitTestDatabaseManager().getConnection());
-            DBUtil.executeScript(script, new FunctionalTestDatabaseManager().getConnection());
+            DBUtil.executeScript(script, DataSourceFactory.getDevDataSource().getConnection());
+            DBUtil.executeScript(script, DataSourceFactory.getUnitTestDataSource().getConnection());
+            DBUtil.executeScript(script, DataSourceFactory.getFunctionalTestDataSource().getConnection());
         }
     }
 
-    private File[] loadSetupScripts() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        final URL resource = classLoader.getResource("scripts/setup/");
-        if (resource == null) {
-            return new File[0];
-        }
-        File dir = new File(resource.getFile());
+    private static File[] loadSetupScripts() {
+        File dir = new File("scripts/setup");
         File[] filesArray = dir.listFiles();
         List<File> filesFromSetup = new ArrayList<>();
         if (filesArray != null) {
