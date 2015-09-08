@@ -10,7 +10,7 @@ angular
             $scope.showMessage = false;
             $scope.isError = false;
             $scope.clients = [];
-            ApiService.callApi('GET', 'clients/' + Session.user.companyId)
+            ApiService.sendRequestToApi('GET', 'clients/' + Session.user.companyId)
                 .success(function(data) {
                     console.log(data);
                     $scope.isProcessing = false;
@@ -36,7 +36,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiService.callApi('PUT', 'companies/' + Session.user.companyId + "/" + $scope.clients[idx].client.phone + '/send_promo_sms')
+                ApiService.sendRequestToApi('PUT', 'companies/' + Session.user.companyId + "/" + $scope.clients[idx].client.phone + '/send_promo_sms')
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

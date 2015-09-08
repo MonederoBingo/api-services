@@ -24,7 +24,7 @@ angular
 
             function getPromotions() {
                 $scope.isProcessing = true;
-                ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId)
+                ApiService.sendRequestToApi('GET', 'promotion_configuration/' + Session.user.companyId)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         $scope.promotions = data.object;
@@ -41,7 +41,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiService.callApi('DELETE', 'promotion_configuration/' + $scope.promotions[idx].promotionConfigurationId)
+                ApiService.sendRequestToApi('DELETE', 'promotion_configuration/' + $scope.promotions[idx].promotionConfigurationId)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

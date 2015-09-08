@@ -6,7 +6,7 @@ angular
             $scope.showMessage = false;
             $scope.isProcessing = true;
             $scope.isError = false;
-            ApiService.callAuthApi('GET',  'company/activate/' + $location.search().key)
+            ApiService.sendRequest('GET',  'company/activate/' + $location.search().key)
                 .success(function(data) {
                     $scope.isProcessing = false;
                     if (data.success) {

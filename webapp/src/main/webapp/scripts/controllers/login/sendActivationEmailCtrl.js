@@ -9,7 +9,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isProcessing = true;
                 $scope.isError = false;
-                ApiService.callAuthApi('POST',  'company/send_activation_email/', $scope.formData.email)
+                ApiService.sendRequest('POST',  'company/send_activation_email/', $scope.formData.email)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {

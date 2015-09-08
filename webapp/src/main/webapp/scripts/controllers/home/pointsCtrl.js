@@ -13,7 +13,7 @@ angular
             $scope.isProcessing = false;
             $scope.points = 0;
             $scope.mapping = {};
-            ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
+            ApiService.sendRequestToApi('GET', 'points_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     if(data.object.pointsToEarn == 0 ) {
                         $scope.isWarning = true;
@@ -22,7 +22,7 @@ angular
                     }
                 });
 
-            ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
+            ApiService.sendRequestToApi('GET', 'points_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     console.log(data);
                     $scope.isProcessing = false;
@@ -34,7 +34,7 @@ angular
                     $scope.message = $translate.instant('AN_ERROR_OCCURRED');
                 });
 
-            ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId)
+            ApiService.sendRequestToApi('GET', 'promotion_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     console.log(data);
                     $scope.isProcessing = false;
@@ -54,7 +54,7 @@ angular
                 $scope.formData.companyId = Session.user.companyId;
                 $scope.isProcessing = true;
                 $scope.showMessage = false;
-                ApiService.callApi('POST', 'points/', $scope.formData)
+                ApiService.sendRequestToApi('POST', 'points/', $scope.formData)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;
@@ -82,7 +82,7 @@ angular
             };
 
             function getClient() {
-                ApiService.callApi('GET', 'clients/' + Session.user.companyId + '/' + $scope.formData.phone)
+                ApiService.sendRequestToApi('GET', 'clients/' + Session.user.companyId + '/' + $scope.formData.phone)
                     .success(function(data) {
                         $scope.mapping = data.object;
                     });
@@ -93,7 +93,7 @@ angular
                 $scope.isProcessing = true;
                 $scope.isError = false;
                 $("#send_button").hide();
-                ApiService.callApi('PUT', 'companies/' + Session.user.companyId + "/" + $scope.mapping.client.phone + '/send_promo_sms')
+                ApiService.sendRequestToApi('PUT', 'companies/' + Session.user.companyId + "/" + $scope.mapping.client.phone + '/send_promo_sms')
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

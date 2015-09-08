@@ -14,7 +14,7 @@ angular
                 $scope.isProcessing = true;
                 $scope.isError = false;
                 $scope.isWarning = false;
-                ApiService.callAuthApi('POST', 'company/change_password', $scope.formData)
+                ApiService.sendRequest('POST', 'company/change_password', $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
