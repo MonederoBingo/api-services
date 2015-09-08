@@ -5,7 +5,7 @@ angular
             var service = {};
             service.getClientPoints = function (phone){
                 $rootScope.isProcessing = true;
-                ApiService.callApi('GET', 'clients/' + Session.user.companyId + "/" + phone, $rootScope.formData)
+                ApiService.sendRequestToApi('GET', 'clients/' + Session.user.companyId + "/" + phone, $rootScope.formData)
                     .success(function(data) {
                         $rootScope.isProcessing = false;
                         if (data.success) {

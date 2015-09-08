@@ -12,7 +12,7 @@ angular
                 $scope.isError = false;
                 $scope.formData.companyId = Session.user.companyId;
                 $scope.isProcessing = true;
-                ApiService.callApi('POST', 'clients/', $scope.formData)
+                ApiService.sendRequestToApi('POST', 'clients/', $scope.formData)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

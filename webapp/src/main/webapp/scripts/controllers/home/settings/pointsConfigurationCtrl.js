@@ -8,7 +8,7 @@ angular
             $scope.formData = {};
             $scope.showMessage = false;
             $scope.isProcessing = true;
-            ApiService.callApi('GET', 'points_configuration/' + Session.user.companyId)
+            ApiService.sendRequestToApi('GET', 'points_configuration/' + Session.user.companyId)
                 .success(function(data) {
                     console.log(data);
                     $scope.isProcessing = false;
@@ -25,7 +25,7 @@ angular
                 $scope.showMessage = false;
                 $scope.isError = false;
                 $scope.isProcessing = true;
-                ApiService.callApi('PUT', 'points_configuration',  $scope.formData)
+                ApiService.sendRequestToApi('PUT', 'points_configuration',  $scope.formData)
                     .success(function(data) {
                         console.log(data);
                         $scope.isProcessing = false;

@@ -16,7 +16,7 @@ angular
                 $scope.isProcessing = true;
                 $scope.isError = false;
                 $scope.isWarning = false;
-                ApiService.callApi('GET', 'promotion_configuration/' + Session.user.companyId + "/" + $scope.formData.phone, $scope.formData)
+                ApiService.sendRequestToApi('GET', 'promotion_configuration/' + Session.user.companyId + "/" + $scope.formData.phone, $scope.formData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
@@ -49,7 +49,7 @@ angular
                 $scope.applyData.promotionConfigurationId = $scope.promotions[idx].promotionConfigurationId;
                 $scope.applyData.phone = $scope.formData.phone;
                 $scope.applyData.companyId = Session.user.companyId;
-                ApiService.callApi('POST', 'promotions', $scope.applyData)
+                ApiService.sendRequestToApi('POST', 'promotions', $scope.applyData)
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
