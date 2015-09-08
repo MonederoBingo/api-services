@@ -176,7 +176,11 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         try {
             final Company company = _companyRepository.getByCompanyId(companyId);
             if (company != null) {
-                return new File(getThreadContext().getEnvironment().getImageDir() + company.getUrlImageLogo());
+                if (StringUtils.isEmpty(company.getUrlImageLogo())) {
+                    return new File(getThreadContext().getEnvironment().getImageDir() + "no_image.png");
+                } else {
+                    return new File(getThreadContext().getEnvironment().getImageDir() + company.getUrlImageLogo());
+                }
             } else {
                 logger.error("None company has the companyId: " + companyId);
             }

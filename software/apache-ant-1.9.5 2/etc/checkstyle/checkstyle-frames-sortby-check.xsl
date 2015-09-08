@@ -1,8 +1,6 @@
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0"
-    xmlns:lxslt="http://xml.apache.org/xslt"
-    xmlns:redirect="http://xml.apache.org/xalan/redirect"
-    extension-element-prefixes="redirect">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:redirect="http://xml.apache.org/xalan/redirect" version="2.0"
+                extension-element-prefixes="redirect">
 
 <!--
    Licensed to the Apache Software Foundation (ASF) under one or more
@@ -126,7 +124,7 @@
 
     <!--
     Generates the content table for the given check module.
-    @param filter full qualified module name 
+    @param filter full qualified module name
     -->
     <xsl:template name="data">
         <xsl:param name="filter"/>
@@ -157,7 +155,7 @@
     Generates the data rows for the current check module.
     Ignores errors in the current file from other modules.
     @param node the file with the errors
-    @param filter full qualified module name 
+    @param filter full qualified module name
     -->
     <xsl:template name="data-rows">
         <xsl:param name="node"/>
