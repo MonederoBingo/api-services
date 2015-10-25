@@ -20,7 +20,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
         DataSource dataSource = _dataSources.get(key);
         if (dataSource == null) {
             dataSource = createDataSource(environment);
-            _dataSources.putIfAbsent(key, dataSource);
+            _dataSources.put(key, dataSource);
             if (_logger.isInfoEnabled()) {
                 _logger.info("Adding new datasource, current data source keys = " + _dataSources.keySet());
             }
