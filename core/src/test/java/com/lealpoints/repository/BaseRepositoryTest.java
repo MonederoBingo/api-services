@@ -5,8 +5,11 @@ import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.Statement;
 import com.lealpoints.common.PropertyManager;
-import com.lealpoints.db.DataSourceFactory;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.datasources.DataSourceFactory;
+import com.lealpoints.db.datasources.DataSourceFactoryImpl;
+import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgentFactoryImpl;
+import com.lealpoints.environments.UnitTestEnvironment;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -16,15 +19,20 @@ import org.junit.Before;
  */
 public class BaseRepositoryTest {
 
-    private QueryAgent _queryAgent;
+    private static QueryAgent _queryAgent;
 
     static {
         PropertyManager.reloadConfiguration();
+        loadQueryAgent();
+    }
+
+    private static void loadQueryAgent() {
+        DataSourceFactory dataSourceFactory = new DataSourceFactoryImpl();
+        _queryAgent = new QueryAgentFactoryImpl(dataSourceFactory).getQueryAgent(new UnitTestEnvironment());
     }
 
     @Before
     public void setUpBase() throws Exception {
-        _queryAgent = new QueryAgent(DataSourceFactory.getUnitTestDataSource());
         _queryAgent.beginTransaction();
     }
 
@@ -34,7 +42,7 @@ public class BaseRepositoryTest {
     }
 
     protected void insertFixture(String fixturesFileName) throws Exception {
-        final String fixturesDirectory = "../../lealpoints-services/database/scripts/fixtures/test/unit/";
+        final String fixturesDirectory = PropertyManager.getProperty("unit_test.fixture_dir");
         File file = new File(fixturesDirectory + fixturesFileName);
         executeFixtureFile(file);
     }
@@ -47,8 +55,7 @@ public class BaseRepositoryTest {
         if (scriptFile.exists() && scriptFile.isFile()) {
             String sql = FileUtils.readFileToString(scriptFile, "UTF-8");
             executeSql(sql, _queryAgent.getConnection());
-        }
-        else {
+        } else {
             throw new FileNotFoundException();
         }
     }

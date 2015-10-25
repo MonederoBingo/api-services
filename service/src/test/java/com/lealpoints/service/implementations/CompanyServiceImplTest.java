@@ -5,10 +5,10 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.CompanyClientMapping;
@@ -37,10 +37,10 @@ public class CompanyServiceImplTest {
     public void testRegister() throws Exception {
         final CompanyRepository companyRepository = createCompanyRepository();
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository();
-        PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepository();
+        final PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepository();
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(Environment.DEV);
+        threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         PromotionConfigurationRepository promotionConfigurationRepository = createStrictMock(PromotionConfigurationRepository.class);
         expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1l);
@@ -141,7 +141,7 @@ public class CompanyServiceImplTest {
     public void testUpdateImageLogo() throws Exception {
         CompanyRepository companyRepository = createCompanyRepositoryForUpdate();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(Environment.DEV);
+        threadContext.setEnvironment(new DevEnvironment());
         ThreadContextService threadContextService = createThreadContextService(threadContext);
         CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, threadContextService, null, null);
         List<FileItem> fileItems = new ArrayList<>();
@@ -176,7 +176,7 @@ public class CompanyServiceImplTest {
         company.setUrlImageLogo("logo.png");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
         ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getEnvironment()).andReturn(Environment.DEV);
+        expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
         CompanyServiceImpl companyService =
             createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
@@ -191,7 +191,7 @@ public class CompanyServiceImplTest {
         company.setUrlImageLogo("");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
         ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getEnvironment()).andReturn(Environment.DEV);
+        expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
         CompanyServiceImpl companyService =
             createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);

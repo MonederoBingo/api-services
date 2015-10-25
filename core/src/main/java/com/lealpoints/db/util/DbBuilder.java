@@ -1,4 +1,4 @@
-package com.lealpoints.db;
+package com.lealpoints.db.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

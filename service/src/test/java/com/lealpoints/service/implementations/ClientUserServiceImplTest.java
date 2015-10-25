@@ -2,10 +2,10 @@ package com.lealpoints.service.implementations;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
-import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.ClientUser;
 import com.lealpoints.repository.ClientRepository;
@@ -30,7 +30,7 @@ public class ClientUserServiceImplTest {
         final QueryAgent queryAgent = createQueryAgent();
 
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(Environment.DEV);
+        threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserServiceImpl clientUserService =
             new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null, null) {
@@ -60,7 +60,7 @@ public class ClientUserServiceImplTest {
         ClientRepository clientRepository = createClientRepositoryForRegister();
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(Environment.DEV);
+        threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserServiceImpl clientUserService =
             new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null, null) {
@@ -232,7 +232,7 @@ public class ClientUserServiceImplTest {
     @Test
     public void testResendKey() throws Exception {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(Environment.DEV);
+        threadContext.setEnvironment(new DevEnvironment());
         ThreadContextService threadContextService = createThreadContextService(threadContext, 1);
         ClientUserServiceImpl clientUserService =
             new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
@@ -251,7 +251,7 @@ public class ClientUserServiceImplTest {
     @Test
     public void testGenerateAndSendRegistrationSMS() throws Exception {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(Environment.DEV);
+        threadContext.setEnvironment(new DevEnvironment());
         ThreadContextService threadContextService = createThreadContextService(threadContext, 2);
         ClientUserServiceImpl clientUserService =
             new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {

@@ -1,7 +1,7 @@
 package com.lealpoints.repository;
 
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class BaseRepository {

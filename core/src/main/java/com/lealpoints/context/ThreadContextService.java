@@ -1,6 +1,7 @@
 package com.lealpoints.context;
 
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.environments.Environment;
 
 public interface ThreadContextService {
 

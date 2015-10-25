@@ -3,7 +3,7 @@ package com.lealpoints.repository;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.List;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.PromotionConfiguration;
 import org.junit.Before;
 import org.junit.Test;

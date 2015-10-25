@@ -2,7 +2,7 @@ package com.lealpoints.repository;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Points;
 import com.lealpoints.util.DateUtil;
 import org.junit.Before;

@@ -1,7 +1,8 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.Environment;
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.environments.Environment;
+import com.lealpoints.environments.ProdEnvironment;
 import com.lealpoints.service.BaseService;
 import com.lealpoints.util.Translations;
 
@@ -20,7 +21,7 @@ public class BaseServiceImpl implements BaseService {
     }
 
     public boolean isProdEnvironment() {
-        return _threadContextService.getThreadContext().getEnvironment() == Environment.PROD;
+        return _threadContextService.getThreadContext().getEnvironment() instanceof ProdEnvironment;
     }
 
     public Environment getEnvironment() {

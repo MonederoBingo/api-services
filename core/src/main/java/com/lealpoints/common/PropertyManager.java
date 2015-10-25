@@ -46,4 +46,8 @@ public class PropertyManager {
         }
         return _properties;
     }
+
+    public static String getProperty(String key) {
+        return getProperties().getProperty(key);
+    }
 }

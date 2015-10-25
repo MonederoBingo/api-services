@@ -2,7 +2,7 @@ package com.lealpoints.service.implementations;
 
 import java.sql.SQLException;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Promotion;

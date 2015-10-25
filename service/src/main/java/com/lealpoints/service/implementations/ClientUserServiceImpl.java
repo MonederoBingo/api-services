@@ -127,7 +127,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
             _smsService.sendSMSMessage(phone, message);
             sendKeyToEmail(key, phone);
         }
-        logger.info("Env: " + getEnvironment().name() + ". New phone number: " + phone + ". New key: " + key);
+        logger.info("Env: " + getEnvironment().getClass().getSimpleName() + ". New phone number: " + phone + ". New key: " + key);
         return key;
     }
 

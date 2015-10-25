@@ -2,7 +2,7 @@ package com.lealpoints.repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import com.lealpoints.db.DbBuilder;
+import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.PointsConfiguration;
 import org.springframework.stereotype.Component;
 

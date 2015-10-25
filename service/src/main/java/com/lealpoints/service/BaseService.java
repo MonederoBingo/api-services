@@ -1,6 +1,6 @@
 package com.lealpoints.service;
 
-import com.lealpoints.context.Environment;
+import com.lealpoints.environments.Environment;
 import com.lealpoints.util.Translations;
 
 public interface BaseService {

@@ -1,4 +1,4 @@
-package com.lealpoints.db;
+package com.lealpoints.db.queryagent;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import com.lealpoints.db.util.DbBuilder;
 
 public class QueryAgent {
     private final transient DataSource _dataSource;

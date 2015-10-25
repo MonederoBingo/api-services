@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.repository.BaseRepositoryTest;
 import org.junit.Before;
 import org.junit.Test;

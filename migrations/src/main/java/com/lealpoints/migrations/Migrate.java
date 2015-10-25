@@ -10,7 +10,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import com.lealpoints.db.DataSourceFactory;
+import com.lealpoints.db.datasources.DataSourceFactoryImpl;
+import com.lealpoints.environments.DevEnvironment;
+import com.lealpoints.environments.FunctionalTestEnvironment;
+import com.lealpoints.environments.ProdEnvironment;
+import com.lealpoints.environments.UATEnvironment;
+import com.lealpoints.environments.UnitTestEnvironment;
 import com.lealpoints.migrations.util.DBUtil;
 import com.lealpoints.util.DateUtil;
 import org.apache.commons.collections15.CollectionUtils;
@@ -18,27 +23,28 @@ import org.apache.commons.collections15.Predicate;
 
 public class Migrate {
     public static void main(String[] args) throws Exception {
+        final DataSourceFactoryImpl dataSourceFactory = new DataSourceFactoryImpl();
         for (String arg : args) {
             switch (arg) {
                 case "dev":
                     System.out.println("Running migrations for development...");
-                    Migrate.run(DataSourceFactory.getDevDataSource());
+                    Migrate.run(dataSourceFactory.getDataSource(new DevEnvironment()));
                     break;
                 case "unit_test":
                     System.out.println("Running migrations for unit test...");
-                    Migrate.run(DataSourceFactory.getUnitTestDataSource());
+                    Migrate.run(dataSourceFactory.getDataSource(new UnitTestEnvironment()));
                     break;
                 case "functional_test":
                     System.out.println("Running migrations for functional test...");
-                    Migrate.run(DataSourceFactory.getFunctionalTestDataSource());
+                    Migrate.run(dataSourceFactory.getDataSource(new FunctionalTestEnvironment()));
                     break;
                 case "prod":
                     System.out.println("Running migrations for production...");
-                    Migrate.run(DataSourceFactory.getProdDataSource());
+                    Migrate.run(dataSourceFactory.getDataSource(new ProdEnvironment()));
                     break;
                 case "uat":
                     System.out.println("Running migrations for uat...");
-                    Migrate.run(DataSourceFactory.getUATDataSource());
+                    Migrate.run(dataSourceFactory.getDataSource(new UATEnvironment()));
                     break;
             }
         }

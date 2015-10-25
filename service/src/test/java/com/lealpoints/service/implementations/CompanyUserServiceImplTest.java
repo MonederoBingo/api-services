@@ -3,7 +3,7 @@ package com.lealpoints.service.implementations;
 import javax.mail.MessagingException;
 import java.sql.SQLException;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.QueryAgent;
+import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.CompanyUser;
 import com.lealpoints.repository.CompanyRepository;
