@@ -85,7 +85,7 @@ public class SavepointPgProxyDriver extends org.postgresql.Driver {
             String urlForWrappedDriver = DRIVER_URL_PROTOCOL_PATTERN.matcher(url).replaceAll(WRAPPED_DRIVER_URL_PROTOCOL);
             return getConnection(url, info, urlForWrappedDriver);
         }
-        logAndThrowException("Could not connect to wrapped driver (PostgreSQL JDBC Driver)");
+        logAndThrowException("Could not connect to wrapped driver (PostgreSQL JDBC Driver). url = " + url);
         return null;
     }
 

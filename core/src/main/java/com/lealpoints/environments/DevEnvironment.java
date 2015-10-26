@@ -33,4 +33,21 @@ public class DevEnvironment extends Environment {
     public String getClientUrl() {
         return PropertyManager.getProperty("dev.client_url");
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof DevEnvironment)) {
+            return false;
+        }
+        DevEnvironment that = (DevEnvironment) obj;
+        return getDatabasePath().equals(that.getDatabasePath());
+    }
+
+    @Override
+    public int hashCode() {
+        return getDatabasePath().hashCode();
+    }
 }

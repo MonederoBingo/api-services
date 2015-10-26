@@ -53,7 +53,7 @@ public class SavepointPgProxyDriverTest {
         SavepointPgProxyDriver savepointPgProxyDriver = getSavepointPgProxyDriver();
         Connection connection = savepointPgProxyDriver.connect(connectionUrl, info);
         assertNotNull(connection);
-        assertTrue(connection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", connection.getClass().getSimpleName());
 
         ((SavepointProxyConnection) connection).rollbackTransactionForAutomationTest();
         assertFalse(connection.isClosed());
@@ -70,7 +70,7 @@ public class SavepointPgProxyDriverTest {
 
         Connection clientDatabaseConnection = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(clientDatabaseConnection);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
 
         ((SavepointProxyConnection) clientDatabaseConnection).rollbackTransactionForAutomationTest();
         assertFalse(clientDatabaseConnection.isClosed());
@@ -78,7 +78,7 @@ public class SavepointPgProxyDriverTest {
         final String unitTestDatabasePath = getUnitTestDatabasePath();
         Connection unitTestDatabaseConnection = getConnection(unitTestDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(unitTestDatabaseConnection);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
 
         assertNotSame(clientDatabaseConnection, unitTestDatabaseConnection);
 
@@ -100,18 +100,18 @@ public class SavepointPgProxyDriverTest {
 
         Connection clientDatabaseConnection = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(clientDatabaseConnection);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
 
         Connection reusedClientDatabaseConnection = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(reusedClientDatabaseConnection);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
         assertNotEquals(clientDatabaseConnection, reusedClientDatabaseConnection);
 
         ((SavepointProxyConnection) reusedClientDatabaseConnection).beginTransactionForAutomationTest("Test1");
 
         Connection reusedClientDatabaseConnectionOnTransaction = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(reusedClientDatabaseConnectionOnTransaction);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
         assertEquals(reusedClientDatabaseConnection, reusedClientDatabaseConnectionOnTransaction);
 
         ((SavepointProxyConnection) reusedClientDatabaseConnection).rollbackTransactionForAutomationTest();
@@ -132,7 +132,7 @@ public class SavepointPgProxyDriverTest {
 
         Connection clientDatabaseConnection = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(clientDatabaseConnection);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
 
         ((SavepointProxyConnection) clientDatabaseConnection).rollbackTransactionForAutomationTest();
         assertFalse(clientDatabaseConnection.isClosed());
@@ -142,7 +142,7 @@ public class SavepointPgProxyDriverTest {
 
         Connection newClientDataBaseConnection = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(newClientDataBaseConnection);
-        assertTrue(clientDatabaseConnection.getClass().getSimpleName().equals("SavepointProxyConnectionImpl"));
+        assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
         assertNotEquals(clientDatabaseConnection, newClientDataBaseConnection);
 
         ((SavepointProxyConnection) newClientDataBaseConnection).rollbackTransactionForAutomationTest();

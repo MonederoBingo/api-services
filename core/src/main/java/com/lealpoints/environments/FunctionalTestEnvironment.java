@@ -33,4 +33,21 @@ public class FunctionalTestEnvironment extends Environment {
     public String getClientUrl() {
         return PropertyManager.getProperty("functional_test.client_url");
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof FunctionalTestEnvironment)) {
+            return false;
+        }
+        FunctionalTestEnvironment that = (FunctionalTestEnvironment) obj;
+        return getDatabasePath().equals(that.getDatabasePath());
+    }
+
+    @Override
+    public int hashCode() {
+        return getDatabasePath().hashCode();
+    }
 }

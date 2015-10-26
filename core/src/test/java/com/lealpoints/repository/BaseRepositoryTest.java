@@ -9,7 +9,8 @@ import com.lealpoints.db.datasources.DataSourceFactory;
 import com.lealpoints.db.datasources.DataSourceFactoryImpl;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.db.queryagent.QueryAgentFactoryImpl;
-import com.lealpoints.environments.UnitTestEnvironment;
+import com.lealpoints.environments.EnvironmentFactory;
+import com.lealpoints.environments.EnvironmentFactoryImpl;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -28,7 +29,8 @@ public class BaseRepositoryTest {
 
     private static void loadQueryAgent() {
         DataSourceFactory dataSourceFactory = new DataSourceFactoryImpl();
-        _queryAgent = new QueryAgentFactoryImpl(dataSourceFactory).getQueryAgent(new UnitTestEnvironment());
+        EnvironmentFactory environmentFactory = new EnvironmentFactoryImpl();
+        _queryAgent = new QueryAgentFactoryImpl(dataSourceFactory).getQueryAgent(environmentFactory.getUnitTestEnvironment());
     }
 
     @Before

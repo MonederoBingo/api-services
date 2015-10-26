@@ -1,8 +1,8 @@
 package com.lealpoints.db.datasources;
 
 import javax.sql.DataSource;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.lealpoints.db.util.concurrent.Computable;
+import com.lealpoints.db.util.concurrent.Memoizer;
 import com.lealpoints.environments.Environment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,20 +12,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataSourceFactoryImpl implements DataSourceFactory {
     private static final Logger _logger = LogManager.getLogger(DataSource.class.getName());
-    private final Map<String, DataSource> _dataSources = new ConcurrentHashMap<>();
+
+    private final Computable<Environment, DataSource> _computable = new Computable<Environment, DataSource>() {
+        @Override
+        public DataSource compute(Environment arg) throws InterruptedException {
+            return createDataSource(arg);
+        }
+    };
+
+    private final Computable<Environment, DataSource> _dataSources = new Memoizer<>(_computable);
 
     @Override
     public DataSource getDataSource(Environment environment) {
-        final String key = environment.getDatabasePath();
-        DataSource dataSource = _dataSources.get(key);
-        if (dataSource == null) {
-            dataSource = createDataSource(environment);
-            _dataSources.put(key, dataSource);
-            if (_logger.isInfoEnabled()) {
-                _logger.info("Adding new datasource, current data source keys = " + _dataSources.keySet());
+        try {
+            final DataSource dataSource = _dataSources.compute(environment);
+            if (dataSource == null) {
+                throw new RuntimeException("DataSource cannot be null!");
             }
+            return dataSource;
+        } catch (InterruptedException e) {
+            _logger.error(e.getMessage());
+            throw new RuntimeException(e);
         }
-        return dataSource;
     }
 
     private DataSource createDataSource(Environment environment) {

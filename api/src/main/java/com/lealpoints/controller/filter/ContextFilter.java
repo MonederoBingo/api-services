@@ -12,11 +12,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.environments.Environment;
-import com.lealpoints.environments.FunctionalTestEnvironment;
-import com.lealpoints.environments.ProdEnvironment;
-import com.lealpoints.environments.UATEnvironment;
+import com.lealpoints.environments.EnvironmentFactory;
+import com.lealpoints.environments.EnvironmentFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -60,15 +58,16 @@ public class ContextFilter implements Filter {
     }
 
     private Environment getEnvironment(HttpServletRequest request) {
+        EnvironmentFactory environmentFactory = new EnvironmentFactoryImpl();
         switch (request.getServerName()) {
             case "services.lealpoints.com":
-                return new ProdEnvironment();
+                return environmentFactory.getProdEnvironment();
             case "test.services.lealpoints.com":
-                return new UATEnvironment();
+                return environmentFactory.getUATEnvironment();
             case "test.localhost":
-                return new FunctionalTestEnvironment();
+                return environmentFactory.getFunctionalTestEnvironment();
             default:
-                return new DevEnvironment();
+                return environmentFactory.getDevEnvironment();
         }
     }
 }

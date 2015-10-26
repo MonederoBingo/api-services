@@ -33,4 +33,21 @@ public class UnitTestEnvironment extends Environment {
     public String getClientUrl() {
         return PropertyManager.getProperty("unit_test.client_url");
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof UnitTestEnvironment)) {
+            return false;
+        }
+        UnitTestEnvironment that = (UnitTestEnvironment) obj;
+        return getDatabasePath().equals(that.getDatabasePath());
+    }
+
+    @Override
+    public int hashCode() {
+        return getDatabasePath().hashCode();
+    }
 }
