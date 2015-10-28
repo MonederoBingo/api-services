@@ -28,7 +28,6 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
     private final PointsConfigurationRepository _pointsConfigurationRepository;
     private final ClientRepository _clientRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
-    private final ThreadContextService _threadContextService;
     private final PhoneValidatorServiceImpl _phoneValidatorService;
 
     @Autowired
@@ -40,7 +39,6 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
-        _threadContextService = threadContextService;
         _phoneValidatorService = phoneValidatorService;
     }
 
@@ -48,7 +46,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         try {
             ValidationResult validationResult = validateRegistration(pointsAwarding);
             if (validationResult.isValid()) {
-                final QueryAgent queryAgent = _threadContextService.getQueryAgent();
+                final QueryAgent queryAgent = getQueryAgent();
                 queryAgent.beginTransaction();
                 float earnedPoints = awardPointsAndUpdateClientStatus(pointsAwarding);
                 queryAgent.commitTransaction();

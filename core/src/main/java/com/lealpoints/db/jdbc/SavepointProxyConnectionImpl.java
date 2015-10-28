@@ -386,14 +386,12 @@ public class SavepointProxyConnectionImpl implements SavepointProxyConnection {
     }
 
     @Override
-    public synchronized void beginTransactionForAutomationTest(String automationTestName) throws SQLException {
+    public synchronized void beginTransactionForAutomationTest() throws SQLException {
         if (!isProxyConnectionActive()) {
             _wrappedConnection.setAutoCommit(false);
             setNewSavepoint();
             setProxyConnectionActive(true);
-            _automationTestName = automationTestName;
-            _logger
-                .info(String.format("==== SavepointProxyConnection TRANSACTION START on %s for test %s", getMetaData().getURL(), automationTestName));
+            _logger.info(String.format("==== SavepointProxyConnection TRANSACTION START on %s", getMetaData().getURL()));
         }
     }
 
@@ -403,7 +401,7 @@ public class SavepointProxyConnectionImpl implements SavepointProxyConnection {
             _wrappedConnection.rollback();
             _wrappedConnection.setAutoCommit(true);
             setProxyConnectionActive(false);
-            _logger.info(String.format("==== SavepointProxyConnection TRANSACTION END on %s for test %s", _connectionUrl, _automationTestName));
+            _logger.info(String.format("==== SavepointProxyConnection TRANSACTION END on %s", _connectionUrl));
         }
     }
 

@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import com.lealpoints.controller.base.BaseController;
-import com.lealpoints.service.implementations.ClientUserServiceImpl;
+import com.lealpoints.service.ClientUserService;
 import com.lealpoints.service.model.ClientLoginResult;
 import com.lealpoints.service.model.ClientUserLogin;
 import com.lealpoints.service.model.ClientUserRegistration;
@@ -22,10 +22,10 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/client")
 public class ClientRegistrationController extends BaseController {
 
-    private final ClientUserServiceImpl _clientUserService;
+    private final ClientUserService _clientUserService;
 
     @Autowired
-    public ClientRegistrationController(ClientUserServiceImpl clientUserService) {
+    public ClientRegistrationController(ClientUserService clientUserService) {
         _clientUserService = clientUserService;
     }
 

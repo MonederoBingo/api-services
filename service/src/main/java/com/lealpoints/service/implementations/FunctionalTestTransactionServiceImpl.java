@@ -1,0 +1,26 @@
+package com.lealpoints.service.implementations;
+
+import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.service.FunctionalTestTransactionService;
+import com.lealpoints.util.Translations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class FunctionalTestTransactionServiceImpl extends BaseServiceImpl implements FunctionalTestTransactionService {
+
+    @Autowired
+    public FunctionalTestTransactionServiceImpl(Translations translations, ThreadContextService threadContextService) {
+        super(translations, threadContextService);
+    }
+
+    @Override
+    public void beginTransaction() {
+        getQueryAgent().beginTransactionForFunctionalTest();
+    }
+
+    @Override
+    public void rollbackTransaction() {
+        getQueryAgent().rollbackTransactionForFunctionalTest();
+    }
+}

@@ -5,7 +5,6 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
-import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.Company;
@@ -42,7 +41,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private final CompanyUserRepository _companyUserRepository;
     private final PointsConfigurationRepository _pointsConfigurationRepository;
     private final ClientRepository _clientRepository;
-    private final ThreadContextService _threadContextService;
     private final SMSServiceImpl _smsService;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
@@ -58,7 +56,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         _companyUserRepository = companyUserRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
-        _threadContextService = threadContextService;
         _smsService = smsService;
         _companyClientMappingRepository = companyClientMappingRepository;
         _promotionConfigurationRepository = promotionConfigurationRepository;
@@ -69,9 +66,9 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         try {
             ValidationResult validationResult = validateRegistration(companyRegistration);
             if (validationResult.isValid()) {
-                _threadContextService.getQueryAgent().beginTransaction();
+                getThreadContextService().getQueryAgent().beginTransaction();
                 long companyId = registerAndInitializeCompany(companyRegistration);
-                _threadContextService.getQueryAgent().commitTransaction();
+                getQueryAgent().commitTransaction();
                 return new ServiceResult<>(true, getTranslation(Translations.Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK), companyId);
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());
@@ -191,10 +188,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         return null;
     }
 
-    private ThreadContext getThreadContext() {
-        return _threadContextService.getThreadContext();
-    }
-
     private boolean isValidContentType(String contentType) {
         return contentType.equalsIgnoreCase("image/jpeg") ||
             contentType.equalsIgnoreCase("image/png") ||
@@ -214,23 +207,15 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     }
 
     private long registerAndInitializeCompany(CompanyRegistration companyRegistration) throws Exception {
-        Company company = new Company();
-        company.setName(companyRegistration.getCompanyName());
-        company.setUrlImageLogo(companyRegistration.getUrlImageLogo());
-        long companyId = _companyRepository.insert(company);
+        long companyId = registerCompany(companyRegistration);
+        registerPointsConfiguration(companyId);
+        registerPromotionConfiguration(companyId);
+        final String activationKey = registerCompanyUser(companyRegistration, companyId);
+        sendActivationEmail(companyRegistration.getEmail(), activationKey);
+        return companyId;
+    }
 
-        PointsConfiguration pointsConfiguration = new PointsConfiguration();
-        pointsConfiguration.setCompanyId(companyId);
-        pointsConfiguration.setPointsToEarn(1);
-        pointsConfiguration.setRequiredAmount(1);
-        _pointsConfigurationRepository.insert(pointsConfiguration);
-
-        PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
-        promotionConfiguration.setCompanyId(companyId);
-        promotionConfiguration.setRequiredPoints(1000);
-        promotionConfiguration.setDescription(getTranslation(Translations.Message.DEFAULT_PROMOTION_MESSAGE));
-        _promotionConfigurationRepository.insert(promotionConfiguration);
-
+    private String registerCompanyUser(CompanyRegistration companyRegistration, long companyId) throws Exception {
         final String activationKey = RandomStringUtils.random(60, true, true);
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyId(companyId);
@@ -246,19 +231,41 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         companyUser.setLanguage(language);
         companyUser.setMustChangePassword(false);
         _companyUserRepository.insert(companyUser);
+        return activationKey;
+    }
 
-        sendActivationEmail(companyRegistration.getEmail(), activationKey);
+    private void registerPromotionConfiguration(long companyId) throws Exception {
+        PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
+        promotionConfiguration.setCompanyId(companyId);
+        promotionConfiguration.setRequiredPoints(1000);
+        promotionConfiguration.setDescription(getTranslation(Translations.Message.DEFAULT_PROMOTION_MESSAGE));
+        _promotionConfigurationRepository.insert(promotionConfiguration);
+    }
 
-        return companyId;
+    private void registerPointsConfiguration(long companyId) throws Exception {
+        PointsConfiguration pointsConfiguration = new PointsConfiguration();
+        pointsConfiguration.setCompanyId(companyId);
+        pointsConfiguration.setPointsToEarn(1);
+        pointsConfiguration.setRequiredAmount(1);
+        _pointsConfigurationRepository.insert(pointsConfiguration);
+    }
+
+    private long registerCompany(CompanyRegistration companyRegistration) throws Exception {
+        Company company = new Company();
+        company.setName(companyRegistration.getCompanyName());
+        company.setUrlImageLogo(companyRegistration.getUrlImageLogo());
+        return _companyRepository.insert(company);
     }
 
     void sendActivationEmail(String email, String activationKey) throws MessagingException {
-        NotificationEmail notificationEmail = new NotificationEmail();
-        notificationEmail.setSubject(getTranslation(Translations.Message.ACTIVATION_EMAIL_SUBJECT));
-        final String activationUrl = getEnvironment().getClientUrl() + "activate?key=" + activationKey;
-        notificationEmail.setBody(getTranslation(Translations.Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
-        notificationEmail.setEmailTo(email);
-        EmailUtil.sendEmail(notificationEmail);
+        if (isProdEnvironment() || isUATEnvironment()) {
+            NotificationEmail notificationEmail = new NotificationEmail();
+            notificationEmail.setSubject(getTranslation(Translations.Message.ACTIVATION_EMAIL_SUBJECT));
+            final String activationUrl = getEnvironment().getClientUrl() + "activate?key=" + activationKey;
+            notificationEmail.setBody(getTranslation(Translations.Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
+            notificationEmail.setEmailTo(email);
+            EmailUtil.sendEmail(notificationEmail);
+        }
     }
 
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {

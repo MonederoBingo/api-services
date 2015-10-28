@@ -23,7 +23,8 @@ public class ThreadContextServiceImpl implements ThreadContextService {
     @Override
     public void initializeContext(Environment environment, String language) {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setClientQueryAgent(_queryAgentFactory.getQueryAgent(environment));
+        final QueryAgent queryAgent = _queryAgentFactory.getQueryAgent(environment);
+        threadContext.setClientQueryAgent(queryAgent);
         threadContext.setLanguage(language);
         threadContext.setEnvironment(environment);
         setThreadContextOnThread(threadContext);

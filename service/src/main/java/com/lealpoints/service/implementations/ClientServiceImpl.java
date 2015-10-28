@@ -21,7 +21,6 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
     private static final Logger logger = LogManager.getLogger(ClientServiceImpl.class.getName());
     private final ClientRepository _clientRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
-    private final ThreadContextService _threadContextService;
     private final PhoneValidatorServiceImpl _phoneValidatorService;
 
     @Autowired
@@ -30,7 +29,6 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
         super(translations, threadContextService);
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
-        _threadContextService = threadContextService;
         _phoneValidatorService = phoneValidatorService;
     }
 
@@ -38,9 +36,9 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
         try {
             ValidationResult validationResult = validateRegistration(clientRegistration);
             if (validationResult.isValid()) {
-                _threadContextService.getQueryAgent().beginTransaction();
+                getThreadContextService().getQueryAgent().beginTransaction();
                 Client client = registerClientAndCompanyMapping(clientRegistration);
-                _threadContextService.getQueryAgent().commitTransaction();
+                getThreadContextService().getQueryAgent().commitTransaction();
                 return new ServiceResult<>(true, getTranslation(Translations.Message.CLIENT_REGISTERED_SUCCESSFULLY), client.getClientId());
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());
@@ -49,6 +47,16 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             logger.error(ex.getMessage(), ex);
             return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
         }
+    }
+
+    private Client registerClientAndCompanyMapping(ClientRegistration clientRegistration) throws Exception {
+        //Client could exist for other companies
+        Client client = _clientRepository.insertIfDoesNotExist(clientRegistration.getPhone(), true);
+        CompanyClientMapping companyClientMapping = new CompanyClientMapping();
+        companyClientMapping.setCompanyId(clientRegistration.getCompanyId());
+        companyClientMapping.setClient(client);
+        _companyClientMappingRepository.insert(companyClientMapping);
+        return client;
     }
 
     public ServiceResult<List<CompanyClientMapping>> getByCompanyId(long companyId) {
@@ -69,16 +77,6 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             logger.error(ex.getMessage(), ex);
             return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
         }
-    }
-
-    private Client registerClientAndCompanyMapping(ClientRegistration clientRegistration) throws Exception {
-        //Client could exist for other companies
-        Client client = _clientRepository.insertIfDoesNotExist(clientRegistration.getPhone(), true);
-        CompanyClientMapping companyClientMapping = new CompanyClientMapping();
-        companyClientMapping.setCompanyId(clientRegistration.getCompanyId());
-        companyClientMapping.setClient(client);
-        _companyClientMappingRepository.insert(companyClientMapping);
-        return client;
     }
 
     private ValidationResult validateRegistration(ClientRegistration clientRegistration) throws Exception {

@@ -28,7 +28,6 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
     private static final Logger logger = LogManager.getLogger(ClientUserServiceImpl.class.getName());
     private final ClientUserRepository _clientUserRepository;
     private final ClientRepository _clientRepository;
-    private final ThreadContextService _threadContextService;
     private final SMSServiceImpl _smsService;
 
     @Autowired
@@ -37,7 +36,6 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
         super(translations, threadContextService);
         _clientUserRepository = clientUserRepository;
         _clientRepository = clientRepository;
-        _threadContextService = threadContextService;
         _smsService = smsService;
     }
 
@@ -45,9 +43,9 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
         try {
             ValidationResult validationResult = validateRegistration(clientUserRegistration);
             if (validationResult.isValid()) {
-                _threadContextService.getQueryAgent().beginTransaction();
+                getThreadContextService().getQueryAgent().beginTransaction();
                 String key = registerClientAndClientUser(clientUserRegistration);
-                _threadContextService.getQueryAgent().commitTransaction();
+                getThreadContextService().getQueryAgent().commitTransaction();
                 return new ServiceResult<>(true, "", key);
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());

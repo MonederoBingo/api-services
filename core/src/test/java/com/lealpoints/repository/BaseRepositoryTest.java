@@ -15,9 +15,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 
-/**
- * Defines basic behaviour for repository tests.
- */
 public class BaseRepositoryTest {
 
     private static QueryAgent _queryAgent;

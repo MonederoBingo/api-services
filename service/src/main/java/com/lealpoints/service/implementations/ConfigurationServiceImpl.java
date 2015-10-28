@@ -5,19 +5,21 @@ import java.util.List;
 import java.util.Map;
 import com.lealpoints.model.Configuration;
 import com.lealpoints.repository.ConfigurationRepository;
+import com.lealpoints.service.ConfigurationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ConfigurationServiceImpl {
+public class ConfigurationServiceImpl extends BaseServiceImpl implements ConfigurationService {
     private final Logger logger = LogManager.getLogger(ConfigurationServiceImpl.class.getName());
     private final Map<String, String> _configurationMap = new HashMap<>();
     private final ConfigurationRepository _configurationRepository;
 
     @Autowired
     private ConfigurationServiceImpl(ConfigurationRepository configurationRepository) {
+        super(null, null);
         _configurationRepository = configurationRepository;
     }
 

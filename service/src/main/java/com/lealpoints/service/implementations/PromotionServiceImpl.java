@@ -27,7 +27,6 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final ClientRepository _clientRepository;
-    private final ThreadContextService _threadContextService;
 
     @Autowired
     public PromotionServiceImpl(PromotionRepository promotionRepository, PromotionConfigurationRepository promotionConfigurationRepository,
@@ -38,12 +37,11 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
         _promotionConfigurationRepository = promotionConfigurationRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
         _clientRepository = clientRepository;
-        _threadContextService = threadContextService;
     }
 
     public ServiceResult<Long> applyPromotion(PromotionApplying promotionApplying) {
         try {
-            final QueryAgent queryAgent = _threadContextService.getQueryAgent();
+            final QueryAgent queryAgent = getQueryAgent();
             final Client client = _clientRepository.getByPhone(promotionApplying.getPhone());
             if (client == null) {
                 throw new IllegalArgumentException("Client doesn't exist.");

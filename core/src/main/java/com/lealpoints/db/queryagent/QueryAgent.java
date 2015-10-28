@@ -9,9 +9,14 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import com.lealpoints.db.jdbc.SavepointProxyConnection;
 import com.lealpoints.db.util.DbBuilder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class QueryAgent {
+    private static final Logger _logger = LogManager.getLogger(QueryAgent.class.getName());
+
     private final transient DataSource _dataSource;
     private transient Connection _connection = null;
     private boolean _isInTransaction;
@@ -22,12 +27,18 @@ public class QueryAgent {
 
     /**
      * Creates a new connection to a postgres database
+     *
      * @return The established connection.
      * @throws Exception
      */
-    public Connection getConnection() throws Exception {
+    public Connection getConnection() {
         if (_connection == null) {
-            _connection = _dataSource.getConnection();
+            try {
+                _connection = _dataSource.getConnection();
+            } catch (SQLException e) {
+                _logger.error(e.getMessage());
+                throw new RuntimeException(e.getMessage(), e);
+            }
         }
         return _connection;
     }
@@ -54,6 +65,7 @@ public class QueryAgent {
 
     /**
      * Executes and update statement.
+     *
      * @param sql Update statement to be executed.
      * @return The number of rows returned from the query.
      * @throws Exception
@@ -69,8 +81,9 @@ public class QueryAgent {
 
     /**
      * Executes a Select statement in the database and returns multiple rows.
+     *
      * @param builder Helper object that contains placeholders and build method
-     * @param <T> Type of object to be returned as list and built by DbBuilder
+     * @param <T>     Type of object to be returned as list and built by DbBuilder
      * @return The list of type T built from the select statement execution
      * @throws SQLException
      */
@@ -93,8 +106,9 @@ public class QueryAgent {
 
     /**
      * Executes a Select statement in the database and returns only one object
+     *
      * @param builder Helper object that contains placeholders and build method
-     * @param <T> Type of object to be returned and built by DbBuilder
+     * @param <T>     Type of object to be returned and built by DbBuilder
      * @return The type T built from the select statement execution
      * @throws SQLException
      */
@@ -111,8 +125,6 @@ public class QueryAgent {
             releaseConnectionIfPossible();
         }
     }
-
-
 
     public synchronized void beginTransaction() throws Exception {
         getConnection().setAutoCommit(false);
@@ -191,4 +203,24 @@ public class QueryAgent {
         super.finalize();
     }
 
+    public synchronized void beginTransactionForFunctionalTest() {
+        SavepointProxyConnection connection = (SavepointProxyConnection) getConnection();
+        try {
+            connection.beginTransactionForAutomationTest();
+            _connection = connection;
+        } catch (SQLException e) {
+            _logger.error(e.getMessage());
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    public synchronized void rollbackTransactionForFunctionalTest() {
+        SavepointProxyConnection connection = (SavepointProxyConnection) getConnection();
+        try {
+            connection.rollbackTransactionForAutomationTest();
+            _connection = null;
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

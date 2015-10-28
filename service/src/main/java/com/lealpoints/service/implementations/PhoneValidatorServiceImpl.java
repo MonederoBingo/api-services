@@ -1,13 +1,14 @@
 package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.service.PhoneValidatorService;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.util.Translations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PhoneValidatorServiceImpl extends BaseServiceImpl {
+public class PhoneValidatorServiceImpl extends BaseServiceImpl implements PhoneValidatorService {
 
     @Autowired
     public PhoneValidatorServiceImpl(Translations translations, ThreadContextService threadContextService) {

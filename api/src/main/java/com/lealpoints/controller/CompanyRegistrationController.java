@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import com.lealpoints.controller.base.BaseController;
-import com.lealpoints.service.implementations.CompanyServiceImpl;
-import com.lealpoints.service.implementations.CompanyUserServiceImpl;
+import com.lealpoints.service.CompanyService;
+import com.lealpoints.service.CompanyUserService;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.CompanyUserLogin;
@@ -33,11 +33,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 @RequestMapping("/company")
 public class CompanyRegistrationController extends BaseController {
 
-    private final CompanyUserServiceImpl _companyUserService;
-    private final CompanyServiceImpl _companyService;
+    private final CompanyUserService _companyUserService;
+    private final CompanyService _companyService;
 
     @Autowired
-    public CompanyRegistrationController(CompanyUserServiceImpl companyUserService, CompanyServiceImpl companyService) {
+    public CompanyRegistrationController(CompanyUserService companyUserService, CompanyService companyService) {
         _companyUserService = companyUserService;
         _companyService = companyService;
     }

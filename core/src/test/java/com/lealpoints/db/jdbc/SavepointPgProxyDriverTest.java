@@ -107,7 +107,7 @@ public class SavepointPgProxyDriverTest {
         assertEquals("SavepointProxyConnectionImpl", clientDatabaseConnection.getClass().getSimpleName());
         assertNotEquals(clientDatabaseConnection, reusedClientDatabaseConnection);
 
-        ((SavepointProxyConnection) reusedClientDatabaseConnection).beginTransactionForAutomationTest("Test1");
+        ((SavepointProxyConnection) reusedClientDatabaseConnection).beginTransactionForAutomationTest();
 
         Connection reusedClientDatabaseConnectionOnTransaction = getConnection(devDatabasePath, savepointPgProxyDriver, infoProperties);
         assertNotNull(reusedClientDatabaseConnectionOnTransaction);

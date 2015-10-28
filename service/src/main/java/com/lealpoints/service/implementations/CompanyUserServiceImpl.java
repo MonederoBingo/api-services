@@ -6,6 +6,7 @@ import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.repository.CompanyUserRepository;
+import com.lealpoints.service.CompanyUserService;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyUserLogin;
 import com.lealpoints.service.model.CompanyUserPasswordChanging;
@@ -21,11 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CompanyUserServiceImpl extends BaseServiceImpl {
+public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUserService {
     private static final Logger logger = LogManager.getLogger(CompanyUserServiceImpl.class.getName());
     private final CompanyUserRepository _companyUserRepository;
     private final CompanyRepository _companyRepository;
-    private final ThreadContextService _threadContextService;
     private final CompanyServiceImpl _companyService;
 
     @Autowired
@@ -33,7 +33,6 @@ public class CompanyUserServiceImpl extends BaseServiceImpl {
         CompanyRepository companyRepository, CompanyServiceImpl companyService) {
         super(translations, threadContextService);
         _companyUserRepository = companyUserRepository;
-        _threadContextService = threadContextService;
         _companyRepository = companyRepository;
         _companyService = companyService;
     }
@@ -68,16 +67,16 @@ public class CompanyUserServiceImpl extends BaseServiceImpl {
         }
     }
 
-    public ServiceResult activateUser(String activationKey) throws Exception {
+    public ServiceResult activateUser(String activationKey) {
         try {
-            _threadContextService.getQueryAgent().beginTransaction();
+            getQueryAgent().beginTransaction();
             int updatedRows = _companyUserRepository.updateActivateByActivationKey(activationKey);
             if (updatedRows > 0) {
                 _companyUserRepository.clearActivationKey(activationKey);
-                _threadContextService.getQueryAgent().commitTransaction();
+                getQueryAgent().commitTransaction();
                 return new ServiceResult(true, getTranslation(Translations.Message.YOUR_USER_IS_ACTIVE_NOW));
             } else {
-                _threadContextService.getQueryAgent().rollbackTransaction();
+                getQueryAgent().rollbackTransaction();
                 return new ServiceResult(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
             }
         } catch (Exception ex) {

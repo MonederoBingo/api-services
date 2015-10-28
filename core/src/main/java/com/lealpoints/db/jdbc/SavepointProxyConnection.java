@@ -12,7 +12,7 @@ public interface SavepointProxyConnection extends Connection {
 
     void close() throws SQLException;
 
-    void beginTransactionForAutomationTest(String automationTestName) throws SQLException;
+    void beginTransactionForAutomationTest() throws SQLException;
 
     void rollbackTransactionForAutomationTest() throws SQLException;
 
