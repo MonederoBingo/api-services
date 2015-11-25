@@ -1,13 +1,15 @@
 package com.lealpoints.db.datasources;
 
-import javax.sql.DataSource;
 import com.lealpoints.db.util.concurrent.Computable;
 import com.lealpoints.db.util.concurrent.Memoizer;
 import com.lealpoints.environments.Environment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
+
+import static com.lealpoints.db.util.DbUtil.createDataSource;
 
 @Component
 public class DataSourceFactoryImpl implements DataSourceFactory {
@@ -34,14 +36,5 @@ public class DataSourceFactoryImpl implements DataSourceFactory {
             _logger.error(e.getMessage());
             throw new RuntimeException(e);
         }
-    }
-
-    private DataSource createDataSource(Environment environment) {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(environment.getDatabaseDriverClass());
-        dataSource.setUrl(environment.getDatabasePath());
-        dataSource.setUsername(environment.getDatabaseUsername());
-        dataSource.setPassword(environment.getDatabasePassword());
-        return dataSource;
     }
 }

@@ -1,12 +1,13 @@
 package com.lealpoints.migrations.util;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.apache.commons.io.FileUtils;
 
-public class DBUtil {
+public class MigrationUtil {
     public static void executeSql(String sql, Connection conn) {
         Statement st = null;
         try {

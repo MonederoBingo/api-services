@@ -1,25 +1,18 @@
 package com.lealpoints.migrations;
 
+import com.lealpoints.db.datasources.DataSourceFactoryImpl;
+import com.lealpoints.environments.*;
+import com.lealpoints.migrations.util.MigrationUtil;
+import com.lealpoints.util.DateUtil;
+import org.apache.commons.collections15.CollectionUtils;
+import org.apache.commons.collections15.Predicate;
+
 import javax.sql.DataSource;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import com.lealpoints.db.datasources.DataSourceFactoryImpl;
-import com.lealpoints.environments.DevEnvironment;
-import com.lealpoints.environments.FunctionalTestEnvironment;
-import com.lealpoints.environments.ProdEnvironment;
-import com.lealpoints.environments.UATEnvironment;
-import com.lealpoints.environments.UnitTestEnvironment;
-import com.lealpoints.migrations.util.DBUtil;
-import com.lealpoints.util.DateUtil;
-import org.apache.commons.collections15.CollectionUtils;
-import org.apache.commons.collections15.Predicate;
+import java.util.*;
 
 public class Migrate {
     public static void main(String[] args) throws Exception {
@@ -56,12 +49,12 @@ public class Migrate {
         Connection connection = dataSource.getConnection();
         String lastFileExecuted = "";
         for (File file : files) {
-            DBUtil.executeScript(file, connection);
+            MigrationUtil.executeScript(file, connection);
             lastFileExecuted = file.getName();
         }
         if (!lastFileExecuted.equals("")) {
             final String lastMigrationString = lastFileExecuted.substring(0, lastFileExecuted.indexOf("_"));
-            DBUtil.executeSql("UPDATE migration SET last_run_migration = " + lastMigrationString, connection);
+            MigrationUtil.executeSql("UPDATE migration SET last_run_migration = " + lastMigrationString, connection);
         }
     }
 

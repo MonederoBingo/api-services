@@ -1,16 +1,18 @@
 package com.lealpoints.migrations;
 
+import com.lealpoints.db.datasources.DataSourceFactoryImpl;
+import com.lealpoints.db.util.DbUtil;
+import com.lealpoints.environments.DevEnvironment;
+import com.lealpoints.environments.FunctionalTestEnvironment;
+import com.lealpoints.environments.UnitTestEnvironment;
+import com.lealpoints.migrations.util.MigrationUtil;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.lealpoints.db.datasources.DataSourceFactoryImpl;
-import com.lealpoints.environments.DevEnvironment;
-import com.lealpoints.environments.FunctionalTestEnvironment;
-import com.lealpoints.environments.UnitTestEnvironment;
-import com.lealpoints.migrations.util.DBUtil;
-import org.apache.commons.io.FileUtils;
 
 public class CreateDb {
     private final static DataSourceFactoryImpl dataSourceFactory = new DataSourceFactoryImpl();
@@ -19,14 +21,14 @@ public class CreateDb {
         System.out.println("Creating database...");
         CreateDb.run();
         System.out.println("Database create successfully.");
-        Migrate.main(null);
+        Migrate.main(new String[]{"dev"});
     }
 
     private static void run() throws Exception {
         File file = new File("scripts/createdb.sql");
         String sql = FileUtils.readFileToString(file);
-        Connection connection = dataSourceFactory.getDataSource(new DevEnvironment()).getConnection();
-        DBUtil.executeSql(sql, connection);
+        Connection connection = DbUtil.createDataSourceWithoutDatabaseName(new DevEnvironment()).getConnection();
+        MigrationUtil.executeSql(sql, connection);
         runSetupScripts();
     }
 
@@ -34,9 +36,9 @@ public class CreateDb {
         final File[] scripts = loadSetupScripts();
         for (File script : scripts) {
             System.out.println(script.getName());
-            DBUtil.executeScript(script, dataSourceFactory.getDataSource(new DevEnvironment()).getConnection());
-            DBUtil.executeScript(script, dataSourceFactory.getDataSource(new UnitTestEnvironment()).getConnection());
-            DBUtil.executeScript(script, dataSourceFactory.getDataSource(new FunctionalTestEnvironment()).getConnection());
+            MigrationUtil.executeScript(script, dataSourceFactory.getDataSource(new DevEnvironment()).getConnection());
+            MigrationUtil.executeScript(script, dataSourceFactory.getDataSource(new UnitTestEnvironment()).getConnection());
+            MigrationUtil.executeScript(script, dataSourceFactory.getDataSource(new FunctionalTestEnvironment()).getConnection());
         }
     }
 
