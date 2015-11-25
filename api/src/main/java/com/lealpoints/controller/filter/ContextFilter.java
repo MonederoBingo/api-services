@@ -1,22 +1,18 @@
 package com.lealpoints.controller.filter;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.environments.Environment;
 import com.lealpoints.environments.EnvironmentFactory;
 import com.lealpoints.environments.EnvironmentFactoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class ContextFilter implements Filter {
@@ -44,7 +40,7 @@ public class ContextFilter implements Filter {
 
     private void setHeaders(HttpServletResponse response, HttpServletRequest request) {
         List<String> incomingURLs =
-            Arrays.asList("http://localhost:8080", "http://test.localhost:8080", "http://www.lealpoints.com", "http://test.lealpoints.com");
+                Arrays.asList("http://localhost:8080", "http://test.localhost:8080", "http://www.lealpoints.com", "http://test.lealpoints.com");
         String clientOrigin = request.getHeader("origin") != null ? request.getHeader("origin") : request.getHeader("referer");
         int myIndex = incomingURLs.indexOf(clientOrigin);
         if (myIndex != -1) {

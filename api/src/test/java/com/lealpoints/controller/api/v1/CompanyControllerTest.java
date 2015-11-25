@@ -1,18 +1,19 @@
 package com.lealpoints.controller.api.v1;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Company;
 import com.lealpoints.service.implementations.CompanyServiceImpl;
 import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.util.Translations;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -21,7 +22,7 @@ public class CompanyControllerTest {
 
     @Test
     public void testUpdateLogo() throws FileUploadException {
-        CompanyServiceImpl companyService = createCompanyService(new ServiceResult<Boolean>(true, Translations.Message.YOUR_LOGO_WAS_UPDATED.name()));
+        CompanyServiceImpl companyService = createCompanyService(new ServiceResult<Boolean>(true, Message.YOUR_LOGO_WAS_UPDATED.name()));
         final ServletFileUpload servletFileUpload = createMock(ServletFileUpload.class);
         expect(servletFileUpload.parseRequest((HttpServletRequest) anyObject())).andReturn(new ArrayList<FileItem>());
         replay(servletFileUpload);
@@ -37,7 +38,7 @@ public class CompanyControllerTest {
         ServiceResult serviceResult = responseEntity.getBody();
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.YOUR_LOGO_WAS_UPDATED.name(), serviceResult.getMessage());
+        assertEquals(Message.YOUR_LOGO_WAS_UPDATED.name(), serviceResult.getMessage());
         verify(companyService);
     }
 

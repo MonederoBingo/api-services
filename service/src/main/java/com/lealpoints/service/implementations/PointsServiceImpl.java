@@ -2,6 +2,7 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Points;
@@ -15,7 +16,6 @@ import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.util.DateUtil;
-import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,9 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
 
     @Autowired
     public PointsServiceImpl(PointsRepository pointsRepository, PointsConfigurationRepository pointsConfigurationRepository,
-        ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
-        Translations translations, PhoneValidatorServiceImpl phoneValidatorService) {
-        super(translations, threadContextService);
+                             ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
+                             PhoneValidatorServiceImpl phoneValidatorService) {
+        super(threadContextService);
         _pointsRepository = pointsRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
@@ -51,16 +51,16 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
                 float earnedPoints = awardPointsAndUpdateClientStatus(pointsAwarding);
                 queryAgent.commitTransaction();
                 if (earnedPoints > 0) {
-                    return new ServiceResult<>(true, getTranslation(Translations.Message.POINTS_AWARDED) + ": " + earnedPoints, earnedPoints);
+                    return new ServiceResult<>(true, getTranslation(Message.POINTS_AWARDED) + ": " + earnedPoints, earnedPoints);
                 } else {
-                    return new ServiceResult<>(true, getTranslation(Translations.Message.THE_CLIENT_DID_NOT_GET_POINTS), earnedPoints);
+                    return new ServiceResult<>(true, getTranslation(Message.THE_CLIENT_DID_NOT_GET_POINTS), earnedPoints);
                 }
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -113,7 +113,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         }
         Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
         if (points != null) {
-            return new ValidationResult(false, getTranslation(Translations.Message.SALE_KEY_ALREADY_EXISTS));
+            return new ValidationResult(false, getTranslation(Message.SALE_KEY_ALREADY_EXISTS));
         }
         return new ValidationResult(true, "");
     }

@@ -10,10 +10,6 @@
             <include name="**/*.jar" />
         </fileset>
     </path>
-
-    <target name="init">
-        <tstamp/>
-    </target>
     <target name="maven-windows" depends="maven.properties" if="isWindows">
         <property name="runFrom" value="${basedir}"/>
         <exec executable="cmd.exe" dir="${runFrom}" failonerror="true" resultproperty="exec.return.code">
@@ -46,23 +42,20 @@
         <fail if="maven.failed" message="Maven build failed."/>
     </target>
     <target name="maven" depends="maven-windows, maven-unix"/>
-    <target name="maven.build" depends="init">
+    <target name="maven.build">
         <antcall target="maven">
             <param name="target" value="install"/>
             <param name="options" value="-Dmaven.test.skip=true"/>
         </antcall>
     </target>
-    <target name="all" depends="init" description="Builds all our sub-projects in order.">
+    <target name="all" description="Builds all our sub-projects in order.">
         <antcall target="maven.build"/>
         <tstamp>
             <format property="buildtime" pattern="yyyy-MM-dd'T'HH:mm:ss"/>
         </tstamp>
         <echo message="Finished build at ${buildtime}"/>
     </target>
-    <target name="compile" depends="init" description="Builds sub-project">
-        <!--<javac srcdir="${src.migrations.util}" destdir="${build}" includeantruntime="false" classpathref="classpath" />--><!--<javac srcdir="${src.migrations.db}" destdir="${build}" includeantruntime="false" classpathref="classpath" />--><!--<javac srcdir="${src.migrations}" destdir="${build}" includeantruntime="false" classpathref="classpath" />-->
-    </target>
-    <target name="createdb" description="Creates the database" depends="compile">
+    <target name="createdb" description="Creates the database">
         <echo message="  *** THIS WILL DROP THE LOCALHOST COPY OF YOUR EXISTING DATABASE! ***  "/>
         <input message="Agree on drop and create db? (y/n): " addproperty="agree_on_createdb_yn" validargs="y,n"
                defaultvalue="n"/>
@@ -74,23 +67,23 @@
         </condition>
         <antcall target="drop_and_create_db"></antcall>
     </target>
-    <target name="drop_and_create_db" description="Creates the database" depends="compile" if="agree_on_createdb">
+    <target name="drop_and_create_db" description="Creates the database" if="agree_on_createdb">
         <java classname="com.lealpoints.migrations.CreateDb" classpathref="classpath"/>
     </target>
-    <target name="migrate" description="Updates the database" depends="compile">
+    <target name="migrate" description="Updates the database">
         <java classname="com.lealpoints.migrations.Migrate" classpathref="classpath">
             <arg value="dev"/>
             <arg value="unit_test"/>
             <arg value="functional_test"/>
         </java>
     </target>
-    <target name="prod_migrate" description="Updates the database" depends="compile">
+    <target name="prod_migrate" description="Updates the database">
         <java classname="com.lealpoints.migrations.Migrate" classpathref="classpath">
             <arg value="prod"/>
             <arg value="uat"/>
         </java>
     </target>
-    <target name="create-migration" description="Creates a new file into migrations directory" depends="compile">
+    <target name="create-migration" description="Creates a new file into migrations directory">
         <taskdef name="slugifytask" classname="com.lealpoints.migrations.util.SlugifyTask" classpathref="classpath"/>
         <input message="Type a short description of what migration does: " addproperty="migration.description"/>
         <slugifytask string="${migration.description}" propertyName="migration.description.slug"/>

@@ -1,5 +1,11 @@
 package com.lealpoints.service.implementations;
 
+import com.lealpoints.common.PropertyManager;
+import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.service.SMSService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import javax.mail.MessagingException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,19 +14,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import com.lealpoints.common.PropertyManager;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.service.SMSService;
-import com.lealpoints.util.Translations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 @Component
 public class SMSServiceImpl extends BaseServiceImpl implements SMSService {
 
     @Autowired
-    public SMSServiceImpl(Translations translations, ThreadContextService threadContextService) {
-        super(translations, threadContextService);
+    public SMSServiceImpl(ThreadContextService threadContextService) {
+        super(threadContextService);
     }
 
     public void sendSMSMessage(String phone, String message) throws IOException, MessagingException {

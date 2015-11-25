@@ -1,5 +1,8 @@
 package com.lealpoints.service.implementations;
 
+import org.easymock.EasyMock;
+import org.junit.Test;
+
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,8 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import org.easymock.EasyMock;
-import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
 
@@ -19,7 +20,7 @@ public class SMSServiceImplTest {
 
         final HttpURLConnection httpURLConnection = creteHttpURLConnection();
 
-        SMSServiceImpl smsService = new SMSServiceImpl(null, null) {
+        SMSServiceImpl smsService = new SMSServiceImpl(null) {
 
             @Override
             URL getUrl(String phone, String message) throws MalformedURLException {

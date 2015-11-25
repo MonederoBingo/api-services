@@ -3,6 +3,7 @@ package com.lealpoints.context;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.db.queryagent.QueryAgentFactory;
 import com.lealpoints.environments.Environment;
+import com.lealpoints.i18n.Language;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -25,7 +26,7 @@ public class ThreadContextServiceImpl implements ThreadContextService {
         ThreadContext threadContext = new ThreadContext();
         final QueryAgent queryAgent = _queryAgentFactory.getQueryAgent(environment);
         threadContext.setClientQueryAgent(queryAgent);
-        threadContext.setLanguage(language);
+        threadContext.setLanguage(Language.getByLangId(language));
         threadContext.setEnvironment(environment);
         setThreadContextOnThread(threadContext);
     }

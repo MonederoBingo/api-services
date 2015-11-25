@@ -1,12 +1,13 @@
 package com.lealpoints.db.datasources;
 
+import com.lealpoints.environments.EnvironmentFactory;
+import com.lealpoints.environments.EnvironmentFactoryImpl;
+import org.junit.Test;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.CountDownLatch;
-import com.lealpoints.environments.EnvironmentFactory;
-import com.lealpoints.environments.EnvironmentFactoryImpl;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -29,8 +30,8 @@ public class DataSourceFactoryImplTest {
 
     @Test
     public void testCreateDataSourceWithTwoThreads() throws SQLException, InterruptedException {
-        int count = 1000;
-        while (count-- > 0) {
+        int times = 5;
+        while (times-- > 0) {
             final DataSourceFactoryImpl dataSourceFactory = new DataSourceFactoryImpl();
             final EnvironmentFactory environmentFactory = new EnvironmentFactoryImpl();
             final DataSource[] dataSource = new DataSource[2];

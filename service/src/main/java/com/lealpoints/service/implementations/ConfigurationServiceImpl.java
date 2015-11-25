@@ -1,8 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import com.lealpoints.model.Configuration;
 import com.lealpoints.repository.ConfigurationRepository;
 import com.lealpoints.service.ConfigurationService;
@@ -10,6 +7,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class ConfigurationServiceImpl extends BaseServiceImpl implements ConfigurationService {
@@ -19,7 +20,7 @@ public class ConfigurationServiceImpl extends BaseServiceImpl implements Configu
 
     @Autowired
     private ConfigurationServiceImpl(ConfigurationRepository configurationRepository) {
-        super(null, null);
+        super(null);
         _configurationRepository = configurationRepository;
     }
 

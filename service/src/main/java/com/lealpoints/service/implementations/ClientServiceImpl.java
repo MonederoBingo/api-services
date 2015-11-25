@@ -1,7 +1,7 @@
 package com.lealpoints.service.implementations;
 
-import java.util.List;
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.repository.ClientRepository;
@@ -10,11 +10,12 @@ import com.lealpoints.service.ClientService;
 import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
-import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class ClientServiceImpl extends BaseServiceImpl implements ClientService {
@@ -25,8 +26,8 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
 
     @Autowired
     public ClientServiceImpl(ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository,
-        ThreadContextService threadContextService, Translations translations, PhoneValidatorServiceImpl phoneValidatorService) {
-        super(translations, threadContextService);
+                             ThreadContextService threadContextService, PhoneValidatorServiceImpl phoneValidatorService) {
+        super(threadContextService);
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
         _phoneValidatorService = phoneValidatorService;
@@ -39,13 +40,13 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
                 getThreadContextService().getQueryAgent().beginTransaction();
                 Client client = registerClientAndCompanyMapping(clientRegistration);
                 getThreadContextService().getQueryAgent().commitTransaction();
-                return new ServiceResult<>(true, getTranslation(Translations.Message.CLIENT_REGISTERED_SUCCESSFULLY), client.getClientId());
+                return new ServiceResult<>(true, getTranslation(Message.CLIENT_REGISTERED_SUCCESSFULLY), client.getClientId());
             } else {
                 return new ServiceResult<>(false, validationResult.getMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -65,7 +66,7 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             return new ServiceResult<>(true, "", clientPointsList);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -75,7 +76,7 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             return new ServiceResult<>(true, "", clientPoints);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -89,7 +90,7 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             CompanyClientMapping companyClientMapping =
                 _companyClientMappingRepository.getByCompanyIdClientId(clientRegistration.getCompanyId(), client.getClientId());
             if (companyClientMapping != null) {
-                return new ValidationResult(false, getTranslation(Translations.Message.THE_CLIENT_ALREADY_EXISTS));
+                return new ValidationResult(false, getTranslation(Message.THE_CLIENT_ALREADY_EXISTS));
             }
         }
         return new ValidationResult(true);

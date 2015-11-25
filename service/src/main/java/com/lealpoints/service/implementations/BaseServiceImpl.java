@@ -6,21 +6,19 @@ import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.environments.Environment;
 import com.lealpoints.environments.ProdEnvironment;
 import com.lealpoints.environments.UATEnvironment;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.service.BaseService;
-import com.lealpoints.util.Translations;
 
 public class BaseServiceImpl implements BaseService {
 
-    private final Translations _translations;
     private final ThreadContextService _threadContextService;
 
-    public BaseServiceImpl(Translations translations, ThreadContextService threadContextService) {
-        _translations = translations;
+    public BaseServiceImpl(ThreadContextService threadContextService) {
         _threadContextService = threadContextService;
     }
 
-    public String getTranslation(Translations.Message message) {
-        return _translations.getMessage(message);
+    public String getTranslation(Message message) {
+        return message.get(getThreadContext().getLanguage());
     }
 
     public boolean isProdEnvironment() {

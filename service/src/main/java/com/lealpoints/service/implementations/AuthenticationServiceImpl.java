@@ -1,11 +1,11 @@
 package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.repository.ClientUserRepository;
 import com.lealpoints.repository.CompanyUserRepository;
 import com.lealpoints.service.AuthenticationService;
 import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +19,9 @@ public class AuthenticationServiceImpl extends BaseServiceImpl implements Authen
     private final ClientUserRepository _clientUserRepository;
 
     @Autowired
-    public AuthenticationServiceImpl(ThreadContextService threadContextService, Translations translations,
-        CompanyUserRepository companyUserRepository, ClientUserRepository clientUserRepository) {
-        super(translations, threadContextService);
+    public AuthenticationServiceImpl(ThreadContextService threadContextService,
+                                     CompanyUserRepository companyUserRepository, ClientUserRepository clientUserRepository) {
+        super(threadContextService);
         _companyUserRepository = companyUserRepository;
         _clientUserRepository = clientUserRepository;
     }
@@ -36,6 +36,6 @@ public class AuthenticationServiceImpl extends BaseServiceImpl implements Authen
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
-        return new ServiceResult(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+        return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
     }
 }

@@ -2,6 +2,7 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Promotion;
@@ -14,7 +15,6 @@ import com.lealpoints.service.PromotionService;
 import com.lealpoints.service.model.PromotionApplying;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.util.DateUtil;
-import com.lealpoints.util.Translations;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +30,8 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
 
     @Autowired
     public PromotionServiceImpl(PromotionRepository promotionRepository, PromotionConfigurationRepository promotionConfigurationRepository,
-        CompanyClientMappingRepository companyClientMappingRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
-        Translations translations) {
-        super(translations, threadContextService);
+                                CompanyClientMappingRepository companyClientMappingRepository, ClientRepository clientRepository, ThreadContextService threadContextService) {
+        super(threadContextService);
         _promotionRepository = promotionRepository;
         _promotionConfigurationRepository = promotionConfigurationRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
@@ -49,10 +48,10 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
             queryAgent.beginTransaction();
             long promotionId = insertPromotionAndUpdatePoints(promotionApplying, client);
             queryAgent.commitTransaction();
-            return new ServiceResult<>(true, getTranslation(Translations.Message.PROMOTION_APPLIED), promotionId);
+            return new ServiceResult<>(true, getTranslation(Message.PROMOTION_APPLIED), promotionId);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
         }
     }
 

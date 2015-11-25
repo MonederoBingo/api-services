@@ -1,8 +1,8 @@
 package com.lealpoints.service.implementations;
 
-import java.sql.SQLException;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Points;
@@ -14,9 +14,10 @@ import com.lealpoints.repository.PointsRepository;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
-import com.lealpoints.util.Translations;
 import org.easymock.EasyMockSupport;
 import org.junit.Test;
+
+import java.sql.SQLException;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -27,10 +28,10 @@ public class PointsServiceImplTest extends EasyMockSupport {
     public void testAwardPoints() throws Exception {
         PointsServiceImpl pointsService =
             new PointsServiceImpl(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
-                createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()), null,
-                createPhoneValidatorService(true, "")) {
+                    createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()),
+                    createPhoneValidatorService(true, "")) {
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -44,18 +45,18 @@ public class PointsServiceImplTest extends EasyMockSupport {
         ServiceResult<Float> serviceResult = pointsService.awardPoints(pointsAwarding);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.POINTS_AWARDED.name() + ": " + 10.0, serviceResult.getMessage());
+        assertEquals(Message.POINTS_AWARDED.name() + ": " + 10.0, serviceResult.getMessage());
         assertEquals(10, serviceResult.getObject(), 0.00);
         verifyAll();
     }
 
     @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
-        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null, null,
-            createPhoneValidatorService(false, Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name())) {
+        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null,
+                createPhoneValidatorService(false, Message.PHONE_MUST_HAVE_10_DIGITS.name())) {
 
             @Override
-            public String getTranslation(Translations.Message message) {
+            public String getTranslation(Message message) {
                 return message.name();
             }
         };
@@ -63,17 +64,17 @@ public class PointsServiceImplTest extends EasyMockSupport {
         ServiceResult<Float> serviceResult = pointsService.awardPoints(new PointsAwarding());
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
+        assertEquals(Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
         verifyAll();
     }
 
     @Test
     public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
         PointsServiceImpl pointsService =
-            new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null, null, createPhoneValidatorService(true, "")) {
+                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null, createPhoneValidatorService(true, "")) {
 
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -81,7 +82,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
         ServiceResult<Float> serviceResult = pointsService.awardPoints(new PointsAwarding());
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Translations.Message.SALE_KEY_ALREADY_EXISTS.name(), serviceResult.getMessage());
+        assertEquals(Message.SALE_KEY_ALREADY_EXISTS.name(), serviceResult.getMessage());
         verifyAll();
     }
 

@@ -1,11 +1,11 @@
 package com.lealpoints.service;
 
 import com.lealpoints.environments.Environment;
-import com.lealpoints.util.Translations;
+import com.lealpoints.i18n.Message;
 
 public interface BaseService {
 
-    String getTranslation(Translations.Message message);
+    String getTranslation(Message message);
 
     boolean isProdEnvironment();
 

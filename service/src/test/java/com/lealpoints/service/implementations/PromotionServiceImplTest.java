@@ -1,8 +1,8 @@
 package com.lealpoints.service.implementations;
 
-import java.sql.SQLException;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Promotion;
@@ -13,13 +13,14 @@ import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.repository.PromotionRepository;
 import com.lealpoints.service.model.PromotionApplying;
 import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.util.Translations;
 import org.junit.Test;
+
+import java.sql.SQLException;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-public class PromotionServiceImplTest {
+public class PromotionServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testApplyPromotion() throws Exception {
@@ -32,9 +33,9 @@ public class PromotionServiceImplTest {
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository();
         PromotionServiceImpl promotionService =
             new PromotionServiceImpl(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
-                threadContextService, null) {
+                    threadContextService) {
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -46,7 +47,7 @@ public class PromotionServiceImplTest {
         ServiceResult<Long> serviceResult = promotionService.applyPromotion(promotionApplying);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.PROMOTION_APPLIED.name(), serviceResult.getMessage());
+        assertEquals(Message.PROMOTION_APPLIED.name(), serviceResult.getMessage());
         assertTrue(serviceResult.getObject() > 0);
         verify(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, queryAgent, threadContextService);
     }
@@ -65,16 +66,6 @@ public class PromotionServiceImplTest {
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(1);
         replay(threadContextService);
         return threadContextService;
-    }
-
-    private QueryAgent createQueryAgent() throws Exception {
-        QueryAgent queryAgent = createMock(QueryAgent.class);
-        queryAgent.beginTransaction();
-        expectLastCall().times(1);
-        queryAgent.commitTransaction();
-        expectLastCall().times(1);
-        replay(queryAgent);
-        return queryAgent;
     }
 
     private ClientRepository createClientRepository() throws Exception {

@@ -1,9 +1,9 @@
 package com.lealpoints.service.implementations;
 
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.util.Translations;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -18,7 +18,7 @@ public class PointsConfigurationServiceImplTest {
         expectedPointsConfiguration.setPointsToEarn(10);
         expectedPointsConfiguration.setRequiredAmount(100);
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepositoryForGet(expectedPointsConfiguration);
-        PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null, null);
+        PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null);
 
         ServiceResult<PointsConfiguration> serviceResult = pointsConfigurationService.getByCompanyId(1);
         assertNotNull(serviceResult);
@@ -36,16 +36,16 @@ public class PointsConfigurationServiceImplTest {
     @Test
     public void testUpdate() throws Exception {
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepositoryForUpdate();
-        PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null, null) {
+        PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null) {
             @Override
-            public String getTranslation(Translations.Message message) {
+            public String getTranslation(Message message) {
                 return message.name();
             }
         };
         ServiceResult<Boolean> serviceResult = pointsConfigurationService.update(new PointsConfiguration());
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.CONFIGURATION_UPDATED.name(), serviceResult.getMessage());
+        assertEquals(Message.CONFIGURATION_UPDATED.name(), serviceResult.getMessage());
         assertEquals(true, serviceResult.getObject());
         verify(pointsConfigurationRepository);
     }

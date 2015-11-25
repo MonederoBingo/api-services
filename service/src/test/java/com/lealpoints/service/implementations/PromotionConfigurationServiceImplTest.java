@@ -1,7 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.PromotionConfiguration;
@@ -9,8 +8,10 @@ import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.util.Translations;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -26,7 +27,7 @@ public class PromotionConfigurationServiceImplTest {
         PromotionConfigurationRepository promotionConfigurationRepository =
             createPromotionConfigurationRepositoryForGet(expectedPromotionConfigurations);
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null, null);
+                new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null);
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyId(1);
         assertNotNull(serviceResult);
@@ -53,9 +54,9 @@ public class PromotionConfigurationServiceImplTest {
     public void testInsert() throws Exception {
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepositoryForInsert();
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null, null) {
+                new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null) {
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -66,7 +67,7 @@ public class PromotionConfigurationServiceImplTest {
         ServiceResult<Long> serviceResult = promotionConfigurationService.insert(promotionConfiguration);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.PROMOTION_SUCCESSFULLY_ADDED.name(), serviceResult.getMessage());
+        assertEquals(Message.PROMOTION_SUCCESSFULLY_ADDED.name(), serviceResult.getMessage());
         assertTrue(serviceResult.getObject() > 0);
     }
 
@@ -84,7 +85,7 @@ public class PromotionConfigurationServiceImplTest {
         ClientRepository clientRepository = createClientRepository(new Client());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null);
+                new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null);
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
         assertNotNull(serviceResult);
@@ -111,9 +112,9 @@ public class PromotionConfigurationServiceImplTest {
     public void testGetByCompanyIdRequiredPointsWhenClientDoesNotExist() throws Exception {
         ClientRepository clientRepository = createClientRepository(null);
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(null, null, clientRepository, null, null) {
+                new PromotionConfigurationServiceImpl(null, null, clientRepository, null) {
             @Override
-            public String getTranslation(Translations.Message message) {
+            public String getTranslation(Message message) {
                 return message.name();
             }
         };
@@ -121,7 +122,7 @@ public class PromotionConfigurationServiceImplTest {
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Translations.Message.PHONE_NUMBER_DOES_NOT_EXIST.name(), serviceResult.getMessage());
+        assertEquals(Message.PHONE_NUMBER_DOES_NOT_EXIST.name(), serviceResult.getMessage());
 
         verify(clientRepository);
     }
@@ -131,9 +132,9 @@ public class PromotionConfigurationServiceImplTest {
         ClientRepository clientRepository = createClientRepository(new Client());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(null);
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(null, companyClientMappingRepository, clientRepository, null, null) {
+                new PromotionConfigurationServiceImpl(null, companyClientMappingRepository, clientRepository, null) {
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -141,7 +142,7 @@ public class PromotionConfigurationServiceImplTest {
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Translations.Message.PHONE_NUMBER_DOES_NOT_EXIST.name(), serviceResult.getMessage());
+        assertEquals(Message.PHONE_NUMBER_DOES_NOT_EXIST.name(), serviceResult.getMessage());
 
         verify(companyClientMappingRepository, clientRepository);
     }
@@ -160,9 +161,9 @@ public class PromotionConfigurationServiceImplTest {
         ClientRepository clientRepository = createClientRepository(new Client());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null, null) {
+                new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null) {
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -170,7 +171,7 @@ public class PromotionConfigurationServiceImplTest {
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.CLIENT_DOES_NOT_HAVE_AVAILABLE_PROMOTIONS.name(), serviceResult.getMessage());
+        assertEquals(Message.CLIENT_DOES_NOT_HAVE_AVAILABLE_PROMOTIONS.name(), serviceResult.getMessage());
         List<PromotionConfiguration> actualPromotionConfigurations = serviceResult.getObject();
         assertNotNull(actualPromotionConfigurations);
         assertEquals(0, actualPromotionConfigurations.size());
@@ -183,9 +184,9 @@ public class PromotionConfigurationServiceImplTest {
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepositoryForDelete();
 
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null, null) {
+                new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null) {
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -193,7 +194,7 @@ public class PromotionConfigurationServiceImplTest {
         final ServiceResult<Boolean> serviceResult = promotionConfigurationService.deletePromotionConfiguration(1);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Translations.Message.THE_PROMOTION_WAS_DELETED.name(), serviceResult.getMessage());
+        assertEquals(Message.THE_PROMOTION_WAS_DELETED.name(), serviceResult.getMessage());
     }
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository(CompanyClientMapping companyClientMapping) throws Exception {

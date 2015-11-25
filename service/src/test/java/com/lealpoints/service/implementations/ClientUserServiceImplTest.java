@@ -1,11 +1,10 @@
 package com.lealpoints.service.implementations;
 
-import javax.mail.MessagingException;
-import java.sql.SQLException;
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.environments.DevEnvironment;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.ClientUser;
 import com.lealpoints.repository.ClientRepository;
@@ -14,14 +13,16 @@ import com.lealpoints.service.model.ClientLoginResult;
 import com.lealpoints.service.model.ClientUserLogin;
 import com.lealpoints.service.model.ClientUserRegistration;
 import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.util.Translations;
 import org.easymock.EasyMock;
 import org.junit.Test;
+
+import javax.mail.MessagingException;
+import java.sql.SQLException;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-public class ClientUserServiceImplTest {
+public class ClientUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testRegister() throws Exception {
@@ -33,9 +34,9 @@ public class ClientUserServiceImplTest {
         threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null, null) {
+                new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null) {
             @Override
-            public String getTranslation(Translations.Message message) {
+            public String getTranslation(Message message) {
                 return message.name();
             }
 
@@ -63,7 +64,7 @@ public class ClientUserServiceImplTest {
         threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
         ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null, null) {
+                new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null) {
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                 return "123456";
@@ -79,9 +80,9 @@ public class ClientUserServiceImplTest {
 
     @Test
     public void testRegisterWithInvalidPhone() {
-        final ClientUserServiceImpl clientUserService = new ClientUserServiceImpl(null, null, null, null, null) {
+        final ClientUserServiceImpl clientUserService = new ClientUserServiceImpl(null, null, null, null) {
             @Override
-            public String getTranslation(Translations.Message message) {
+            public String getTranslation(Message message) {
                 return message.name();
             }
 
@@ -94,7 +95,7 @@ public class ClientUserServiceImplTest {
         clientUserRegistration.setPhone("123");
         ServiceResult<String> serviceResult = clientUserService.register(clientUserRegistration);
         assertNotNull(serviceResult);
-        assertEquals(Translations.Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
+        assertEquals(Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
     }
 
     @Test
@@ -109,7 +110,7 @@ public class ClientUserServiceImplTest {
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForPhone(clientUser);
         final ClientRepository clientRepository = createClientRepository();
         final ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
+                new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
@@ -140,13 +141,13 @@ public class ClientUserServiceImplTest {
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForPhoneWhenNotUpdatingApiKey(clientUser);
         final ClientRepository clientRepository = createClientRepository();
         final ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
+                new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
                 }
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -159,7 +160,7 @@ public class ClientUserServiceImplTest {
         ServiceResult serviceResult = clientUserService.login(clientUserLogin);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
+        assertEquals(Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
         verify(clientUserRepository, clientRepository);
     }
 
@@ -175,7 +176,7 @@ public class ClientUserServiceImplTest {
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForEmail(clientUser);
         final ClientRepository clientRepository = createClientRepository();
         final ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
+                new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
@@ -206,13 +207,13 @@ public class ClientUserServiceImplTest {
         final ClientUserRepository clientUserRepository = createClientUserRepositoryForEmailWhenNotUpdatingApiKey(clientUser);
         final ClientRepository clientRepository = createClientRepository();
         final ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null, null) {
+                new ClientUserServiceImpl(clientUserRepository, clientRepository, createMock(ThreadContextService.class), null) {
                 @Override
                 String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                     return "";
                 }
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -225,7 +226,7 @@ public class ClientUserServiceImplTest {
         ServiceResult serviceResult = clientUserService.login(clientUserLogin);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Translations.Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
+        assertEquals(Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
         verify(clientUserRepository, clientRepository);
     }
 
@@ -235,7 +236,7 @@ public class ClientUserServiceImplTest {
         threadContext.setEnvironment(new DevEnvironment());
         ThreadContextService threadContextService = createThreadContextService(threadContext, 1);
         ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
+                new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null) {
             @Override
             String generateAndSendRegistrationSMS(String phone) throws MessagingException {
                 return "";
@@ -254,10 +255,10 @@ public class ClientUserServiceImplTest {
         threadContext.setEnvironment(new DevEnvironment());
         ThreadContextService threadContextService = createThreadContextService(threadContext, 2);
         ClientUserServiceImpl clientUserService =
-            new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null, null) {
+                new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null) {
 
                 @Override
-                public String getTranslation(Translations.Message message) {
+                public String getTranslation(Message message) {
                     return message.name();
                 }
             };
@@ -279,16 +280,6 @@ public class ClientUserServiceImplTest {
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(times);
         replay(threadContextService);
         return threadContextService;
-    }
-
-    private QueryAgent createQueryAgent() throws Exception {
-        QueryAgent queryAgent = createMock(QueryAgent.class);
-        queryAgent.beginTransaction();
-        expectLastCall().times(1);
-        queryAgent.commitTransaction();
-        expectLastCall().times(1);
-        replay(queryAgent);
-        return queryAgent;
     }
 
     private ClientUserRepository createClientUserRepositoryForPhone(ClientUser clientUser) throws Exception {

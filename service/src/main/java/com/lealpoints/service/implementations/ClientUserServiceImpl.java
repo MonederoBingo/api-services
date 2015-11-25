@@ -1,27 +1,24 @@
 package com.lealpoints.service.implementations;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.ClientUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.ClientUserRepository;
 import com.lealpoints.service.ClientUserService;
-import com.lealpoints.service.model.ClientLoginResult;
-import com.lealpoints.service.model.ClientUserLogin;
-import com.lealpoints.service.model.ClientUserRegistration;
-import com.lealpoints.service.model.ServiceResult;
-import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.model.*;
 import com.lealpoints.util.EmailUtil;
-import com.lealpoints.util.Translations;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
 
 @Component
 public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUserService {
@@ -32,8 +29,8 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     @Autowired
     public ClientUserServiceImpl(ClientUserRepository clientUserRepository, ClientRepository clientRepository,
-        ThreadContextService threadContextService, Translations translations, SMSServiceImpl smsService) {
-        super(translations, threadContextService);
+                                 ThreadContextService threadContextService, SMSServiceImpl smsService) {
+        super(threadContextService);
         _clientUserRepository = clientUserRepository;
         _clientRepository = clientRepository;
         _smsService = smsService;
@@ -52,7 +49,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -66,13 +63,13 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
                 clientUser = authenticateUsingEmail(clientUserLogin);
             }
             if (clientUser == null) {
-                return new ServiceResult<>(false, getTranslation(Translations.Message.LOGIN_FAILED));
+                return new ServiceResult<>(false, getTranslation(Message.LOGIN_FAILED));
             } else {
                 String apiKey = RandomStringUtils.random(20, true, true) + "cli";
                 final int updatedRows = _clientUserRepository.updateApiKeyById(clientUser.getClientUserId(), apiKey);
                 if (updatedRows != 1) {
                     logger.error("The client user api key could not be updated. updatedRows: " + updatedRows);
-                    return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+                    return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
                 }
                 ClientLoginResult clientLoginResult = new ClientLoginResult();
                 clientLoginResult.setClientUserId(clientUser.getClientUserId());
@@ -81,7 +78,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -91,7 +88,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
             return new ServiceResult<>(true, "", true);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Translations.Message.COMMON_USER_ERROR));
+            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -120,7 +117,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     String generateAndSendRegistrationSMS(String phone) throws MessagingException, IOException {
         String key = RandomStringUtils.random(6, false, true);
-        String message = getTranslation(Translations.Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
+        String message = getTranslation(Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
         if (isProdEnvironment()) {
             _smsService.sendSMSMessage(phone, message);
             sendKeyToEmail(key, phone);
@@ -131,7 +128,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     void sendKeyToEmail(String key, String phone) throws MessagingException {
         NotificationEmail notificationEmail = new NotificationEmail();
-        notificationEmail.setSubject(getTranslation(Translations.Message.ACTIVATION_EMAIL_SUBJECT));
+        notificationEmail.setSubject(getTranslation(Message.ACTIVATION_EMAIL_SUBJECT));
         notificationEmail.setBody("Phone: " + phone + ", Key:" + key);
         notificationEmail.setEmailTo("aayala@lealpoints.com");
         EmailUtil.sendEmail(notificationEmail);
@@ -139,7 +136,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     private ValidationResult validateRegistration(ClientUserRegistration clientUserRegistration) {
         if (clientUserRegistration.getPhone() != null && clientUserRegistration.getPhone().length() != 10) {
-            return new ValidationResult(false, getTranslation(Translations.Message.PHONE_MUST_HAVE_10_DIGITS));
+            return new ValidationResult(false, getTranslation(Message.PHONE_MUST_HAVE_10_DIGITS));
         }
         return new ValidationResult(true, "");
     }
