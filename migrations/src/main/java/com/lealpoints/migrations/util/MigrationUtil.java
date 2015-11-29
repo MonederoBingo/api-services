@@ -14,7 +14,7 @@ public class MigrationUtil {
             st = conn.createStatement();
             st.execute(sql);
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to execute SQL statement: " + sql);
+            throw new RuntimeException("Failed to execute SQL statement: " + sql, e);
         } finally {
             if (st != null) {
                 try {

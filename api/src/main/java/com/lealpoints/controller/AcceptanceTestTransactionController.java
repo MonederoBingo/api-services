@@ -3,18 +3,20 @@ package com.lealpoints.controller;
 import com.lealpoints.service.FunctionalTestTransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
-@RequestMapping("/functional_test/transaction")
-public class AutomatedTestTransactionController {
+@RestController
+@RequestMapping("/acceptance_test/transaction")
+public class AcceptanceTestTransactionController {
 
     private final FunctionalTestTransactionService _functionalTestTransactionService;
 
     @Autowired
-    public AutomatedTestTransactionController(FunctionalTestTransactionService functionalTestTransactionService) {
+    public AcceptanceTestTransactionController(FunctionalTestTransactionService functionalTestTransactionService) {
         _functionalTestTransactionService = functionalTestTransactionService;
     }
 

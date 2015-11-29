@@ -21,7 +21,7 @@ public class CreateDb {
         System.out.println("Creating database...");
         CreateDb.run();
         System.out.println("Database create successfully.");
-        Migrate.main(new String[]{"dev", "unit_test"});
+        Migrate.main(new String[]{"dev", "unit_test", "functional_test"});
     }
 
     private static void run() throws Exception {
