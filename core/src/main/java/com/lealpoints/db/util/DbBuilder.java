@@ -2,10 +2,21 @@ package com.lealpoints.db.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 
 public abstract class DbBuilder<T> {
 
-    public abstract String sql();
+
+
+    public void setValue(Object valueT) {
+
+    }
+    public Object[] getValue()
+
+    {
+        return  null;
+    }
+    public abstract String sql() throws SQLException;
 
     public Object[] values() {
         return new Object[0];

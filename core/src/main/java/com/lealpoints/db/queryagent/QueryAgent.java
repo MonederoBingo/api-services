@@ -90,9 +90,9 @@ public class QueryAgent {
     public synchronized <T> List<T> selectList(DbBuilder<T> builder) throws Exception {
         Connection connection = getConnection();
         try (PreparedStatement statement = connection.prepareStatement(builder.sql())) {
-            setValues(statement, builder.values());
+            PreparedStatement statement1 =setValues(statement, builder.getValue());
 
-            try (ResultSet resultSet = statement.executeQuery()) {
+            try (ResultSet resultSet = statement1.executeQuery()) {
                 List<T> results = new ArrayList<>();
                 while (resultSet.next()) {
                     results.add(builder.build(resultSet));
@@ -113,9 +113,11 @@ public class QueryAgent {
      * @throws SQLException
      */
     public synchronized <T> T selectObject(DbBuilder<T> builder) throws Exception {
+
         try (PreparedStatement statement = getConnection().prepareStatement(builder.sql())) {
-            setValues(statement, builder.values());
-            try (ResultSet resultSet = statement.executeQuery()) {
+            PreparedStatement statement1= setValues(statement, builder.getValue());
+
+            try (ResultSet resultSet = statement1.executeQuery()) {
                 if (!resultSet.next()) {
                     return null;
                 }
@@ -168,9 +170,9 @@ public class QueryAgent {
         }
     }
 
-    private void setValues(PreparedStatement statement, Object... values) throws SQLException {
+    private PreparedStatement setValues(PreparedStatement statement, Object... values) throws SQLException {
         if (values == null) {
-            return;
+            return null;
         }
         for (int i = 0; i < values.length; i++) {
             Object obj = values[i];
@@ -192,6 +194,7 @@ public class QueryAgent {
                 throw new RuntimeException("Unsupported SQL type for object : " + obj);
             }
         }
+        return statement;
     }
 
     @Override

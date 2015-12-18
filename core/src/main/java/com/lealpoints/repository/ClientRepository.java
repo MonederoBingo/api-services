@@ -1,5 +1,7 @@
 package com.lealpoints.repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,8 +20,19 @@ public class ClientRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
-                sql.append(" WHERE company_client_mapping.company_id = ").append(companyId).append(";");
+                sql.append(" WHERE company_client_mapping.company_id = ").append("?").append(" ;");
+                setValue(companyId);
                 return sql.toString();
+            }
+            private Object[] value=new Object[1];
+            @Override
+            public Object[] getValue() {
+                return value;
+            }
+
+            @Override
+            public void setValue(Object valueT) {
+                value[0]=valueT;
             }
 
             @Override
@@ -42,9 +55,25 @@ public class ClientRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
-                sql.append(" WHERE company_client_mapping.company_id = ").append(companyId);
-                sql.append(" AND client.phone = '").append(phone).append("';");
+                sql.append(" WHERE company_client_mapping.company_id = ?");
+                sql.append(" AND client.phone = ").append("?").append(" ;");
+
+                setValue(companyId);
+                setValue(phone);
                 return sql.toString();
+            }
+
+            private Object[] value = new Object[2];
+            private int index=0;
+            @Override
+            public Object[] getValue() {
+                return value;
+            }
+
+            @Override
+            public void setValue(Object valueT) {
+                this.value[index]=valueT;
+                index++;
             }
 
             @Override
@@ -60,11 +89,22 @@ public class ClientRepository extends BaseRepository {
     public Client getByPhone(final String phone) throws Exception {
         return getQueryAgent().selectObject(new DbBuilder<Client>() {
             @Override
-            public String sql() {
+            public String sql() throws SQLException {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
-                sql.append(" WHERE phone = '").append(phone).append("';");
+                sql.append(" WHERE phone = ").append("?").append(";");
+                setValue(phone);
                 return sql.toString();
+            }
+            private Object[] value=new Object[1];
+            @Override
+            public void setValue(Object valueT) {
+                this.value[0]=valueT;
+            }
+
+            @Override
+            public Object[] getValue() {
+              return value;
             }
 
             @Override
@@ -72,6 +112,7 @@ public class ClientRepository extends BaseRepository {
                 Client client = new Client();
                 client.setClientId(resultSet.getLong("client_id"));
                 client.setPhone(resultSet.getString("phone"));
+
                 return client;
             }
         });
