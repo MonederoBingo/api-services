@@ -1,14 +1,13 @@
 package com.lealpoints.repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 @Component
 public class ClientRepository extends BaseRepository {
@@ -21,18 +20,12 @@ public class ClientRepository extends BaseRepository {
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
                 sql.append(" WHERE company_client_mapping.company_id = ").append("?").append(" ;");
-                setValue(companyId);
                 return sql.toString();
-            }
-            private Object[] value=new Object[1];
-            @Override
-            public Object[] getValue() {
-                return value;
             }
 
             @Override
-            public void setValue(Object valueT) {
-                value[0]=valueT;
+            public Object[] values() {
+                return new Object[]{companyId};
             }
 
             @Override
@@ -50,6 +43,9 @@ public class ClientRepository extends BaseRepository {
 
     public CompanyClientMapping getByCompanyIdPhone(final long companyId, final String phone) throws Exception {
         return getQueryAgent().selectObject(new DbBuilder<CompanyClientMapping>() {
+            private Object[] value = new Object[2];
+            private int index = 0;
+
             @Override
             public String sql() {
                 StringBuilder sql = new StringBuilder();
@@ -63,8 +59,6 @@ public class ClientRepository extends BaseRepository {
                 return sql.toString();
             }
 
-            private Object[] value = new Object[2];
-            private int index=0;
             @Override
             public Object[] getValue() {
                 return value;
@@ -88,6 +82,8 @@ public class ClientRepository extends BaseRepository {
 
     public Client getByPhone(final String phone) throws Exception {
         return getQueryAgent().selectObject(new DbBuilder<Client>() {
+            private Object[] value = new Object[1];
+
             @Override
             public String sql() throws SQLException {
                 StringBuilder sql = new StringBuilder();
@@ -96,15 +92,15 @@ public class ClientRepository extends BaseRepository {
                 setValue(phone);
                 return sql.toString();
             }
-            private Object[] value=new Object[1];
-            @Override
-            public void setValue(Object valueT) {
-                this.value[0]=valueT;
-            }
 
             @Override
             public Object[] getValue() {
-              return value;
+                return value;
+            }
+
+            @Override
+            public void setValue(Object valueT) {
+                this.value[0] = valueT;
             }
 
             @Override
