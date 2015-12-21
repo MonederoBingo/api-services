@@ -31,9 +31,14 @@ public class CompanyUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM ").append("company_user");
-                sql.append(" WHERE company_user.email = '").append(email).append("'");
+                sql.append(" WHERE company_user.email = ?");
                 sql.append(" AND company_user.password = ").append(encryptForSelect("password", password));
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{email};
             }
 
             @Override
@@ -49,8 +54,13 @@ public class CompanyUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.email = '").append(email).append("';");
+                sql.append(" WHERE company_user.email = ? ;");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{email};
             }
 
             @Override
@@ -78,15 +88,20 @@ public class CompanyUserRepository extends BaseRepository {
         return getQueryAgent().executeUpdate("UPDATE company_user SET activation_key = NULL WHERE activation_key = '" + activationKey + "';");
     }
 
-    public CompanyUser getByCompanyUserIdApiKey(final String companyUserId, final String apiKey) throws Exception {
+    public CompanyUser getByCompanyUserIdApiKey(final Integer companyUserId, final String apiKey) throws Exception {
         return getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
             @Override
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.company_user_id = ").append(companyUserId);
+                sql.append(" WHERE company_user.company_user_id = ?");
                 sql.append(" AND company_user.api_key = ").append(encryptForSelect("api_key", apiKey)).append(";");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyUserId};
             }
 
             @Override

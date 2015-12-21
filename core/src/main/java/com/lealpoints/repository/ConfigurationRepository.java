@@ -29,6 +29,11 @@ public class ConfigurationRepository extends BaseRepository {
             }
 
             @Override
+            public Object[] values() {
+                return new Object[0];
+            }
+
+            @Override
             public Configuration build(ResultSet resultSet) throws SQLException {
                 Configuration configuration = new Configuration();
                 configuration.setConfigurationId(resultSet.getLong("configuration_id"));
@@ -44,7 +49,12 @@ public class ConfigurationRepository extends BaseRepository {
         return getQueryAgent().selectObject(new DbBuilder<String>() {
             @Override
             public String sql() {
-                return "SELECT value FROM configuration WHERE name = '" + name + "';";
+                return "SELECT value FROM configuration WHERE name = ?;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{name};
             }
 
             @Override

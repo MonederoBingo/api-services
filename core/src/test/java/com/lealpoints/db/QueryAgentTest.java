@@ -66,6 +66,11 @@ public class QueryAgentTest extends BaseRepositoryTest {
             }
 
             @Override
+            public Object[] values() {
+                return new Object[0];
+            }
+
+            @Override
             public Dummy build(ResultSet resultSet) throws SQLException {
                 Dummy dummy = new Dummy();
                 dummy.name = resultSet.getString("name");
@@ -86,6 +91,11 @@ public class QueryAgentTest extends BaseRepositoryTest {
             @Override
             public String sql() {
                 return "SELECT * FROM dummy;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[0];
             }
 
             @Override
@@ -116,6 +126,11 @@ public class QueryAgentTest extends BaseRepositoryTest {
             }
 
             @Override
+            public Object[] values() {
+                return new Object[0];
+            }
+
+            @Override
             public Dummy build(ResultSet resultSet) throws SQLException {
                 Dummy dummy = new Dummy();
                 dummy.name = resultSet.getString("name");
@@ -133,6 +148,11 @@ public class QueryAgentTest extends BaseRepositoryTest {
             @Override
             public String sql() {
                 return "SELECT * FROM dummy;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[0];
             }
 
             @Override

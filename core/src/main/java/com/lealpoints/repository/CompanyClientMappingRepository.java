@@ -14,8 +14,13 @@ public class CompanyClientMappingRepository extends BaseRepository {
         return getQueryAgent().selectObject(new DbBuilder<CompanyClientMapping>() {
             @Override
             public String sql() {
-                return "SELECT * FROM company_client_mapping WHERE company_id = " + companyId + " AND" +
-                    " client_id = " + clientId + ";";
+                return "SELECT * FROM company_client_mapping WHERE company_id = ? AND" +
+                    " client_id = ?;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId,clientId};
             }
 
             @Override

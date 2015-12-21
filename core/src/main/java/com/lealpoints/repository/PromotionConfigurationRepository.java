@@ -14,7 +14,12 @@ public class PromotionConfigurationRepository extends BaseRepository {
         return getQueryAgent().selectObject(new DbBuilder<PromotionConfiguration>() {
             @Override
             public String sql() {
-                return "SELECT * FROM promotion_configuration WHERE promotion_configuration_id = " + id + ";";
+                return "SELECT * FROM promotion_configuration WHERE promotion_configuration_id = ?;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{id};
             }
 
             @Override
@@ -33,7 +38,12 @@ public class PromotionConfigurationRepository extends BaseRepository {
         return getQueryAgent().selectList(new DbBuilder<PromotionConfiguration>() {
             @Override
             public String sql() {
-                return "SELECT * FROM promotion_configuration WHERE company_id = " + companyId + ";";
+                return "SELECT * FROM promotion_configuration WHERE company_id = ? ;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId};
             }
 
             @Override
