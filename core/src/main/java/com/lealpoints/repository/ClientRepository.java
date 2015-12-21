@@ -1,7 +1,6 @@
 package com.lealpoints.repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,18 +20,12 @@ public class ClientRepository extends BaseRepository {
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
                 sql.append(" WHERE company_client_mapping.company_id = ").append("?").append(" ;");
-                setValue(companyId);
                 return sql.toString();
-            }
-            private Object[] value=new Object[1];
-            @Override
-            public Object[] getValue() {
-                return value;
             }
 
             @Override
-            public void setValue(Object valueT) {
-                value[0]=valueT;
+            public Object[] values() {
+                return new Object[]{companyId};
             }
 
             @Override
@@ -56,24 +49,13 @@ public class ClientRepository extends BaseRepository {
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
                 sql.append(" WHERE company_client_mapping.company_id = ?");
-                sql.append(" AND client.phone = ").append("?").append(" ;");
-
-                setValue(companyId);
-                setValue(phone);
+                sql.append(" AND client.phone = ? ;");
                 return sql.toString();
             }
 
-            private Object[] value = new Object[2];
-            private int index=0;
             @Override
-            public Object[] getValue() {
-                return value;
-            }
-
-            @Override
-            public void setValue(Object valueT) {
-                this.value[index]=valueT;
-                index++;
+            public Object[] values() {
+                return new Object[]{companyId,phone};
             }
 
             @Override
@@ -92,19 +74,13 @@ public class ClientRepository extends BaseRepository {
             public String sql() throws SQLException {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
-                sql.append(" WHERE phone = ").append("?").append(";");
-                setValue(phone);
+                sql.append(" WHERE phone = ? ;");
                 return sql.toString();
-            }
-            private Object[] value=new Object[1];
-            @Override
-            public void setValue(Object valueT) {
-                this.value[0]=valueT;
             }
 
             @Override
-            public Object[] getValue() {
-              return value;
+            public Object[] values() {
+                return new Object[]{phone};
             }
 
             @Override
