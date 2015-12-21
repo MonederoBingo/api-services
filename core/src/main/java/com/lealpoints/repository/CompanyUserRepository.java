@@ -32,13 +32,13 @@ public class CompanyUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM ").append("company_user");
                 sql.append(" WHERE company_user.email = ?");
-                sql.append(" AND company_user.password = ").append(encryptForSelect("password", password));
+                sql.append(" AND company_user.password = ").append(encryptForSelect("password", "?"));
                 return sql.toString();
             }
 
             @Override
             public Object[] values() {
-                return new Object[]{email};
+                return new Object[]{email,password};
             }
 
             @Override
@@ -95,13 +95,13 @@ public class CompanyUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM company_user");
                 sql.append(" WHERE company_user.company_user_id = ?");
-                sql.append(" AND company_user.api_key = ").append(encryptForSelect("api_key", apiKey)).append(";");
+                sql.append(" AND company_user.api_key = ").append(encryptForSelect("api_key", "?")).append(";");
                 return sql.toString();
             }
 
             @Override
             public Object[] values() {
-                return new Object[]{companyUserId};
+                return new Object[]{companyUserId,apiKey};
             }
 
             @Override

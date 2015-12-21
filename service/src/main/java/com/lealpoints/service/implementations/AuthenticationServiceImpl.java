@@ -29,9 +29,9 @@ public class AuthenticationServiceImpl extends BaseServiceImpl implements Authen
     public ServiceResult isValidApiKey(String userId, String apiKey) {
         try {
             if (apiKey.endsWith("com")) {
-                return new ServiceResult(_companyUserRepository.getByCompanyUserIdApiKey(userId, apiKey) != null, "");
+                return new ServiceResult(_companyUserRepository.getByCompanyUserIdApiKey(Integer.parseInt(userId), apiKey) != null, "");
             } else if (apiKey.endsWith("cli")) {
-                return new ServiceResult(_clientUserRepository.getByClientUserIdApiKey(userId, apiKey) != null, "");
+                return new ServiceResult(_clientUserRepository.getByClientUserIdApiKey(Integer.parseInt(userId), apiKey) != null, "");
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);

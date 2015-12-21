@@ -22,7 +22,7 @@ public abstract class BaseRepository {
      * @return The encrypted string
      */
     protected String encryptForSelect(String column, String wordToEncrypt) {
-        return "crypt('" + wordToEncrypt + "', " + column + ")";
+        return "crypt(" + wordToEncrypt + ", " + column + ")";
     }
 
     protected String encryptForUpdate(String wordToEncrypt) {
