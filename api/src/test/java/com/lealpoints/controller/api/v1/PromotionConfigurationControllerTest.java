@@ -1,12 +1,14 @@
 package com.lealpoints.controller.api.v1;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.service.implementations.PromotionConfigurationServiceImpl;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -18,7 +20,7 @@ public class PromotionConfigurationControllerTest {
         List<PromotionConfiguration> expectedPromotionConfigurations = new ArrayList<>();
         expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "10% off", 1200));
         expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "20% off", 2400));
-        ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, "", expectedPromotionConfigurations);
+        ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, expectedPromotionConfigurations);
         PromotionConfigurationServiceImpl pointsConfigurationService = createPromotionConfigurationServiceForGet(expectedServiceResult);
         PromotionConfigurationController pointsConfigurationController = new PromotionConfigurationController(pointsConfigurationService);
 
@@ -48,7 +50,7 @@ public class PromotionConfigurationControllerTest {
     @Test
     public void testInsert() throws Exception {
 
-        ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "Promotion updated", 1l);
+        ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("Promotion updated"), 1L);
         PromotionConfigurationServiceImpl promotionConfigurationService = createPromotionConfigurationService(expectedServiceResult);
         PromotionConfigurationController promotionConfigurationController = new PromotionConfigurationController(promotionConfigurationService);
 
@@ -68,7 +70,7 @@ public class PromotionConfigurationControllerTest {
         List<PromotionConfiguration> expectedPromotionConfigurations = new ArrayList<>();
         expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "5% off", 600));
         expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "10% off", 1000));
-        ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, "", expectedPromotionConfigurations);
+        ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, expectedPromotionConfigurations);
         PromotionConfigurationServiceImpl pointsConfigurationService =
             createPromotionConfigurationServiceForGetByRequiredPoints(expectedServiceResult);
         PromotionConfigurationController pointsConfigurationController = new PromotionConfigurationController(pointsConfigurationService);
@@ -100,7 +102,7 @@ public class PromotionConfigurationControllerTest {
     @Test
     public void testDelete() throws Exception {
         PromotionConfigurationServiceImpl promotionConfigurationService =
-            createPromotionConfigurationServiceForDelete(new ServiceResult<Boolean>(true, ""));
+                createPromotionConfigurationServiceForDelete(new ServiceResult<Boolean>(true, ServiceMessage.EMPTY));
         PromotionConfigurationController promotionConfigurationController = new PromotionConfigurationController(promotionConfigurationService);
         final ResponseEntity<ServiceResult<Boolean>> responseEntity = promotionConfigurationController.delete(1);
         assertNotNull(responseEntity);

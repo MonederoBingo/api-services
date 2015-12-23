@@ -12,8 +12,9 @@ import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
 import com.lealpoints.service.model.PointsAwarding;
-import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMockSupport;
 import org.junit.Test;
 
@@ -27,14 +28,14 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPoints() throws Exception {
         PointsServiceImpl pointsService =
-            new PointsServiceImpl(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
-                    createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()),
-                    createPhoneValidatorService(true, "")) {
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
-            };
+                new PointsServiceImpl(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
+                        createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()),
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(String.format(message.name(), params));
+                    }
+                };
         replayAll();
         PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setCompanyId(1);
@@ -45,7 +46,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
         ServiceResult<Float> serviceResult = pointsService.awardPoints(pointsAwarding);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals(Message.POINTS_AWARDED.name() + ": " + 10.0, serviceResult.getMessage());
+        assertEquals(Message.POINTS_AWARDED.name(), serviceResult.getMessage());
         assertEquals(10, serviceResult.getObject(), 0.00);
         verifyAll();
     }
@@ -53,11 +54,11 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
         PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null,
-                createPhoneValidatorService(false, Message.PHONE_MUST_HAVE_10_DIGITS.name())) {
+                createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name()))) {
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         replayAll();
@@ -71,11 +72,11 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null, createPhoneValidatorService(true, "")) {
-
+                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null,
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
                 @Override
-                public String getTranslation(Message message) {
-                    return message.name();
+                public ServiceMessage getServiceMessage(Message message, String... params) {
+                    return new ServiceMessage(message.name());
                 }
             };
         replayAll();
@@ -86,9 +87,9 @@ public class PointsServiceImplTest extends EasyMockSupport {
         verifyAll();
     }
 
-    private PhoneValidatorServiceImpl createPhoneValidatorService(boolean isValid, String message) {
+    private PhoneValidatorServiceImpl createPhoneValidatorService(boolean isValid, ServiceMessage serviceMessage) {
         PhoneValidatorServiceImpl phoneValidatorService = createStrictMock(PhoneValidatorServiceImpl.class);
-        expect(phoneValidatorService.validate(anyString())).andReturn(new ValidationResult(isValid, message));
+        expect(phoneValidatorService.validate(anyString())).andReturn(new ValidationResult(isValid, serviceMessage));
         return phoneValidatorService;
     }
 

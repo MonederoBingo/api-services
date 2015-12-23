@@ -7,7 +7,8 @@ import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PromotionConfigurationRepository;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -55,10 +56,10 @@ public class PromotionConfigurationServiceImplTest {
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepositoryForInsert();
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null) {
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
             };
         PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
         promotionConfiguration.setCompanyId(1);
@@ -113,10 +114,10 @@ public class PromotionConfigurationServiceImplTest {
         ClientRepository clientRepository = createClientRepository(null);
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(null, null, clientRepository, null) {
-            @Override
-            public String getTranslation(Message message) {
-                return message.name();
-            }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
         };
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
@@ -133,10 +134,10 @@ public class PromotionConfigurationServiceImplTest {
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(null);
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(null, companyClientMappingRepository, clientRepository, null) {
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
             };
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
@@ -162,10 +163,10 @@ public class PromotionConfigurationServiceImplTest {
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null) {
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
             };
 
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
@@ -185,10 +186,10 @@ public class PromotionConfigurationServiceImplTest {
 
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(promotionConfigurationRepository, null, null, null) {
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
             };
 
         final ServiceResult<Boolean> serviceResult = promotionConfigurationService.deletePromotionConfiguration(1);
@@ -213,7 +214,7 @@ public class PromotionConfigurationServiceImplTest {
 
     private PromotionConfigurationRepository createPromotionConfigurationRepositoryForInsert() throws Exception {
         PromotionConfigurationRepository promotionConfigurationRepository = createMock(PromotionConfigurationRepository.class);
-        expect(promotionConfigurationRepository.insert((PromotionConfiguration) anyObject())).andReturn(1l);
+        expect(promotionConfigurationRepository.insert((PromotionConfiguration) anyObject())).andReturn(1L);
         replay(promotionConfigurationRepository);
         return promotionConfigurationRepository;
     }

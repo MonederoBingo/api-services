@@ -17,7 +17,7 @@ public class PhoneValidatorServiceImpl extends BaseServiceImpl implements PhoneV
 
     public ValidationResult validate(String phone) {
         if (phone == null || phone.length() != 10) {
-            return new ValidationResult(false, getTranslation(Message.PHONE_MUST_HAVE_10_DIGITS));
+            return new ValidationResult(false, getServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS));
         }
         return new ValidationResult(true);
     }

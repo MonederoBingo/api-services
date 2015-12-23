@@ -1,10 +1,11 @@
 package com.lealpoints.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Points;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class PointsRepository extends BaseRepository {
@@ -34,7 +35,7 @@ public class PointsRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyId , saleKey};
+                return new Object[]{companyId, saleKey};
             }
 
             @Override

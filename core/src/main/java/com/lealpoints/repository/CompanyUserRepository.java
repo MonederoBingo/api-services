@@ -1,10 +1,11 @@
 package com.lealpoints.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class CompanyUserRepository extends BaseRepository {
@@ -38,7 +39,7 @@ public class CompanyUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{email , password};
+                return new Object[]{email, password};
             }
 
             @Override
@@ -101,7 +102,7 @@ public class CompanyUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyUserId , apiKey};
+                return new Object[]{companyUserId, apiKey};
             }
 
             @Override

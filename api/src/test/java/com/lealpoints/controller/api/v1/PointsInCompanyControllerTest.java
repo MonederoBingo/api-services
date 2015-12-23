@@ -1,13 +1,15 @@
 package com.lealpoints.controller.api.v1;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.lealpoints.model.PointsInCompany;
 import com.lealpoints.service.implementations.CompanyServiceImpl;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -19,7 +21,7 @@ public class PointsInCompanyControllerTest {
         List<PointsInCompany> expectedPointsInCompanies = new ArrayList<>();
         expectedPointsInCompanies.add(createCompany(1, "name1", "logo1", 100));
         expectedPointsInCompanies.add(createCompany(2, "name2", "logo2", 200));
-        final ServiceResult<List<PointsInCompany>> expectedServiceResult = new ServiceResult<>(true, "1", expectedPointsInCompanies);
+        final ServiceResult<List<PointsInCompany>> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage(""), expectedPointsInCompanies);
         final CompanyServiceImpl clientService = createCompanyServiceForGetPoints(expectedServiceResult);
         final PointsInCompanyController pointsInCompanyController = new PointsInCompanyController(clientService);
 

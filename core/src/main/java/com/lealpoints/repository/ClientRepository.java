@@ -1,13 +1,14 @@
 package com.lealpoints.repository;
 
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 @Component
 public class ClientRepository extends BaseRepository {
@@ -55,7 +56,7 @@ public class ClientRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyId , phone};
+                return new Object[]{companyId, phone};
             }
 
             @Override

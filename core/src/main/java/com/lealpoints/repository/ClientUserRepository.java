@@ -1,10 +1,11 @@
 package com.lealpoints.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.ClientUser;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class ClientUserRepository extends BaseRepository {
@@ -66,7 +67,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{phone , smsKey};
+                return new Object[]{phone, smsKey};
             }
 
             @Override
@@ -83,13 +84,13 @@ public class ClientUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM ").append("client_user");
                 sql.append(" WHERE client_user.email = ?");
-                sql.append(" AND client_user.password = ").append(encryptForSelect("password","?" ));
+                sql.append(" AND client_user.password = ").append(encryptForSelect("password", "?"));
                 return sql.toString();
             }
 
             @Override
             public Object[] values() {
-                return new Object[]{email , password};
+                return new Object[]{email, password};
             }
 
             @Override
@@ -117,7 +118,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{userId , apiKey};
+                return new Object[]{userId, apiKey};
             }
 
             @Override

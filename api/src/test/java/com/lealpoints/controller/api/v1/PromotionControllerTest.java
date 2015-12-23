@@ -2,7 +2,8 @@ package com.lealpoints.controller.api.v1;
 
 import com.lealpoints.service.implementations.PromotionServiceImpl;
 import com.lealpoints.service.model.PromotionApplying;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -14,7 +15,7 @@ public class PromotionControllerTest {
 
     @Test
     public void testAwardPoints() throws Exception {
-        ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "", 1l);
+        ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, 1L);
         PromotionServiceImpl promotionService = createPromotionService(expectedServiceResult);
         PromotionController pointsController = new PromotionController(promotionService);
         PromotionApplying pointsAwarding = new PromotionApplying();

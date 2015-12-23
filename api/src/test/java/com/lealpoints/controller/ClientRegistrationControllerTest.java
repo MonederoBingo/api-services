@@ -4,7 +4,8 @@ import com.lealpoints.service.implementations.ClientUserServiceImpl;
 import com.lealpoints.service.model.ClientLoginResult;
 import com.lealpoints.service.model.ClientUserLogin;
 import com.lealpoints.service.model.ClientUserRegistration;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class ClientRegistrationControllerTest {
 
     @Test
     public void testRegisterClient() throws Exception {
-        final ServiceResult<String> expectedServiceResult = new ServiceResult<>(true, "1");
+        final ServiceResult<String> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"));
         final ClientUserServiceImpl clientUserService = createClientUserServiceForRegister(expectedServiceResult);
         final ClientRegistrationController clientAuthController = new ClientRegistrationController(clientUserService);
 
@@ -34,7 +35,7 @@ public class ClientRegistrationControllerTest {
 
     @Test
     public void testLoginUser() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "name");
+        final ServiceResult expectedServiceResult = new ServiceResult(true, new ServiceMessage("name"));
         final ClientUserServiceImpl clientUserService = createUserLoginService(expectedServiceResult);
         final ClientRegistrationController clientAuthController = new ClientRegistrationController(clientUserService);
 
@@ -54,7 +55,7 @@ public class ClientRegistrationControllerTest {
 
     @Test
     public void testResendKey() throws Exception {
-        ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, "", true);
+        ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, true);
         ClientUserServiceImpl clientUserService = createUserService(expectedServiceResult);
         ClientRegistrationController clientAuthController = new ClientRegistrationController(clientUserService);
         ResponseEntity<ServiceResult<Boolean>> actualServiceResult = clientAuthController.resendKey(new ClientUserRegistration());

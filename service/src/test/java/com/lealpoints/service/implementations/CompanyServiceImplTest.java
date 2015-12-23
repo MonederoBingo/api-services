@@ -8,7 +8,8 @@ import com.lealpoints.i18n.Message;
 import com.lealpoints.model.*;
 import com.lealpoints.repository.*;
 import com.lealpoints.service.model.CompanyRegistration;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.apache.commons.fileupload.FileItem;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -33,11 +34,11 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         PromotionConfigurationRepository promotionConfigurationRepository = createStrictMock(PromotionConfigurationRepository.class);
-        expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1l);
+        expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1L);
         replay(promotionConfigurationRepository);
         CompanyServiceImpl companyService =
-            createCompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, threadContextService, null,
-                promotionConfigurationRepository);
+                createCompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, threadContextService, null,
+                        promotionConfigurationRepository);
 
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setCompanyName("company name");
@@ -106,12 +107,12 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
         ClientRepository clientRepository = createClientRepository();
         CompanyServiceImpl companyService =
-            createCompanyService(companyRepository, null, pointsConfigurationRepository, null, clientRepository, null);
+                createCompanyService(companyRepository, null, pointsConfigurationRepository, null, clientRepository, null);
 
         ServiceResult<List<PointsInCompany>> serviceResult = companyService.getPointsInCompanyByPhone("1234567890");
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals("companies", serviceResult.getMessage());
+        assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
         List<PointsInCompany> actualClients = serviceResult.getObject();
@@ -169,7 +170,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
         CompanyServiceImpl companyService =
-            createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
+                createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
         final File logo = companyService.getLogo(1);
         assertNotNull(logo);
     }
@@ -184,7 +185,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
         CompanyServiceImpl companyService =
-            createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
+                createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
         final File logo = companyService.getLogo(1);
         assertNotNull(logo);
     }
@@ -212,18 +213,18 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                configurationManager) {
+                        configurationManager) {
 
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
 
-                @Override
-                public boolean isProdEnvironment() {
-                    return true;
-                }
-            };
+                    @Override
+                    public boolean isProdEnvironment() {
+                        return true;
+                    }
+                };
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
@@ -237,8 +238,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         replay(configurationManager);
         CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, configurationManager) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
 
             @Override
@@ -275,18 +276,18 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                configurationManager) {
+                        configurationManager) {
 
-                @Override
-                public String getTranslation(Message message) {
-                    return message.name();
-                }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
 
-                @Override
-                public boolean isProdEnvironment() {
-                    return false;
-                }
-            };
+                    @Override
+                    public boolean isProdEnvironment() {
+                        return false;
+                    }
+                };
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
@@ -297,19 +298,19 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     public void testGetSMSMessage() {
         CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
             }
         };
         String smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name", 1000);
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Leal Points to see our promotions. " +
-            "https://goo.gl/JRssA6", smsMessage);
+                "https://goo.gl/JRssA6", smsMessage);
 
         companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
             }
         };
         smsMessage = companyService.getSMSMessage("TG", 1000);
@@ -318,53 +319,52 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return "You've got %s points at %s. Install Leal Points to see our promotions. %s";
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
             }
         };
         smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does not .... " +
-            "Install Leal Points to see our promotions. https://goo.gl/JRssA6", smsMessage);
+                "Install Leal Points to see our promotions. https://goo.gl/JRssA6", smsMessage);
     }
 
     @Test
     public void testGetSMSMessageWithInvalidTranslation() {
         CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return "You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
-                    "much much much much much much more. %s";
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
+                        "much much much much much much more. %s");
             }
         };
         try {
             companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
         } catch (IllegalArgumentException e) {
             assertEquals(
-                "Message length must be less than 160 in: You've got %s points at %s. Install Leal Points to see our promotions and much much " +
-                    "much much much much much much much much much much much much much more. %s", e.getMessage());
+                    "Message length must be less than 160 in: You've got %s points at %s. Install Leal Points to see our promotions and much much " +
+                            "much much much much much much much much much much much much much more. %s", e.getMessage());
         }
 
         companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return
-                    "You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much much " +
-                    "much much much much much much much much much much much much much much much much much much much much more. %s";
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much much " +
+                        "much much much much much much much much much much much much much much much much much much much much more. %s");
             }
         };
         try {
             companyService.getSMSMessage("TG", 1000);
         } catch (IllegalArgumentException e) {
             assertEquals("Message length must be less than 160 in: You've got %s points at %s. Install Leal Points to see our promotions and much " +
-                "much much much much much much much much much much much much much much much much much much much much much much much much much much " +
-                "much much much more. %s", e.getMessage());
+                    "much much much much much much much much much much much much much much much much much much much much much much much much much much " +
+                    "much much much more. %s", e.getMessage());
         }
     }
 
     private CompanyServiceImpl createCompanyService(final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
-        final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
-        ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
+                                                    final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
+                                                    ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
                 null, null, promotionConfigurationRepository, null) {
             @Override
@@ -373,8 +373,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
             }
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
     }
@@ -411,7 +411,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepository() throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.insert((CompanyUser) anyObject())).andReturn(1l).times(1);
+        expect(companyUserRepository.insert((CompanyUser) anyObject())).andReturn(1L).times(1);
         expect(companyUserRepository.getByEmail(anyString())).andReturn(null).times(1);
         replay(companyUserRepository);
         return companyUserRepository;
@@ -419,7 +419,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     private CompanyRepository createCompanyRepository() throws Exception {
         final CompanyRepository companyRepository = EasyMock.createMock(CompanyRepository.class);
-        expect(companyRepository.insert((Company) anyObject())).andReturn(1l).times(1);
+        expect(companyRepository.insert((Company) anyObject())).andReturn(1L).times(1);
         replay(companyRepository);
         return companyRepository;
     }
@@ -447,7 +447,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     private PointsConfigurationRepository createPointsConfigurationRepository() throws Exception {
         PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
-        expect(pointsConfigurationRepository.insert((PointsConfiguration) anyObject())).andReturn(1l);
+        expect(pointsConfigurationRepository.insert((PointsConfiguration) anyObject())).andReturn(1L);
         replay(pointsConfigurationRepository);
         return pointsConfigurationRepository;
     }
