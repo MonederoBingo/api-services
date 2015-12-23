@@ -194,9 +194,9 @@ public enum Message {
             "Ocurrió un error al enviar el mensaje de promoción de Leal Points, intente de nuevo."
     ),
     DEFAULT_PROMOTION_MESSAGE(
-            "10% off in your next purchase!",
+            "10%% off in your next purchase!",
 
-            "10% de descuento en su próxima compra!"
+            "10%% de descuento en su próxima compra!"
     );
 
     private final String english;
