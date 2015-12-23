@@ -59,9 +59,9 @@ public enum Message {
             "La promoción fue agregada exitosamente."
     ),
     POINTS_AWARDED(
-            "Points awarded.",
+            "Points awarded: %s",
 
-            "Puntos otorgados"
+            "Puntos otorgados: %s"
     ),
     SALE_KEY_ALREADY_EXISTS(
             "Sale key already exists.",

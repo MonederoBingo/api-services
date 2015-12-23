@@ -1,15 +1,17 @@
 package com.lealpoints.controller.api.v1;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.service.implementations.ClientServiceImpl;
 import com.lealpoints.service.model.ClientRegistration;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -18,7 +20,7 @@ import static org.junit.Assert.assertNotNull;
 public class ClientControllerTest {
     @Test
     public void testRegisterClient() throws Exception {
-        final ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, "1");
+        final ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"));
         final ClientServiceImpl clientService = createClientServiceForRegister(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
@@ -39,7 +41,7 @@ public class ClientControllerTest {
         List<CompanyClientMapping> expectedClients = new ArrayList<>();
         expectedClients.add(createCompanyClientMapping(100, "123"));
         expectedClients.add(createCompanyClientMapping(200, "456"));
-        final ServiceResult<List<CompanyClientMapping>> expectedServiceResult = new ServiceResult<>(true, "1", expectedClients);
+        final ServiceResult<List<CompanyClientMapping>> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"), expectedClients);
         final ClientServiceImpl clientService = createClientServiceForGet(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
@@ -65,7 +67,7 @@ public class ClientControllerTest {
         Client client = new Client();
         client.setPhone("1234567890");
         companyClientMapping.setClient(client);
-        final ServiceResult<CompanyClientMapping> expectedServiceResult = new ServiceResult<>(true, "1", companyClientMapping);
+        final ServiceResult<CompanyClientMapping> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"), companyClientMapping);
         final ClientServiceImpl clientService = createClientServiceForGetByCompanyIdPhone(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 

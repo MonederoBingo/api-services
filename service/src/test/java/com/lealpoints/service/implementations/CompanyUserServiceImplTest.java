@@ -10,7 +10,8 @@ import com.lealpoints.repository.CompanyUserRepository;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyUserLogin;
 import com.lealpoints.service.model.CompanyUserPasswordChanging;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -51,8 +52,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     public void testUserLoginWithoutEmail() throws Exception {
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
@@ -69,8 +70,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     public void testUserLoginWithoutPassword() throws Exception {
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(null, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
@@ -89,8 +90,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryIsNotActive(companyUser);
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         replay(companyUserRepository);
@@ -114,8 +115,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         replay(companyUserRepository);
@@ -137,8 +138,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, threadContextService, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         ServiceResult serviceResult = companyUserService.activateUser("1234");
@@ -151,8 +152,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendActivation();
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, createCompanyService()) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         ServiceResult serviceResult = companyUserService.sendActivationEmail("a@a.com");
@@ -173,8 +174,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingActivationWhenEmailDoesNotExist();
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, createCompanyService()) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         ServiceResult serviceResult = companyUserService.sendActivationEmail("a@a.com");
@@ -193,8 +194,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             }
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -214,8 +215,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             }
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -238,8 +239,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             }
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -261,8 +262,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             }
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 

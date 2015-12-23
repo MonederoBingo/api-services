@@ -8,8 +8,9 @@ import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.service.model.ClientRegistration;
-import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -35,8 +36,8 @@ public class ClientServiceImplTest extends BaseServiceTest {
                 new ClientServiceImpl(clientRepository, companyClientMappingRepository, threadContextService, phoneValidationService) {
 
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         ClientRegistration clientRegistration = new ClientRegistration();
@@ -53,12 +54,12 @@ public class ClientServiceImplTest extends BaseServiceTest {
     public void testRegisterWithInvalidPhone() {
         PhoneValidatorServiceImpl phoneValidatorService = createStrictMock(PhoneValidatorServiceImpl.class);
         expect(phoneValidatorService.validate(anyString()))
-                .andReturn(new ValidationResult(false, Message.PHONE_MUST_HAVE_10_DIGITS.name()));
+                .andReturn(new ValidationResult(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name())));
         replay(phoneValidatorService);
         final ClientServiceImpl clientService = new ClientServiceImpl(null, null, null, phoneValidatorService) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         ClientRegistration clientRegistration = new ClientRegistration();
@@ -79,10 +80,10 @@ public class ClientServiceImplTest extends BaseServiceTest {
         replay(phoneValidatorService);
         final ClientServiceImpl clientService =
                 new ClientServiceImpl(clientRepository, companyClientMappingRepository, null, phoneValidatorService) {
-            @Override
-            public String getTranslation(Message message) {
-                return message.name();
-            }
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
         };
 
         final ClientRegistration clientRegistration = new ClientRegistration();
@@ -150,7 +151,7 @@ public class ClientServiceImplTest extends BaseServiceTest {
 
     private CompanyClientMappingRepository createCompanyClientMappingRepositoryForInsert() throws Exception {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.insert((CompanyClientMapping) anyObject())).andReturn(1l);
+        expect(companyClientMappingRepository.insert((CompanyClientMapping) anyObject())).andReturn(1L);
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(null);
         replay(companyClientMappingRepository);
         return companyClientMappingRepository;

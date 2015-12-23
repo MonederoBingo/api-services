@@ -7,7 +7,12 @@ import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.repository.CompanyUserRepository;
 import com.lealpoints.service.CompanyUserService;
-import com.lealpoints.service.model.*;
+import com.lealpoints.service.model.CompanyLoginResult;
+import com.lealpoints.service.model.CompanyUserLogin;
+import com.lealpoints.service.model.CompanyUserPasswordChanging;
+import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.EmailUtil;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,12 +44,12 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         try {
             final ValidationResult validateCredentials = validateUserLoginCredentials(companyUserLogin);
             if (validateCredentials.isInvalid()) {
-                return new ServiceResult<>(false, validateCredentials.getMessage());
+                return new ServiceResult<>(false, validateCredentials.getServiceMessage());
             } else {
                 CompanyUser companyUser = _companyUserRepository.getByEmailAndPassword(companyUserLogin.getEmail(), companyUserLogin.getPassword());
                 final ValidationResult validateLogin = validateUserLogin(companyUser, loginResult);
                 if (validateLogin.isInvalid()) {
-                    return new ServiceResult<>(false, validateLogin.getMessage(), loginResult);
+                    return new ServiceResult<>(false, validateLogin.getServiceMessage(), loginResult);
                 } else {
                     String apiKey = updateApiKey(companyUser);
                     loginResult.setEmail(companyUser.getEmail());
@@ -55,12 +60,12 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
                     loginResult.setLanguage(companyUser.getLanguage());
                     loginResult.setCompanyName(_companyRepository.getByCompanyId(companyUser.getCompanyId()).getName());
                     loginResult.setApiKey(apiKey);
-                    return new ServiceResult<>(true, "", loginResult);
+                    return new ServiceResult<>(true, ServiceMessage.EMPTY, loginResult);
                 }
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -71,14 +76,14 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
             if (updatedRows > 0) {
                 _companyUserRepository.clearActivationKey(activationKey);
                 getQueryAgent().commitTransaction();
-                return new ServiceResult(true, getTranslation(Message.YOUR_USER_HAS_BEEN_ACTIVATED));
+                return new ServiceResult(true, getServiceMessage(Message.YOUR_USER_HAS_BEEN_ACTIVATED));
             } else {
                 getQueryAgent().rollbackTransaction();
-                return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+                return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -86,13 +91,13 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         try {
             final CompanyUser companyUser = _companyUserRepository.getByEmail(email);
             if (companyUser == null) {
-                return new ServiceResult(false, getTranslation(Message.THIS_EMAIL_DOES_NOT_EXIST));
+                return new ServiceResult(false, getServiceMessage(Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
             _companyService.sendActivationEmail(email, companyUser.getActivationKey());
-            return new ServiceResult(true, getTranslation(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK));
+            return new ServiceResult(true, getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -100,19 +105,19 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         try {
             final CompanyUser companyUser = _companyUserRepository.getByEmail(email);
             if (companyUser == null) {
-                return new ServiceResult(false, getTranslation(Message.THIS_EMAIL_DOES_NOT_EXIST));
+                return new ServiceResult(false, getServiceMessage(Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
             final String tempPassword = RandomStringUtils.random(8, true, true);
             final int updatedRows = _companyUserRepository.updatePasswordByEmail(email, tempPassword, true);
             if (updatedRows > 0) {
                 sendTempPasswordEmail(email, tempPassword);
             } else {
-                return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+                return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
             }
-            return new ServiceResult(true, getTranslation(Message.WE_HAVE_SENT_YOU_A_NEW_PASSWORD_TO_YOUR_EMAIL));
+            return new ServiceResult(true, getServiceMessage(Message.WE_HAVE_SENT_YOU_A_NEW_PASSWORD_TO_YOUR_EMAIL));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -123,62 +128,62 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
                 final int updatedRows =
                     _companyUserRepository.updatePasswordByEmail(passwordChanging.getEmail(), passwordChanging.getNewPassword(), false);
                 if (updatedRows > 0) {
-                    return new ServiceResult<>(true, getTranslation(Message.YOUR_PASSWORD_HAS_BEEN_CHANGED));
+                    return new ServiceResult<>(true, getServiceMessage(Message.YOUR_PASSWORD_HAS_BEEN_CHANGED));
                 } else {
-                    return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+                    return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
                 }
             } else {
-                return new ServiceResult<>(false, validationResult.getMessage());
+                return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
     void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
         NotificationEmail notificationEmail = new NotificationEmail();
-        notificationEmail.setSubject(getTranslation(Message.NEW_PASSWORD_EMAIL_SUBJECT));
-        notificationEmail.setBody(getTranslation(Message.NEW_PASSWORD_EMAIL_BODY) + " " + tempPassword);
+        notificationEmail.setSubject(getServiceMessage(Message.NEW_PASSWORD_EMAIL_SUBJECT).getMessage());
+        notificationEmail.setBody(getServiceMessage(Message.NEW_PASSWORD_EMAIL_BODY) + " " + tempPassword);
         notificationEmail.setEmailTo(email);
         EmailUtil.sendEmail(notificationEmail);
     }
 
     private ValidationResult validatePassword(CompanyUserPasswordChanging passwordChanging) {
         if (passwordChanging.getNewPassword() == null || passwordChanging.getPasswordConfirmation() == null) {
-            return new ValidationResult(false, getTranslation(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
+            return new ValidationResult(false, getServiceMessage(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
         }
         if (passwordChanging.getNewPassword().length() < 6) {
-            return new ValidationResult(false, getTranslation(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
+            return new ValidationResult(false, getServiceMessage(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
         }
         if (!passwordChanging.getNewPassword().equals(passwordChanging.getPasswordConfirmation())) {
-            return new ValidationResult(false, getTranslation(Message.PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT));
+            return new ValidationResult(false, getServiceMessage(Message.PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT));
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
     private ValidationResult validateUserLogin(CompanyUser companyUser, CompanyLoginResult loginResult) throws Exception {
         if (companyUser == null) {
-            return new ValidationResult(false, getTranslation(Message.LOGIN_FAILED));
+            return new ValidationResult(false, getServiceMessage(Message.LOGIN_FAILED));
         }
         if (!companyUser.isActive()) {
             loginResult.setActive(false);
-            return new ValidationResult(false, getTranslation(Message.YOUR_USER_IS_NOT_ACTIVE));
+            return new ValidationResult(false, getServiceMessage(Message.YOUR_USER_IS_NOT_ACTIVE));
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
     private ValidationResult validateUserLoginCredentials(CompanyUserLogin companyUserLogin) throws Exception {
 
         if (StringUtils.isEmpty(companyUserLogin.getEmail())) {
             logger.error("The company user email is empty");
-            return new ValidationResult(false, getTranslation(Message.EMAIL_IS_EMPTY));
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_EMPTY));
         }
         if (StringUtils.isEmpty(companyUserLogin.getPassword())) {
             logger.error("The company user password is empty");
-            return new ValidationResult(false, getTranslation(Message.PASSWORD_IS_EMPTY));
+            return new ValidationResult(false, getServiceMessage(Message.PASSWORD_IS_EMPTY));
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
     private String updateApiKey(CompanyUser companyUser) throws Exception {
@@ -186,7 +191,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         final int updatedRows = _companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
         if (updatedRows != 1) {
             logger.error("The company user api key could not be updated. updatedRows: " + updatedRows);
-            throw new RuntimeException(getTranslation(Message.COMMON_USER_ERROR));
+            throw new RuntimeException(getServiceMessage(Message.COMMON_USER_ERROR).getMessage());
         }
         return apiKey;
     }

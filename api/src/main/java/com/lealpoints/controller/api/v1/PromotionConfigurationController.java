@@ -1,12 +1,10 @@
 package com.lealpoints.controller.api.v1;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
 import com.lealpoints.controller.base.BaseController;
 import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.service.PromotionConfigurationService;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
@@ -35,7 +37,7 @@ public class PromotionConfigurationController extends BaseController {
             ServiceResult<List<PromotionConfiguration>> serviceResult = _promotionConfigurationService.getByCompanyId(companyId);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<List<PromotionConfiguration>>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<List<PromotionConfiguration>>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -47,7 +49,7 @@ public class PromotionConfigurationController extends BaseController {
             ServiceResult<List<PromotionConfiguration>> serviceResult = _promotionConfigurationService.getByCompanyIdRequiredPoints(companyId, phone);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<List<PromotionConfiguration>>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<List<PromotionConfiguration>>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -58,7 +60,7 @@ public class PromotionConfigurationController extends BaseController {
             ServiceResult<Long> serviceResult = _promotionConfigurationService.insert(promotionConfiguration);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Long>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<Long>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -69,7 +71,7 @@ public class PromotionConfigurationController extends BaseController {
             ServiceResult<Boolean> serviceResult = _promotionConfigurationService.deletePromotionConfiguration(promotionConfigurationId);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Boolean>(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult<Boolean>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

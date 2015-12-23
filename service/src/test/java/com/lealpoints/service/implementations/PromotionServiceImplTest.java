@@ -12,7 +12,8 @@ import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.repository.PromotionRepository;
 import com.lealpoints.service.model.PromotionApplying;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -35,8 +36,8 @@ public class PromotionServiceImplTest extends BaseServiceTest {
             new PromotionServiceImpl(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
                     threadContextService) {
                 @Override
-                public String getTranslation(Message message) {
-                    return message.name();
+                public ServiceMessage getServiceMessage(Message message, String... params) {
+                    return new ServiceMessage(message.name());
                 }
             };
         PromotionApplying promotionApplying = new PromotionApplying();
@@ -84,7 +85,7 @@ public class PromotionServiceImplTest extends BaseServiceTest {
 
     private PromotionRepository createPromotionRepository() throws Exception {
         PromotionRepository promotionRepository = createMock(PromotionRepository.class);
-        expect(promotionRepository.insert((Promotion) anyObject())).andReturn(1l);
+        expect(promotionRepository.insert((Promotion) anyObject())).andReturn(1L);
         replay(promotionRepository);
         return promotionRepository;
     }

@@ -1,9 +1,9 @@
 package com.lealpoints.service;
 
 import com.lealpoints.service.model.PromotionApplying;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceResult;
 
 public interface PromotionService extends BaseService {
 
-    public ServiceResult<Long> applyPromotion(PromotionApplying promotionApplying);
+    ServiceResult<Long> applyPromotion(PromotionApplying promotionApplying);
 }

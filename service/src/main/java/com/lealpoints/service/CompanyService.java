@@ -4,7 +4,7 @@ import com.lealpoints.model.Company;
 import com.lealpoints.model.PointsInCompany;
 import com.lealpoints.service.annotation.OnlyProduction;
 import com.lealpoints.service.model.CompanyRegistration;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceResult;
 import org.apache.commons.fileupload.FileItem;
 
 import java.io.File;

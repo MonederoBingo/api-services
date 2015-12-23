@@ -2,7 +2,7 @@ package com.lealpoints.service;
 
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.service.model.ClientRegistration;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceResult;
 
 import java.util.List;
 

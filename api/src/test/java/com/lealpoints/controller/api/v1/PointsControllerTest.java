@@ -2,7 +2,8 @@ package com.lealpoints.controller.api.v1;
 
 import com.lealpoints.service.implementations.PointsServiceImpl;
 import com.lealpoints.service.model.PointsAwarding;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -14,7 +15,7 @@ public class PointsControllerTest {
 
     @Test
     public void testAwardPoints() throws Exception {
-        ServiceResult<Float> expectedServiceResult = new ServiceResult<>(true, "", 10.0f);
+        ServiceResult<Float> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, 10.0f);
         PointsServiceImpl pointsService = createPointsService(expectedServiceResult);
         PointsController pointsController = new PointsController(pointsService);
         PointsAwarding pointsAwarding = new PointsAwarding();

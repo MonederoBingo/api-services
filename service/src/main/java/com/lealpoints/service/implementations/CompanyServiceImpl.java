@@ -7,8 +7,9 @@ import com.lealpoints.repository.*;
 import com.lealpoints.service.CompanyService;
 import com.lealpoints.service.annotation.OnlyProduction;
 import com.lealpoints.service.model.CompanyRegistration;
-import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.EmailUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.RandomStringUtils;
@@ -59,13 +60,13 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
                 getThreadContextService().getQueryAgent().beginTransaction();
                 long companyId = registerAndInitializeCompany(companyRegistration);
                 getQueryAgent().commitTransaction();
-                return new ServiceResult<>(true, getTranslation(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK), Long.toString(companyId));
+                return new ServiceResult<>(true, getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK), Long.toString(companyId));
             } else {
-                return new ServiceResult<>(false, validationResult.getMessage());
+                return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -73,10 +74,10 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         try {
             Client client = _clientRepository.getByPhone(phone);
             List<PointsInCompany> companies = _companyRepository.getPointsInCompanyByClientId(client.getClientId());
-            return new ServiceResult<>(true, "companies", companies);
+            return new ServiceResult<>(true, ServiceMessage.EMPTY, companies);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -85,14 +86,14 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             final Company company = _companyRepository.getByCompanyId(companyId);
             if (company != null) {
                 company.setUrlImageLogo(company.getUrlImageLogo() + "?" + new Date().getTime());
-                return new ServiceResult<>(true, "", company);
+                return new ServiceResult<>(true, ServiceMessage.EMPTY, company);
             } else {
                 logger.error("None company has the companyId: " + companyId);
-                return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+                return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -102,18 +103,18 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
                 final FileItem fileItem = fileItems.get(0);
                 final String contentType = fileItem.getContentType();
                 if (!isValidContentType(contentType)) {
-                    return new ServiceResult<>(false, getTranslation(Message.INVALID_LOGO_FILE));
+                    return new ServiceResult<>(false, getServiceMessage(Message.INVALID_LOGO_FILE));
                 }
                 final String fileName = companyId + "." + getExtensionFromContentType(contentType);
                 fileItem.write(new File(String.valueOf(getThreadContext().getEnvironment().getImageDir() + fileName)));
                 _companyRepository.updateUrlImageLogo(companyId, fileName);
             } else {
-                return new ServiceResult<>(false, getTranslation(Message.COULD_NOT_READ_FILE));
+                return new ServiceResult<>(false, getServiceMessage(Message.COULD_NOT_READ_FILE));
             }
-            return new ServiceResult<>(true, getTranslation(Message.YOUR_LOGO_WAS_UPDATED));
+            return new ServiceResult<>(true, getServiceMessage(Message.YOUR_LOGO_WAS_UPDATED));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -132,19 +133,19 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
                     _clientRepository.updateCanReceivePromoSms(clientId, false);
                 } else {
                     logger.error("None company has the companyId: " + companyId);
-                    return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+                    return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
                 }
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
-                return new ServiceResult(false, getTranslation(Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY));
+                return new ServiceResult(false, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY));
             }
-            return new ServiceResult(true, getTranslation(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY));
+            return new ServiceResult(true, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY));
         }
-        return new ServiceResult(false, getTranslation(Message.COMMON_USER_ERROR));
+        return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
     }
 
     public String getSMSMessage(String companyName, double points) {
-        final String translation = getTranslation(Message.MOBILE_APP_AD_MESSAGE);
+        final String translation = getServiceMessage(Message.MOBILE_APP_AD_MESSAGE).getMessage();
         int SMS_MESSAGE_MAX_CHAR = 160;
         final String appUrl = "https://goo.gl/JRssA6";
         final int formattedMessageLength = String.format(translation, points, "", appUrl).length();
@@ -228,7 +229,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
         promotionConfiguration.setCompanyId(companyId);
         promotionConfiguration.setRequiredPoints(1000);
-        promotionConfiguration.setDescription(getTranslation(Message.DEFAULT_PROMOTION_MESSAGE));
+        promotionConfiguration.setDescription(getServiceMessage(Message.DEFAULT_PROMOTION_MESSAGE).getMessage());
         _promotionConfigurationRepository.insert(promotionConfiguration);
     }
 
@@ -250,9 +251,9 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     void sendActivationEmail(String email, String activationKey) throws MessagingException {
         if (isProdEnvironment() || isUATEnvironment()) {
             NotificationEmail notificationEmail = new NotificationEmail();
-            notificationEmail.setSubject(getTranslation(Message.ACTIVATION_EMAIL_SUBJECT));
+            notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
             final String activationUrl = getEnvironment().getClientUrl() + "activate?key=" + activationKey;
-            notificationEmail.setBody(getTranslation(Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
+            notificationEmail.setBody(getServiceMessage(Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
             notificationEmail.setEmailTo(email);
             EmailUtil.sendEmail(notificationEmail);
         }
@@ -261,15 +262,15 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {
         //Validate user password
         if (companyRegistration.getPassword() == null || companyRegistration.getPassword().length() < 6) {
-            return new ValidationResult(false, getTranslation(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
+            return new ValidationResult(false, getServiceMessage(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));
         }
         if (!companyRegistration.getPassword().equals(companyRegistration.getPasswordConfirmation())) {
-            return new ValidationResult(false, getTranslation(Message.PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT));
+            return new ValidationResult(false, getServiceMessage(Message.PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT));
         }
         //Validate user email
         if (_companyUserRepository.getByEmail(companyRegistration.getEmail()) != null) {
-            return new ValidationResult(false, getTranslation(Message.EMAIL_ALREADY_EXISTS));
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_ALREADY_EXISTS));
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 }

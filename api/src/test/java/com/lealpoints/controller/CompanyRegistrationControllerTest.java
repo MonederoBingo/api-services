@@ -6,7 +6,8 @@ import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.CompanyUserLogin;
 import com.lealpoints.service.model.CompanyUserPasswordChanging;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class CompanyRegistrationControllerTest {
 
     @Test
     public void testRegister() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "1");
+        final ServiceResult expectedServiceResult = new ServiceResult(true, new ServiceMessage("1"));
         final CompanyServiceImpl companyService = createCompanyServiceForRegister(expectedServiceResult);
         final CompanyUserServiceImpl companyUserService = createMock(CompanyUserServiceImpl.class);
         final CompanyRegistrationController companyController = new CompanyRegistrationController(companyUserService, companyService);
@@ -43,7 +44,7 @@ public class CompanyRegistrationControllerTest {
     public void testLoginUser() throws Exception {
         CompanyLoginResult loginResult = new CompanyLoginResult();
         loginResult.setActive(true);
-        final ServiceResult<CompanyLoginResult> expectedServiceResult = new ServiceResult<>(true, "name", loginResult);
+        final ServiceResult<CompanyLoginResult> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("name"), loginResult);
         final CompanyUserServiceImpl companyUserService = createCompanyUserForLogin(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         final CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
@@ -65,7 +66,7 @@ public class CompanyRegistrationControllerTest {
 
     @Test
     public void testSendActivationEmail() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "");
+        final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForSendingActivation(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
@@ -80,7 +81,7 @@ public class CompanyRegistrationControllerTest {
 
     @Test
     public void testActivate() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "");
+        final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForActivate(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
@@ -95,7 +96,7 @@ public class CompanyRegistrationControllerTest {
 
     @Test
     public void testSendTempPasswordEmail() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "");
+        final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForSendingTempPassword(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
@@ -110,7 +111,7 @@ public class CompanyRegistrationControllerTest {
 
     @Test
     public void testChangePassword() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(true, "");
+        final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForChangingPassword(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
         CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
