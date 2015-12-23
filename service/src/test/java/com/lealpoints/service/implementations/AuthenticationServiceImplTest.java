@@ -17,7 +17,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
     @Test
     public void testIsValidCompanyApiKey() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByCompanyUserIdApiKey(anyString(), anyString())).andReturn(new CompanyUser());
+        expect(companyUserRepository.getByCompanyUserIdApiKey(anyInt(), anyString())).andReturn(new CompanyUser());
         replay((companyUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, companyUserRepository, null) {
             @Override
@@ -26,7 +26,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
             }
         };
 
-        final ServiceResult validApiKey = authenticationService.isValidApiKey("ABC", "123com");
+        final ServiceResult validApiKey = authenticationService.isValidApiKey(123, "123com");
         assertTrue(validApiKey.isSuccess());
         verify(companyUserRepository);
     }
@@ -34,7 +34,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
     @Test
     public void testIsValidCompanyApiKeyWhenNotValid() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByCompanyUserIdApiKey(anyString(), anyString())).andReturn(null);
+        expect(companyUserRepository.getByCompanyUserIdApiKey(anyInt(), anyString())).andReturn(null);
         replay((companyUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, companyUserRepository, null) {
             @Override
@@ -43,7 +43,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
             }
         };
 
-        final ServiceResult validApiKey = authenticationService.isValidApiKey("ABC", "123com");
+        final ServiceResult validApiKey = authenticationService.isValidApiKey(123, "123com");
         assertFalse(validApiKey.isSuccess());
         verify(companyUserRepository);
     }
@@ -57,14 +57,14 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
             }
         };
 
-        final ServiceResult validApiKey = authenticationService.isValidApiKey("ABC", "123");
+        final ServiceResult validApiKey = authenticationService.isValidApiKey(123, "123");
         assertFalse(validApiKey.isSuccess());
     }
 
     @Test
     public void testIsValidClientApiKey() throws Exception {
         ClientUserRepository clientUserRepository = createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByClientUserIdApiKey(anyString(), anyString())).andReturn(new ClientUser());
+        expect(clientUserRepository.getByClientUserIdApiKey(anyInt(), anyString())).andReturn(new ClientUser());
         replay((clientUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, clientUserRepository) {
             @Override
@@ -73,7 +73,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
             }
         };
 
-        final ServiceResult validApiKey = authenticationService.isValidApiKey("ABC", "123cli");
+        final ServiceResult validApiKey = authenticationService.isValidApiKey(123, "123cli");
         assertTrue(validApiKey.isSuccess());
         verify(clientUserRepository);
     }
@@ -82,7 +82,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
     @Test
     public void testIsValidClientApiKeyWhenNotValid() throws Exception {
         ClientUserRepository clientUserRepository = createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByClientUserIdApiKey(anyString(), anyString())).andReturn(null);
+        expect(clientUserRepository.getByClientUserIdApiKey(anyInt(), anyString())).andReturn(null);
         replay((clientUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, clientUserRepository) {
             @Override
@@ -91,7 +91,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
             }
         };
 
-        final ServiceResult validApiKey = authenticationService.isValidApiKey("ABC", "123cli");
+        final ServiceResult validApiKey = authenticationService.isValidApiKey(123, "123cli");
         assertFalse(validApiKey.isSuccess());
         verify(clientUserRepository);
     }
@@ -105,7 +105,7 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
             }
         };
 
-        final ServiceResult validApiKey = authenticationService.isValidApiKey("ABC", "123");
+        final ServiceResult validApiKey = authenticationService.isValidApiKey(123, "123");
         assertFalse(validApiKey.isSuccess());
     }
 }

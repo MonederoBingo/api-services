@@ -34,7 +34,7 @@ public class PointsRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyId,saleKey};
+                return new Object[]{companyId , saleKey};
             }
 
             @Override

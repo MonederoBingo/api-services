@@ -66,7 +66,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{phone,smsKey};
+                return new Object[]{phone , smsKey};
             }
 
             @Override
@@ -89,7 +89,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{email,password};
+                return new Object[]{email , password};
             }
 
             @Override
@@ -117,7 +117,7 @@ public class ClientUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{userId,apiKey};
+                return new Object[]{userId , apiKey};
             }
 
             @Override

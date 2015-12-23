@@ -20,7 +20,7 @@ public class CompanyClientMappingRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyId,clientId};
+                return new Object[]{companyId , clientId};
             }
 
             @Override

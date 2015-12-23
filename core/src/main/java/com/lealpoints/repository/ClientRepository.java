@@ -55,7 +55,7 @@ public class ClientRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyId,phone};
+                return new Object[]{companyId , phone};
             }
 
             @Override

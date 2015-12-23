@@ -38,7 +38,7 @@ public class CompanyUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{email,password};
+                return new Object[]{email , password};
             }
 
             @Override
@@ -101,7 +101,7 @@ public class CompanyUserRepository extends BaseRepository {
 
             @Override
             public Object[] values() {
-                return new Object[]{companyUserId,apiKey};
+                return new Object[]{companyUserId , apiKey};
             }
 
             @Override

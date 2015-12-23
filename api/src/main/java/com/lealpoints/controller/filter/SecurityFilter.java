@@ -41,6 +41,7 @@ public class SecurityFilter implements Filter {
         }
         final String userId = request.getHeader("User-Id");
         final String apiKey = request.getHeader("Api-Key");
-        return userId != null && apiKey != null && _authenticationService.isValidApiKey(userId, apiKey).isSuccess();
+        return userId != null && apiKey != null &&
+                _authenticationService.isValidApiKey(Integer.parseInt(userId), apiKey).isSuccess();
     }
 }
