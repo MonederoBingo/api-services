@@ -36,8 +36,13 @@ public class ClientUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM ").append("client_user");
-                sql.append(" WHERE client_id = ").append(clientId).append(";");
+                sql.append(" WHERE client_id = ?;");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{clientId};
             }
 
             @Override
@@ -54,9 +59,14 @@ public class ClientUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM ").append("client_user");
                 sql.append(" INNER JOIN client USING (client_id)");
-                sql.append(" WHERE client.phone = '").append(phone).append("'");
-                sql.append(" AND client_user.sms_key = ").append(encryptForSelect("sms_key", smsKey));
+                sql.append(" WHERE client.phone = ? ");
+                sql.append(" AND client_user.sms_key = ").append(encryptForSelect("sms_key", "?"));
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{phone , smsKey};
             }
 
             @Override
@@ -72,9 +82,14 @@ public class ClientUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM ").append("client_user");
-                sql.append(" WHERE client_user.email = '").append(email).append("'");
-                sql.append(" AND client_user.password = ").append(encryptForSelect(password, "password"));
+                sql.append(" WHERE client_user.email = ?");
+                sql.append(" AND client_user.password = ").append(encryptForSelect("password","?" ));
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{email , password};
             }
 
             @Override
@@ -89,15 +104,20 @@ public class ClientUserRepository extends BaseRepository {
             .executeUpdate("UPDATE client_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE client_user_id = '" + clientUserId + "';");
     }
 
-    public ClientUser getByClientUserIdApiKey(final String userId, final String apiKey) throws Exception {
+    public ClientUser getByClientUserIdApiKey(final Integer userId, final String apiKey) throws Exception {
         return getQueryAgent().selectObject(new DbBuilder<ClientUser>() {
             @Override
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM client_user");
-                sql.append(" WHERE client_user.client_user_id = ").append(userId);
-                sql.append(" AND client_user.api_key = ").append(encryptForSelect("api_key", apiKey)).append(";");
+                sql.append(" WHERE client_user.client_user_id = ").append("?").append("");
+                sql.append(" AND client_user.api_key = ").append(encryptForSelect("api_key", "?")).append(";");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{userId , apiKey};
             }
 
             @Override

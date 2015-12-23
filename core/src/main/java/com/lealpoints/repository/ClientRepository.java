@@ -1,5 +1,6 @@
 package com.lealpoints.repository;
 
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,8 +19,13 @@ public class ClientRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
-                sql.append(" WHERE company_client_mapping.company_id = ").append(companyId).append(";");
+                sql.append(" WHERE company_client_mapping.company_id = ").append("?").append(" ;");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId};
             }
 
             @Override
@@ -42,9 +48,14 @@ public class ClientRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
                 sql.append(" INNER JOIN company_client_mapping USING (client_id)");
-                sql.append(" WHERE company_client_mapping.company_id = ").append(companyId);
-                sql.append(" AND client.phone = '").append(phone).append("';");
+                sql.append(" WHERE company_client_mapping.company_id = ?");
+                sql.append(" AND client.phone = ? ;");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId , phone};
             }
 
             @Override
@@ -60,11 +71,16 @@ public class ClientRepository extends BaseRepository {
     public Client getByPhone(final String phone) throws Exception {
         return getQueryAgent().selectObject(new DbBuilder<Client>() {
             @Override
-            public String sql() {
+            public String sql() throws SQLException {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT * FROM client");
-                sql.append(" WHERE phone = '").append(phone).append("';");
+                sql.append(" WHERE phone = ? ;");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{phone};
             }
 
             @Override
@@ -83,7 +99,6 @@ public class ClientRepository extends BaseRepository {
         sql.append(" VALUES (");
         sql.append("'").append(client.getPhone()).append("', ");
         sql.append("").append(client.canReceivePromotionSms()).append(");");
-
         return getQueryAgent().executeInsert(sql.toString(), "client_id");
     }
 

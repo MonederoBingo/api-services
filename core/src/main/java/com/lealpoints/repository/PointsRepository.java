@@ -29,7 +29,12 @@ public class PointsRepository extends BaseRepository {
         return getQueryAgent().selectObject(new DbBuilder<Points>() {
             @Override
             public String sql() {
-                return "SELECT * FROM points WHERE company_id = " + companyId + " AND sale_key = '" + saleKey + "';";
+                return "SELECT * FROM points WHERE company_id = ? AND sale_key = ? ;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId , saleKey};
             }
 
             @Override

@@ -41,7 +41,7 @@ public class BaseRepositoryTest {
     }
 
     protected void insertFixture(String fixturesFileName) throws Exception {
-        final String fixturesDirectory = PropertyManager.getProperty("unit_test.fixture_dir");
+       final String fixturesDirectory = PropertyManager.getProperty("unit_test.fixture_dir");
         File file = new File(fixturesDirectory + fixturesFileName);
         executeFixtureFile(file);
     }
