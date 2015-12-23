@@ -113,10 +113,8 @@ public class QueryAgent {
      * @throws SQLException
      */
     public synchronized <T> T selectObject(DbBuilder<T> builder) throws Exception {
-
         try (PreparedStatement statement = getConnection().prepareStatement(builder.sql())) {
             setValues(statement, builder.values());
-
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
                     return null;
@@ -194,7 +192,6 @@ public class QueryAgent {
                 throw new RuntimeException("Unsupported SQL type for object : " + obj);
             }
         }
-
     }
 
     @Override

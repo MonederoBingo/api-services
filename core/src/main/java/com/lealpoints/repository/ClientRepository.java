@@ -88,7 +88,6 @@ public class ClientRepository extends BaseRepository {
                 Client client = new Client();
                 client.setClientId(resultSet.getLong("client_id"));
                 client.setPhone(resultSet.getString("phone"));
-
                 return client;
             }
         });
@@ -100,7 +99,6 @@ public class ClientRepository extends BaseRepository {
         sql.append(" VALUES (");
         sql.append("'").append(client.getPhone()).append("', ");
         sql.append("").append(client.canReceivePromotionSms()).append(");");
-
         return getQueryAgent().executeInsert(sql.toString(), "client_id");
     }
 
