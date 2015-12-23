@@ -1,13 +1,11 @@
 package com.lealpoints.controller.api.v1;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
 import com.lealpoints.controller.base.BaseController;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.service.ClientService;
 import com.lealpoints.service.model.ClientRegistration;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -37,7 +39,7 @@ public class ClientController extends BaseController {
             ServiceResult serviceResult = _clientService.register(clientRegistration);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

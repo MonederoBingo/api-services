@@ -8,8 +8,9 @@ import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.service.ClientService;
 import com.lealpoints.service.model.ClientRegistration;
-import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +41,13 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
                 getThreadContextService().getQueryAgent().beginTransaction();
                 Client client = registerClientAndCompanyMapping(clientRegistration);
                 getThreadContextService().getQueryAgent().commitTransaction();
-                return new ServiceResult<>(true, getTranslation(Message.CLIENT_REGISTERED_SUCCESSFULLY), client.getClientId());
+                return new ServiceResult<>(true, getServiceMessage(Message.CLIENT_REGISTERED_SUCCESSFULLY), client.getClientId());
             } else {
-                return new ServiceResult<>(false, validationResult.getMessage());
+                return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -63,20 +64,20 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
     public ServiceResult<List<CompanyClientMapping>> getByCompanyId(long companyId) {
         try {
             List<CompanyClientMapping> clientPointsList = _clientRepository.getByCompanyId(companyId);
-            return new ServiceResult<>(true, "", clientPointsList);
+            return new ServiceResult<>(true, ServiceMessage.EMPTY, clientPointsList);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
     public ServiceResult<CompanyClientMapping> getByCompanyIdPhone(long companyId, String phone) {
         try {
             CompanyClientMapping clientPoints = _clientRepository.getByCompanyIdPhone(companyId, phone);
-            return new ServiceResult<>(true, "", clientPoints);
+            return new ServiceResult<>(true, ServiceMessage.EMPTY, clientPoints);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -90,7 +91,7 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             CompanyClientMapping companyClientMapping =
                 _companyClientMappingRepository.getByCompanyIdClientId(clientRegistration.getCompanyId(), client.getClientId());
             if (companyClientMapping != null) {
-                return new ValidationResult(false, getTranslation(Message.THE_CLIENT_ALREADY_EXISTS));
+                return new ValidationResult(false, getServiceMessage(Message.THE_CLIENT_ALREADY_EXISTS));
             }
         }
         return new ValidationResult(true);

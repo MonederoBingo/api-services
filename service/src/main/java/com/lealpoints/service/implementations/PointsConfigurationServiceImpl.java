@@ -5,7 +5,8 @@ import com.lealpoints.i18n.Message;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.service.PointsConfigurationService;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +27,20 @@ public class PointsConfigurationServiceImpl extends BaseServiceImpl implements P
     public ServiceResult<PointsConfiguration> getByCompanyId(long companyId) {
         try {
             PointsConfiguration pointsConfiguration = _pointsConfigurationRepository.getByCompanyId(companyId);
-            return new ServiceResult<>(true, "", pointsConfiguration);
+            return new ServiceResult<>(true, ServiceMessage.EMPTY, pointsConfiguration);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
     public ServiceResult<Boolean> update(PointsConfiguration pointsConfiguration) {
         try {
             int updatedRows = _pointsConfigurationRepository.update(pointsConfiguration);
-            return new ServiceResult<>(true, getTranslation(Message.CONFIGURATION_UPDATED), updatedRows == 1);
+            return new ServiceResult<>(true, getServiceMessage(Message.CONFIGURATION_UPDATED), updatedRows == 1);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 }

@@ -13,8 +13,9 @@ import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
 import com.lealpoints.service.PointsService;
 import com.lealpoints.service.model.PointsAwarding;
-import com.lealpoints.service.model.ServiceResult;
 import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.DateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,16 +52,16 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
                 float earnedPoints = awardPointsAndUpdateClientStatus(pointsAwarding);
                 queryAgent.commitTransaction();
                 if (earnedPoints > 0) {
-                    return new ServiceResult<>(true, getTranslation(Message.POINTS_AWARDED) + ": " + earnedPoints, earnedPoints);
+                    return new ServiceResult<>(true, getServiceMessage(Message.POINTS_AWARDED, "" + earnedPoints), earnedPoints);
                 } else {
-                    return new ServiceResult<>(true, getTranslation(Message.THE_CLIENT_DID_NOT_GET_POINTS), earnedPoints);
+                    return new ServiceResult<>(true, getServiceMessage(Message.THE_CLIENT_DID_NOT_GET_POINTS), earnedPoints);
                 }
             } else {
-                return new ServiceResult<>(false, validationResult.getMessage());
+                return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -113,8 +114,8 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         }
         Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
         if (points != null) {
-            return new ValidationResult(false, getTranslation(Message.SALE_KEY_ALREADY_EXISTS));
+            return new ValidationResult(false, getServiceMessage(Message.SALE_KEY_ALREADY_EXISTS));
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 }

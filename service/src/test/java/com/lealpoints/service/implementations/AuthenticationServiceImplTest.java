@@ -5,7 +5,8 @@ import com.lealpoints.model.ClientUser;
 import com.lealpoints.model.CompanyUser;
 import com.lealpoints.repository.ClientUserRepository;
 import com.lealpoints.repository.CompanyUserRepository;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -21,8 +22,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
         replay((companyUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, companyUserRepository, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -38,8 +39,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
         replay((companyUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, companyUserRepository, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -52,8 +53,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
     public void testIsValidCompanyApiKeyWhenWrongApiKey() throws Exception {
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -68,8 +69,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
         replay((clientUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, clientUserRepository) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -86,8 +87,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
         replay((clientUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, clientUserRepository) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 
@@ -100,8 +101,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
     public void testIsValidClientApiKeyWhenWrongApiKey() throws Exception {
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, null, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
 

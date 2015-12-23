@@ -1,18 +1,18 @@
-package com.lealpoints.service.model;
+package com.lealpoints.service.response;
 
 public class ServiceResult<T> {
 
     private final boolean success;
-    private final String message;
+    private final ServiceMessage message;
     private T object;
 
-    public ServiceResult(boolean success, String message, T object) {
+    public ServiceResult(boolean success, ServiceMessage message, T object) {
         this.success = success;
         this.message = message;
         this.object = object;
     }
 
-    public ServiceResult(boolean success, String message) {
+    public ServiceResult(boolean success, ServiceMessage message) {
         this(success, message, null);
     }
 
@@ -21,7 +21,7 @@ public class ServiceResult<T> {
     }
 
     public String getMessage() {
-        return message;
+        return message.getMessage();
     }
 
     public T getObject() {

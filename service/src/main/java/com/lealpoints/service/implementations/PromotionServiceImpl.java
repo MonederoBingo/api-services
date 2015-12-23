@@ -13,7 +13,7 @@ import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.repository.PromotionRepository;
 import com.lealpoints.service.PromotionService;
 import com.lealpoints.service.model.PromotionApplying;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.DateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,10 +48,10 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
             queryAgent.beginTransaction();
             long promotionId = insertPromotionAndUpdatePoints(promotionApplying, client);
             queryAgent.commitTransaction();
-            return new ServiceResult<>(true, getTranslation(Message.PROMOTION_APPLIED), promotionId);
+            return new ServiceResult<>(true, getServiceMessage(Message.PROMOTION_APPLIED), promotionId);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 

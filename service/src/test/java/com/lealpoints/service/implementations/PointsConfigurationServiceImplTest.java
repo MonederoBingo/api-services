@@ -3,7 +3,8 @@ package com.lealpoints.service.implementations;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.PointsConfigurationRepository;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -38,8 +39,8 @@ public class PointsConfigurationServiceImplTest {
         PointsConfigurationRepository pointsConfigurationRepository = createPointsConfigurationRepositoryForUpdate();
         PointsConfigurationServiceImpl pointsConfigurationService = new PointsConfigurationServiceImpl(pointsConfigurationRepository, null) {
             @Override
-            public String getTranslation(Message message) {
-                return message.name();
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
             }
         };
         ServiceResult<Boolean> serviceResult = pointsConfigurationService.update(new PointsConfiguration());

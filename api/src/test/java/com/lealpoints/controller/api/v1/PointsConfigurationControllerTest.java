@@ -2,7 +2,8 @@ package com.lealpoints.controller.api.v1;
 
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.service.implementations.PointsConfigurationServiceImpl;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -18,7 +19,8 @@ public class PointsConfigurationControllerTest {
         expectedPointsConfiguration.setCompanyId(1);
         expectedPointsConfiguration.setPointsToEarn(10);
         expectedPointsConfiguration.setRequiredAmount(100);
-        ServiceResult<PointsConfiguration> expectedServiceResult = new ServiceResult<>(true, "", expectedPointsConfiguration);
+        ServiceResult<PointsConfiguration> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY,
+                expectedPointsConfiguration);
         PointsConfigurationServiceImpl pointsConfigurationService = createPointsConfigurationServiceForGet(expectedServiceResult);
         PointsConfigurationController pointsConfigurationController = new PointsConfigurationController(pointsConfigurationService);
 
@@ -40,7 +42,7 @@ public class PointsConfigurationControllerTest {
 
     @Test
     public void testUpdate() throws Exception {
-        ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, "", true);
+        ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, true);
         PointsConfigurationServiceImpl pointsConfigurationService = createPointsConfigurationServiceForUpdate(expectedServiceResult);
         PointsConfigurationController pointsConfigurationController = new PointsConfigurationController(pointsConfigurationService);
 

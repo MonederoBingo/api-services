@@ -1,19 +1,20 @@
 package com.lealpoints.controller.api.v1;
 
-import javax.servlet.annotation.MultipartConfig;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
 import com.lealpoints.controller.base.BaseController;
 import com.lealpoints.model.PointsInCompany;
 import com.lealpoints.service.CompanyService;
-import com.lealpoints.service.model.ServiceResult;
+import com.lealpoints.service.response.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.annotation.MultipartConfig;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 

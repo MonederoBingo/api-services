@@ -8,7 +8,12 @@ import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.ClientUserRepository;
 import com.lealpoints.service.ClientUserService;
-import com.lealpoints.service.model.*;
+import com.lealpoints.service.model.ClientLoginResult;
+import com.lealpoints.service.model.ClientUserLogin;
+import com.lealpoints.service.model.ClientUserRegistration;
+import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.EmailUtil;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
@@ -43,13 +48,13 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
                 getThreadContextService().getQueryAgent().beginTransaction();
                 String key = registerClientAndClientUser(clientUserRegistration);
                 getThreadContextService().getQueryAgent().commitTransaction();
-                return new ServiceResult<>(true, "", key);
+                return new ServiceResult<>(true, ServiceMessage.EMPTY, key);
             } else {
-                return new ServiceResult<>(false, validationResult.getMessage());
+                return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR), null);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
     }
 
@@ -63,32 +68,32 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
                 clientUser = authenticateUsingEmail(clientUserLogin);
             }
             if (clientUser == null) {
-                return new ServiceResult<>(false, getTranslation(Message.LOGIN_FAILED));
+                return new ServiceResult<>(false, getServiceMessage(Message.LOGIN_FAILED));
             } else {
                 String apiKey = RandomStringUtils.random(20, true, true) + "cli";
                 final int updatedRows = _clientUserRepository.updateApiKeyById(clientUser.getClientUserId(), apiKey);
                 if (updatedRows != 1) {
                     logger.error("The client user api key could not be updated. updatedRows: " + updatedRows);
-                    return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+                    return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
                 }
                 ClientLoginResult clientLoginResult = new ClientLoginResult();
                 clientLoginResult.setClientUserId(clientUser.getClientUserId());
                 clientLoginResult.setApiKey(apiKey);
-                return new ServiceResult<>(true, "", clientLoginResult);
+                return new ServiceResult<>(true, ServiceMessage.EMPTY, clientLoginResult);
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
     public ServiceResult<Boolean> resendKey(String phone) {
         try {
             _clientUserRepository.updateSmsKey(generateAndSendRegistrationSMS(phone), phone);
-            return new ServiceResult<>(true, "", true);
+            return new ServiceResult<>(true, ServiceMessage.EMPTY, true);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getTranslation(Message.COMMON_USER_ERROR));
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
         }
     }
 
@@ -117,7 +122,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     String generateAndSendRegistrationSMS(String phone) throws MessagingException, IOException {
         String key = RandomStringUtils.random(6, false, true);
-        String message = getTranslation(Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
+        String message = getServiceMessage(Message.KEY_EMAIL_SMS_MESSAGE) + " " + key;
         if (isProdEnvironment()) {
             _smsService.sendSMSMessage(phone, message);
             sendKeyToEmail(key, phone);
@@ -128,7 +133,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     void sendKeyToEmail(String key, String phone) throws MessagingException {
         NotificationEmail notificationEmail = new NotificationEmail();
-        notificationEmail.setSubject(getTranslation(Message.ACTIVATION_EMAIL_SUBJECT));
+        notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
         notificationEmail.setBody("Phone: " + phone + ", Key:" + key);
         notificationEmail.setEmailTo("aayala@lealpoints.com");
         EmailUtil.sendEmail(notificationEmail);
@@ -136,8 +141,8 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     private ValidationResult validateRegistration(ClientUserRegistration clientUserRegistration) {
         if (clientUserRegistration.getPhone() != null && clientUserRegistration.getPhone().length() != 10) {
-            return new ValidationResult(false, getTranslation(Message.PHONE_MUST_HAVE_10_DIGITS));
+            return new ValidationResult(false, getServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS));
         }
-        return new ValidationResult(true, "");
+        return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 }
