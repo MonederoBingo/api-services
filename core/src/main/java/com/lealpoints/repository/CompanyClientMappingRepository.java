@@ -1,11 +1,12 @@
 package com.lealpoints.repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class CompanyClientMappingRepository extends BaseRepository {
@@ -15,12 +16,12 @@ public class CompanyClientMappingRepository extends BaseRepository {
             @Override
             public String sql() {
                 return "SELECT * FROM company_client_mapping WHERE company_id = ? AND" +
-                    " client_id = ?;";
+                        " client_id = ?;";
             }
 
             @Override
             public Object[] values() {
-                return new Object[]{companyId , clientId};
+                return new Object[]{companyId, clientId};
             }
 
             @Override

@@ -1,9 +1,5 @@
 package com.lealpoints.repository;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.sql.Connection;
-import java.sql.Statement;
 import com.lealpoints.common.PropertyManager;
 import com.lealpoints.db.datasources.DataSourceFactory;
 import com.lealpoints.db.datasources.DataSourceFactoryImpl;
@@ -14,6 +10,11 @@ import com.lealpoints.environments.EnvironmentFactoryImpl;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.Statement;
 
 public class BaseRepositoryTest {
 
@@ -41,7 +42,7 @@ public class BaseRepositoryTest {
     }
 
     protected void insertFixture(String fixturesFileName) throws Exception {
-       final String fixturesDirectory = PropertyManager.getProperty("unit_test.fixture_dir");
+        final String fixturesDirectory = PropertyManager.getProperty("unit_test.fixture_dir");
         File file = new File(fixturesDirectory + fixturesFileName);
         executeFixtureFile(file);
     }

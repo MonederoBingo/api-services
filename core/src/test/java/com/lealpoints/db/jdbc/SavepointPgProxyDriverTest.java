@@ -1,12 +1,13 @@
 package com.lealpoints.db.jdbc;
 
+import com.lealpoints.db.util.DbUtil;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
-import com.lealpoints.db.util.DbUtil;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import static org.junit.Assert.*;
 
