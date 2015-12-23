@@ -13,7 +13,12 @@ public class PointsConfigurationRepository extends BaseRepository {
         return getQueryAgent().selectObject(new DbBuilder<PointsConfiguration>() {
             @Override
             public String sql() {
-                return "SELECT * FROM points_configuration WHERE company_id = " + companyId + ";";
+                return "SELECT * FROM points_configuration WHERE company_id = ? ;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId};
             }
 
             @Override

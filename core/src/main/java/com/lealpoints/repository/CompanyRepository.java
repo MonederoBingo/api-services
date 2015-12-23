@@ -33,7 +33,12 @@ public class CompanyRepository extends BaseRepository {
         final Company company = getQueryAgent().selectObject(new DbBuilder<Company>() {
             @Override
             public String sql() {
-                return "SELECT * FROM company WHERE company_id = " + companyId + ";";
+                return "SELECT * FROM company WHERE company_id = ?;";
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId};
             }
 
             @Override
@@ -55,8 +60,13 @@ public class CompanyRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company.*, company_client_mapping.points FROM ").append("company");
                 sql.append(" INNER JOIN company_client_mapping USING (").append("company_id").append(")");
-                sql.append(" WHERE company_client_mapping.client_id = ").append(clientId);
+                sql.append(" WHERE company_client_mapping.client_id = ? ;");
                 return sql.toString();
+            }
+
+            @Override
+            public Object[] values() {
+                return new Object[]{clientId};
             }
 
             @Override
