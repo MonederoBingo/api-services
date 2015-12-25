@@ -7,12 +7,8 @@ import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.db.queryagent.QueryAgentFactoryImpl;
 import com.lealpoints.environments.EnvironmentFactory;
 import com.lealpoints.environments.EnvironmentFactoryImpl;
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.Statement;
 
@@ -41,22 +37,16 @@ public class BaseRepositoryTest {
         _queryAgent.rollbackTransaction();
     }
 
-    protected void insertFixture(String fixturesFileName) throws Exception {
-        final String fixturesDirectory = PropertyManager.getProperty("unit_test.fixture_dir");
-        File file = new File(fixturesDirectory + fixturesFileName);
-        executeFixtureFile(file);
-    }
-
     protected QueryAgent getQueryAgent() {
         return _queryAgent;
     }
 
-    private void executeFixtureFile(File scriptFile) throws Exception {
-        if (scriptFile.exists() && scriptFile.isFile()) {
-            String sql = FileUtils.readFileToString(scriptFile, "UTF-8");
+    protected void executeFixture(String script) throws Exception {
+        if (!script.equals(null)) {
+            String sql = script;
             executeSql(sql, _queryAgent.getConnection());
         } else {
-            throw new FileNotFoundException();
+            throw new NullPointerException();
         }
     }
 

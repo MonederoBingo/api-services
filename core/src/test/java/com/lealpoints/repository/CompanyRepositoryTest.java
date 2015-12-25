@@ -6,6 +6,7 @@ import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.PointsInCompany;
+import com.lealpoints.repository.fixture.CompanyRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +15,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class CompanyRepositoryTest extends BaseRepositoryTest {
+
     private CompanyRepository _companyRepository;
+    private CompanyRepositoryFixture _companyFixture = new CompanyRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -40,7 +43,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetPointsInCompanyByClientIdId() throws Exception {
-        insertFixture("company_repository_test_fixture.sql");
+        executeFixture(_companyFixture.getFixturefortestGetPointsInCompanyByClientIdId());
         List<PointsInCompany> companies = _companyRepository.getPointsInCompanyByClientId(1);
         assertNotNull(companies);
         assertEquals(2, companies.size());
@@ -48,7 +51,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdateUrlImageLogo() throws Exception {
-        insertFixture("company_repository_test_update.sql");
+        executeFixture(_companyFixture.getFixturefortestUpdateUrlImageLogo());
         Company company = getCompanyById(1);
         assertNotNull(company);
         assertEquals("B", company.getUrlImageLogo());
@@ -60,7 +63,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        insertFixture("company_repository_test_get.sql");
+        executeFixture(_companyFixture.getFixturefortestGetByCompanyId());
         Company company = _companyRepository.getByCompanyId(1);
         assertNotNull(company);
         assertEquals("A", company.getName());

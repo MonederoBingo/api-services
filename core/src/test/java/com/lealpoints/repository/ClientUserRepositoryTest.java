@@ -2,6 +2,7 @@ package com.lealpoints.repository;
 
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.ClientUser;
+import com.lealpoints.repository.fixture.ClientUserRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +13,9 @@ import java.sql.Statement;
 import static org.junit.Assert.*;
 
 public class ClientUserRepositoryTest extends BaseRepositoryTest {
+
     private ClientUserRepository _clientUserRepository;
+    private ClientUserRepositoryFixture _clientUserFixture=new ClientUserRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -25,7 +28,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        insertFixture("client_user_repository_test_fixture_for_insert.sql");
+        executeFixture(_clientUserFixture.getFixturefortestInsert());
         ClientUser expectedClientUser = new ClientUser();
         expectedClientUser.setClientId(1);
         expectedClientUser.setName("pepe");
@@ -44,7 +47,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdateSmsKey() throws Exception {
-        insertFixture("client_user_repository_test_fixture_for_update.sql");
+        executeFixture(_clientUserFixture.getFixturefortestUpdateSmsKey());
         int updatedRows = _clientUserRepository.updateSmsKey("1234", "6141112233");
         assertTrue(updatedRows == 1);
         ClientUser clientUser = getClientUserByPhoneAndSmsKey("6141112233", "1234");
@@ -55,7 +58,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByClientId() throws Exception {
-        insertFixture("client_user_repository_test_fixture_for_get.sql");
+        executeFixture(_clientUserFixture.getFixturefortestGetByClientId());
         ClientUser clientUser = _clientUserRepository.getByClientId(1);
         assertNotNull(clientUser);
         assertNotNull(clientUser.getSmsKey());
@@ -63,7 +66,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByPhoneAndKey() throws Exception {
-        insertFixture("client_user_repository_test_fixture_for_get.sql");
+        executeFixture(_clientUserFixture.getFixturefortestGetByPhoneAndKey());
         ClientUser clientUser = _clientUserRepository.getByPhoneAndKey("6141112233", "qwerty");
         assertNotNull(clientUser);
         assertNotNull(clientUser.getSmsKey());
@@ -73,7 +76,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
     public void testGetByEmailAndPassword() throws Exception {
         final String email = "a@a.com";
         final String password = "password";
-        insertFixture("client_user_repository_test_fixture_for_get.sql");
+        executeFixture(_clientUserFixture.getFixturefortestGetByEmailAndPassword());
         ClientUser clientUser = _clientUserRepository.getByEmailAndPassword(email, password);
         assertNotNull(clientUser);
         Assert.assertEquals("a@a.com", clientUser.getEmail());
@@ -81,17 +84,16 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testApiKeyByEmail() throws Exception {
-        insertFixture("client_user_repository_test_fixture_for_update.sql");
+        executeFixture(_clientUserFixture.getFixturefortestApiKeyByEmail());
         ClientUser beforeUpdateClientUser = getClientUserById(1);
         _clientUserRepository.updateApiKeyById(1, "QWER");
         ClientUser afterUpdateClientUser = getClientUserById(1);
         assertNotEquals(beforeUpdateClientUser.getApiKey(), afterUpdateClientUser.getApiKey());
     }
 
-
     @Test
     public void testGetByCompanyUserIdApiKey() throws Exception {
-        insertFixture("client_user_repository_test_fixture_for_get.sql");
+        executeFixture(_clientUserFixture.getFixturefortestGetByCompanyUserIdApiKey());
         ClientUser companyUser = _clientUserRepository.getByClientUserIdApiKey(1, "ASDQWE");
         assertNotNull(companyUser);
     }
@@ -101,7 +103,6 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
         ClientUser companyUser = _clientUserRepository.getByClientUserIdApiKey(1, "ASDQWE");
         assertNull(companyUser);
     }
-
 
     private ClientUser getClientUserById(long clientUserId) throws Exception {
         Statement st = null;

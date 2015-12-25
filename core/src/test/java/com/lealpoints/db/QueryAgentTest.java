@@ -2,6 +2,7 @@ package com.lealpoints.db;
 
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.repository.BaseRepositoryTest;
+import com.lealpoints.repository.fixture.QueryAgentFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,9 +16,11 @@ import static org.junit.Assert.*;
 
 public class QueryAgentTest extends BaseRepositoryTest {
 
+    private QueryAgentFixture _queryFixture = new QueryAgentFixture();
+
     @Before
     public void setUp() throws Exception {
-        insertFixture("query_agent_create_dummy_table.sql");
+        executeFixture(_queryFixture.getFixtureforQueryAgent());
     }
 
     @Test
@@ -48,7 +51,6 @@ public class QueryAgentTest extends BaseRepositoryTest {
         assertEquals("name1", dummyBeforeUpdate.name);
         assertEquals("desc1", dummyBeforeUpdate.description);
         assertEquals("value1", dummyBeforeUpdate.value);
-
         final String updateSql = "UPDATE dummy SET name = 'name2', description = 'desc2', value = 'value2' WHERE dummy_id = " + dummyId + ";";
         long affectedRows = getQueryAgent().executeUpdate(updateSql);
         assertEquals(1, affectedRows);
@@ -82,12 +84,10 @@ public class QueryAgentTest extends BaseRepositoryTest {
         });
         assertNotNull(dummies);
         assertEquals(0, dummies.size());
-
         String insertSql = "INSERT INTO dummy (name, description, value) VALUES ('name1', 'desc1', 'value1');";
         executeInsert(insertSql, "dummy_id");
         insertSql = "INSERT INTO dummy (name, description, value) VALUES ('name1', 'desc1', 'value1');";
         executeInsert(insertSql, "dummy_id");
-
         dummies = getQueryAgent().selectList(new DbBuilder<Dummy>() {
             @Override
             public String sql() {
@@ -141,10 +141,8 @@ public class QueryAgentTest extends BaseRepositoryTest {
             }
         });
         assertNull(dummy);
-
         String insertSql = "INSERT INTO dummy (name, description, value) VALUES ('name1', 'desc1', 'value1');";
         executeInsert(insertSql, "dummy_id");
-
         dummy = getQueryAgent().selectObject(new DbBuilder<Dummy>() {
             @Override
             public String sql() {
@@ -181,7 +179,7 @@ public class QueryAgentTest extends BaseRepositoryTest {
         getQueryAgent().rollbackTransaction();
         assertFalse(getQueryAgent().isInTransaction());
         getQueryAgent().beginTransaction();
-        insertFixture("query_agent_create_dummy_table.sql");
+        executeFixture(_queryFixture.getFixtureforQueryAgent());
         dummy = getDummyById(dummyId);
         assertNull(dummy);
     }
