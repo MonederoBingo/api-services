@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.PointsConfiguration;
+import com.lealpoints.repository.fixture.PointsConfigurationRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import static org.junit.Assert.assertNotNull;
 public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
 
     private PointsConfigurationRepository _pointsConfigurationRepository;
+    private PointsConfigurationRepositoryFixture _pointsConfigurationFixture = new PointsConfigurationRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -26,7 +28,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        insertFixture("points_configuration_repository_get_by_company_id.sql");
+        executeFixture(_pointsConfigurationFixture.getFixturefortestGetByCompanyId());
         PointsConfiguration pointsConfiguration = _pointsConfigurationRepository.getByCompanyId(1);
         assertNotNull(pointsConfiguration);
         assertEquals(0, pointsConfiguration.getPointsToEarn(), 0.00);
@@ -36,13 +38,12 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testInsert() throws Exception {
         final int companyIdFromFixture = 1;
-        insertFixture("points_configuration_repository_insert.sql");
+        executeFixture(_pointsConfigurationFixture.getFixturefortestInsert());
         PointsConfiguration expectedPointsConfiguration = new PointsConfiguration();
         expectedPointsConfiguration.setCompanyId(companyIdFromFixture);
         expectedPointsConfiguration.setPointsToEarn(10);
         expectedPointsConfiguration.setRequiredAmount(100);
         final long pointsConfigurationId = _pointsConfigurationRepository.insert(expectedPointsConfiguration);
-
         PointsConfiguration actualPointsConfiguration = getPointsConfigurationById(pointsConfigurationId);
         assertEquals(pointsConfigurationId, actualPointsConfiguration.getPointsConfigurationId());
         assertEquals(expectedPointsConfiguration.getCompanyId(), actualPointsConfiguration.getCompanyId());
@@ -53,7 +54,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testUpdate() throws Exception {
         final int companyIdFromFixture = 1;
-        insertFixture("points_configuration_repository_get_by_company_id.sql");
+        executeFixture(_pointsConfigurationFixture.getFixturefortestUpdate());
         PointsConfiguration expectedPointsConfiguration = getPointFirstConfigurationByCompanyId();
         assertEquals(0, expectedPointsConfiguration.getPointsToEarn(), 0.00);
         assertEquals(0, expectedPointsConfiguration.getRequiredAmount(), 0.00);
@@ -61,7 +62,6 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
         expectedPointsConfiguration.setPointsToEarn(10);
         expectedPointsConfiguration.setRequiredAmount(100);
         int updatedRows = _pointsConfigurationRepository.update(expectedPointsConfiguration);
-
         PointsConfiguration actualPointsConfiguration = getPointFirstConfigurationByCompanyId();
         assertEquals(1, updatedRows);
         Assert.assertEquals(10, actualPointsConfiguration.getPointsToEarn(), 0.00);
@@ -71,7 +71,6 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     private PointsConfiguration getPointFirstConfigurationByCompanyId() throws Exception {
         PointsConfiguration pointsConfiguration = new PointsConfiguration();
         try (Statement st = getQueryAgent().getConnection().createStatement()) {
-
             ResultSet resultSet = st.executeQuery("SELECT * FROM points_configuration;");
             if (resultSet.next()) {
                 pointsConfiguration.setPointsConfigurationId(resultSet.getLong("points_configuration_id"));

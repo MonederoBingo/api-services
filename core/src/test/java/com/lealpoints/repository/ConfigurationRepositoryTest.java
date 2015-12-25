@@ -5,6 +5,7 @@ import java.sql.Statement;
 import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Configuration;
+import com.lealpoints.repository.fixture.ConfigurationRepositoryFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +14,7 @@ import static org.junit.Assert.*;
 public class ConfigurationRepositoryTest extends BaseRepositoryTest {
 
     private ConfigurationRepository _configurationRepository;
+    private ConfigurationRepositoryFixture _configurationFixture = new ConfigurationRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -40,7 +42,7 @@ public class ConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testGetAll() throws Exception {
         deleteConfigurationTable();
-        insertFixture("configuration_repository_insert.sql");
+        executeFixture(_configurationFixture.getFixturefortestGetAll());
         final List<Configuration> configurationList = _configurationRepository.getConfigurationList();
         assertNotNull(configurationList);
         assertEquals(3, configurationList.size());
@@ -48,11 +50,10 @@ public class ConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetValueByName() throws Exception {
-        insertFixture("configuration_repository_insert.sql");
+        executeFixture(_configurationFixture.getFixturefortestGetValueByName());
         final String value = _configurationRepository.getValueByName("name1");
         assertNotNull(value);
         assertEquals("value1", value);
-
         final String value2 = _configurationRepository.getValueByName("name10");
         assertNull(value2);
     }
