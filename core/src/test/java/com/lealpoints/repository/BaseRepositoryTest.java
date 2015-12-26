@@ -41,13 +41,11 @@ public class BaseRepositoryTest {
         return _queryAgent;
     }
 
-    protected void executeFixture(String script) throws Exception {
-        if (!script.equals(null)) {
-            String sql = script;
+    protected void executeFixture(String sql) throws Exception {
+        if (!sql.equals(null))
             executeSql(sql, _queryAgent.getConnection());
-        } else {
+        else
             throw new NullPointerException();
-        }
     }
 
     private void executeSql(String sql, Connection conn) throws Exception {
