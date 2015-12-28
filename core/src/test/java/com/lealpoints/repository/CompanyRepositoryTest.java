@@ -6,7 +6,7 @@ import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.PointsInCompany;
-import com.lealpoints.repository.fixture.CompanyRepositoryFixture;
+import com.lealpoints.repository.fixtures.CompanyRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +43,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetPointsInCompanyByClientIdId() throws Exception {
-        executeFixture(_companyFixture.getFixturefortestGetPointsInCompanyByClientIdId());
+        executeFixture(_companyFixture.insertClientTwoCompaniesAndMapping());
         List<PointsInCompany> companies = _companyRepository.getPointsInCompanyByClientId(1);
         assertNotNull(companies);
         assertEquals(2, companies.size());
@@ -51,7 +51,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdateUrlImageLogo() throws Exception {
-        executeFixture(_companyFixture.getFixturefortestUpdateUrlImageLogo());
+        executeFixture(_companyFixture.insertCompany());
         Company company = getCompanyById(1);
         assertNotNull(company);
         assertEquals("B", company.getUrlImageLogo());
@@ -63,7 +63,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_companyFixture.getFixturefortestGetByCompanyId());
+        executeFixture(_companyFixture.insertCompany());
         Company company = _companyRepository.getByCompanyId(1);
         assertNotNull(company);
         assertEquals("A", company.getName());

@@ -2,7 +2,7 @@ package com.lealpoints.db;
 
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.repository.BaseRepositoryTest;
-import com.lealpoints.repository.fixture.QueryAgentFixture;
+import com.lealpoints.db.fixtures.QueryAgentFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +20,7 @@ public class QueryAgentTest extends BaseRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        executeFixture(_queryFixture.getFixtureforQueryAgent());
+        executeFixture(_queryFixture.createDummyTable());
     }
 
     @Test
@@ -179,7 +179,7 @@ public class QueryAgentTest extends BaseRepositoryTest {
         getQueryAgent().rollbackTransaction();
         assertFalse(getQueryAgent().isInTransaction());
         getQueryAgent().beginTransaction();
-        executeFixture(_queryFixture.getFixtureforQueryAgent());
+        executeFixture(_queryFixture.createDummyTable());
         dummy = getDummyById(dummyId);
         assertNull(dummy);
     }

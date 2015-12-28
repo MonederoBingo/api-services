@@ -6,7 +6,7 @@ import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
-import com.lealpoints.repository.fixture.ClientRepositoryFixture;
+import com.lealpoints.repository.fixtures.ClientRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class ClientRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_clientRepositoryFixture.getFixturefortestGetByCompanyId());
+        executeFixture(_clientRepositoryFixture.insertCompanyTwoClientsAndTwoMapping());
         List<CompanyClientMapping> clientPointsList = _clientRepository.getByCompanyId(1);
         assertNotNull(clientPointsList);
         assertEquals(2, clientPointsList.size());
@@ -45,7 +45,7 @@ public class ClientRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyIdPhone() throws Exception {
-        executeFixture(_clientRepositoryFixture.getFixturefortestGetByCompanyIdPhone());
+        executeFixture(_clientRepositoryFixture.insertCompanyClientAndMapping());
         CompanyClientMapping clientPoints = _clientRepository.getByCompanyIdPhone(1, "1234567890");
         assertNotNull(clientPoints);
         assertEquals(1200, clientPoints.getPoints(), 0.00);
@@ -53,7 +53,7 @@ public class ClientRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByPhone() throws Exception {
-        executeFixture(_clientRepositoryFixture.getFixturefortestGetByPhone());
+        executeFixture(_clientRepositoryFixture.insertTwoClients());
         Client client = _clientRepository.getByPhone("1234");
         assertNotNull(client);
         assertTrue(client.getClientId() > 0);
@@ -68,7 +68,7 @@ public class ClientRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsertIfDoesNotExistWhenDoes() throws Exception {
-        executeFixture(_clientRepositoryFixture.getFixturefortestInsertIfDoesNotExistWhenDoes());
+        executeFixture(_clientRepositoryFixture.insertClient());
         Client client = _clientRepository.insertIfDoesNotExist("1234", true);
         assertNotNull(client);
         Assert.assertEquals(1, client.getClientId());
@@ -77,7 +77,7 @@ public class ClientRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdateCanReceivePromoSms() throws Exception {
-        executeFixture(_clientRepositoryFixture.getFixturefortestUpdateCanReceivePromoSms());
+        executeFixture(_clientRepositoryFixture.insertClientThatCanReceiveSMS());
         Client clientBeforeUpdate = getClientById(1);
         assertTrue(clientBeforeUpdate.canReceivePromotionSms());
         int updatedRows = _clientRepository.updateCanReceivePromoSms(1, false);

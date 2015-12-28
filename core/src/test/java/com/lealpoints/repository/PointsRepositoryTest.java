@@ -5,7 +5,7 @@ import java.sql.Statement;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Points;
 import com.lealpoints.util.DateUtil;
-import com.lealpoints.repository.fixture.PointsRepositoryFixture;
+import com.lealpoints.repository.fixtures.PointsRepositoryFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +28,7 @@ public class PointsRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        executeFixture(_pointsFixture.getFixturefortestInsert());
+        executeFixture(_pointsFixture.insertCompany());
         Points expectedPoints = new Points();
         expectedPoints.setCompanyId(1);
         expectedPoints.setClientId(1);
@@ -53,7 +53,7 @@ public class PointsRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_pointsFixture.getFixturefortestGetByCompanyId());
+        executeFixture(_pointsFixture.insertCompanyClientAndPoints());
         Points points = _pointsRepository.getByCompanyIdSaleKey(1, "A123");
         assertNotNull(points);
         assertEquals(1, points.getCompanyId());

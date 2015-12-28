@@ -7,6 +7,7 @@ import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.db.queryagent.QueryAgentFactoryImpl;
 import com.lealpoints.environments.EnvironmentFactory;
 import com.lealpoints.environments.EnvironmentFactoryImpl;
+import org.apache.commons.lang.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import java.sql.Connection;
@@ -42,10 +43,10 @@ public class BaseRepositoryTest {
     }
 
     protected void executeFixture(String sql) throws Exception {
-        if (!sql.equals(null))
+        if (StringUtils.isNotEmpty(sql))
             executeSql(sql, _queryAgent.getConnection());
         else
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
     }
 
     private void executeSql(String sql, Connection conn) throws Exception {
