@@ -6,7 +6,7 @@ import java.sql.Statement;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
-import com.lealpoints.repository.fixture.CompanyClientMappingRepositoryFixture;
+import com.lealpoints.repository.fixtures.CompanyClientMappingRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
         final int companyClientMappingIdFromFixture = 1;
         final int companyIdFromFixture = 1;
         final int clientIdFromFixture = 1;
-        executeFixture(_companyClientMappingFixture.getFixturefortestGetByCompanyIdClientId());
+        executeFixture(_companyClientMappingFixture.insertCompanyClientAndMapping());
         CompanyClientMapping companyClientMapping = _companyClientMappingRepository.getByCompanyIdClientId(companyIdFromFixture, clientIdFromFixture);
         assertNotNull(companyClientMapping);
         assertEquals(companyClientMappingIdFromFixture, companyClientMapping.getCompanyClientMappingId());
@@ -42,7 +42,7 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        executeFixture(_companyClientMappingFixture.getFixturefortestInsert());
+        executeFixture(_companyClientMappingFixture.insertCompanyAndClient());
         CompanyClientMapping expectedCompanyClientMapping = new CompanyClientMapping();
         expectedCompanyClientMapping.setCompanyId(1);
         Client client = new Client();
@@ -57,7 +57,7 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
 
     @Test(expected = PSQLException.class)
     public void testInsertViolatingUnique() throws Exception {
-        executeFixture(_companyClientMappingFixture.getFixturefortestInsertViolatingUnique());
+        executeFixture(_companyClientMappingFixture.insertCompanyAndClient());
         CompanyClientMapping expectedCompanyClientMapping = new CompanyClientMapping();
         expectedCompanyClientMapping.setCompanyId(1);
         Client client = new Client();
@@ -69,14 +69,14 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsertIfDoesNotExistWhenDoNot() throws Exception {
-        executeFixture(_companyClientMappingFixture.getFixturefortestInsertIfDoesNotExistWhenDoNot());
+        executeFixture(_companyClientMappingFixture.insertCompanyAndClient());
         CompanyClientMapping companyClientMapping = _companyClientMappingRepository.insertIfDoesNotExist(1, 1);
         assertNotNull(companyClientMapping);
     }
 
     @Test
     public void testInsertIfDoesNotExistWhenDoes() throws Exception {
-        executeFixture(_companyClientMappingFixture.getFixturefortestInsertIfDoesNotExistWhenDoes());
+        executeFixture(_companyClientMappingFixture.insertCompanyClientAndMapping());
         CompanyClientMapping companyClientMapping = _companyClientMappingRepository.insertIfDoesNotExist(1, 1);
         assertNotNull(companyClientMapping);
         Assert.assertEquals(1, companyClientMapping.getCompanyClientMappingId());
@@ -86,7 +86,7 @@ public class CompanyClientMappingRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdatePoints() throws Exception {
-        executeFixture(_companyClientMappingFixture.getFixturefortestUpdatePoints());
+        executeFixture(_companyClientMappingFixture.insertCompanyClientAndMappingWithPoints());
         CompanyClientMapping beforeUpdateCompanyClientMapping = getCompanyClientMappingById(1);
         assertEquals(10, beforeUpdateCompanyClientMapping.getPoints(), 0.00);
         beforeUpdateCompanyClientMapping.setPoints(20);

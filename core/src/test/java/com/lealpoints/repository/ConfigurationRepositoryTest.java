@@ -5,7 +5,7 @@ import java.sql.Statement;
 import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Configuration;
-import com.lealpoints.repository.fixture.ConfigurationRepositoryFixture;
+import com.lealpoints.repository.fixtures.ConfigurationRepositoryFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class ConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testGetAll() throws Exception {
         deleteConfigurationTable();
-        executeFixture(_configurationFixture.getFixturefortestGetAll());
+        executeFixture(_configurationFixture.insertConfiguration());
         final List<Configuration> configurationList = _configurationRepository.getConfigurationList();
         assertNotNull(configurationList);
         assertEquals(3, configurationList.size());
@@ -50,7 +50,7 @@ public class ConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetValueByName() throws Exception {
-        executeFixture(_configurationFixture.getFixturefortestGetValueByName());
+        executeFixture(_configurationFixture.insertConfiguration());
         final String value = _configurationRepository.getValueByName("name1");
         assertNotNull(value);
         assertEquals("value1", value);

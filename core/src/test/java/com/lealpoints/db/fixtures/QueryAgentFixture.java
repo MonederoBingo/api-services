@@ -1,8 +1,8 @@
-package com.lealpoints.repository.fixture;
+package com.lealpoints.db.fixtures;
 
 public class QueryAgentFixture {
 
-    public String getFixtureforQueryAgent()
+    public String createDummyTable()
     {
         return "CREATE TABLE IF NOT EXISTS dummy (\n" +
                 "  dummy_id    SERIAL PRIMARY KEY,\n" +

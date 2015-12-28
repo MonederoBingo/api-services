@@ -5,7 +5,7 @@ import java.sql.Statement;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Promotion;
 import com.lealpoints.util.DateUtil;
-import com.lealpoints.repository.fixture.PromotionRepositoryFixture;
+import com.lealpoints.repository.fixtures.PromotionRepositoryFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public class PromotionRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        executeFixture(_promotionFixture.getFixturefortestInser());
+        executeFixture(_promotionFixture.insertCompanyAndClient());
         Promotion expectedPromotion = new Promotion();
         expectedPromotion.setCompanyId(1);
         expectedPromotion.setClientId(1);

@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.PointsConfiguration;
-import com.lealpoints.repository.fixture.PointsConfigurationRepositoryFixture;
+import com.lealpoints.repository.fixtures.PointsConfigurationRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_pointsConfigurationFixture.getFixturefortestGetByCompanyId());
+        executeFixture(_pointsConfigurationFixture.insertCompanyAndPointsConfiguration());
         PointsConfiguration pointsConfiguration = _pointsConfigurationRepository.getByCompanyId(1);
         assertNotNull(pointsConfiguration);
         assertEquals(0, pointsConfiguration.getPointsToEarn(), 0.00);
@@ -38,7 +38,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testInsert() throws Exception {
         final int companyIdFromFixture = 1;
-        executeFixture(_pointsConfigurationFixture.getFixturefortestInsert());
+        executeFixture(_pointsConfigurationFixture.insertCompany());
         PointsConfiguration expectedPointsConfiguration = new PointsConfiguration();
         expectedPointsConfiguration.setCompanyId(companyIdFromFixture);
         expectedPointsConfiguration.setPointsToEarn(10);
@@ -54,7 +54,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testUpdate() throws Exception {
         final int companyIdFromFixture = 1;
-        executeFixture(_pointsConfigurationFixture.getFixturefortestUpdate());
+        executeFixture(_pointsConfigurationFixture.insertCompanyAndPointsConfiguration());
         PointsConfiguration expectedPointsConfiguration = getPointFirstConfigurationByCompanyId();
         assertEquals(0, expectedPointsConfiguration.getPointsToEarn(), 0.00);
         assertEquals(0, expectedPointsConfiguration.getRequiredAmount(), 0.00);
