@@ -1,8 +1,5 @@
 package com.lealpoints.repository;
 
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
@@ -11,6 +8,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.List;
+
+import static com.lealpoints.repository.fixtures.ClientRepositoryFixture.INSERT_COMPANY_TWO_CLIENTS_AND_MAPPING;
 import static org.junit.Assert.*;
 
 public class ClientRepositoryTest extends BaseRepositoryTest {
@@ -35,7 +37,7 @@ public class ClientRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_clientRepositoryFixture.insertCompanyTwoClientsAndTwoMapping());
+        executeFixture(INSERT_COMPANY_TWO_CLIENTS_AND_MAPPING);
         List<CompanyClientMapping> clientPointsList = _clientRepository.getByCompanyId(1);
         assertNotNull(clientPointsList);
         assertEquals(2, clientPointsList.size());
