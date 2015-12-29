@@ -33,13 +33,13 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/company")
-public class CompanyRegistrationController extends BaseController {
+public class CompanyAuthenticationController extends BaseController {
 
     private final CompanyUserService _companyUserService;
     private final CompanyService _companyService;
 
     @Autowired
-    public CompanyRegistrationController(CompanyUserService companyUserService, CompanyService companyService) {
+    public CompanyAuthenticationController(CompanyUserService companyUserService, CompanyService companyService) {
         _companyUserService = companyUserService;
         _companyService = companyService;
     }
