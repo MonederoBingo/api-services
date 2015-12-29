@@ -5,16 +5,16 @@ import java.sql.Statement;
 import java.util.List;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.PromotionConfiguration;
-import com.lealpoints.repository.fixtures.PromotionConfigurationRepositoryFixture;
 import org.junit.Before;
 import org.junit.Test;
-
+import static com.lealpoints.repository.fixtures.PromotionConfigurationRepositoryFixture.INSERT_COMPANY;
+import static com.lealpoints.repository.fixtures.PromotionConfigurationRepositoryFixture.INSERT_COMPANY_ANDO_PROMOTION_CONFIGURATION;
+import static com.lealpoints.repository.fixtures.PromotionConfigurationRepositoryFixture.INSERT_COMPANY_AND_TWO_PROMOTION_CONFIGURATION;
 import static org.junit.Assert.*;
 
 public class PromotionConfigurationRepositoryTest extends BaseRepositoryTest {
 
     private PromotionConfigurationRepository _promotionConfigurationRepository;
-    private PromotionConfigurationRepositoryFixture _promotionConfigurationFixture = new PromotionConfigurationRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -27,7 +27,7 @@ public class PromotionConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetById() throws Exception {
-        executeFixture(_promotionConfigurationFixture.insertCompanyAndPromotionConfiguration());
+        executeFixture(INSERT_COMPANY_ANDO_PROMOTION_CONFIGURATION);
         PromotionConfiguration promotionConfiguration = _promotionConfigurationRepository.getById(1);
         assertNotNull(promotionConfiguration);
         assertEquals("10% off", promotionConfiguration.getDescription());
@@ -42,7 +42,7 @@ public class PromotionConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_promotionConfigurationFixture.insertCompanyAndTwoPromotionConfiguration());
+        executeFixture(INSERT_COMPANY_AND_TWO_PROMOTION_CONFIGURATION);
         List<PromotionConfiguration> promotionConfigurations = _promotionConfigurationRepository.getByCompanyId(1);
         assertNotNull(promotionConfigurations);
         assertEquals(2, promotionConfigurations.size());
@@ -56,7 +56,7 @@ public class PromotionConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        executeFixture(_promotionConfigurationFixture.insertCompany());
+        executeFixture(INSERT_COMPANY);
         PromotionConfiguration expectedPromotionConfiguration = new PromotionConfiguration();
         expectedPromotionConfiguration.setCompanyId(1);
         expectedPromotionConfiguration.setDescription("10% off");
@@ -70,7 +70,7 @@ public class PromotionConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testDelete() throws Exception {
-        executeFixture(_promotionConfigurationFixture.insertCompanyAndPromotionConfiguration());
+        executeFixture(INSERT_COMPANY_ANDO_PROMOTION_CONFIGURATION);
         PromotionConfiguration promotionConfiguration = getPromotionById(1);
         assertNotNull(promotionConfiguration);
         final int deletedRows = _promotionConfigurationRepository.delete(1);

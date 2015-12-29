@@ -2,7 +2,6 @@ package com.lealpoints.db;
 
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.repository.BaseRepositoryTest;
-import com.lealpoints.db.fixtures.QueryAgentFixture;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,15 +11,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import static com.lealpoints.db.fixtures.QueryAgentFixture.CREATE_DUMMY_TABLE;
 import static org.junit.Assert.*;
 
 public class QueryAgentTest extends BaseRepositoryTest {
 
-    private QueryAgentFixture _queryFixture = new QueryAgentFixture();
-
     @Before
     public void setUp() throws Exception {
-        executeFixture(_queryFixture.createDummyTable());
+        executeFixture(CREATE_DUMMY_TABLE);
     }
 
     @Test
@@ -179,7 +177,7 @@ public class QueryAgentTest extends BaseRepositoryTest {
         getQueryAgent().rollbackTransaction();
         assertFalse(getQueryAgent().isInTransaction());
         getQueryAgent().beginTransaction();
-        executeFixture(_queryFixture.createDummyTable());
+        executeFixture(CREATE_DUMMY_TABLE);
         dummy = getDummyById(dummyId);
         assertNull(dummy);
     }

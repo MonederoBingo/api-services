@@ -4,18 +4,18 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.PointsConfiguration;
-import com.lealpoints.repository.fixtures.PointsConfigurationRepositoryFixture;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.lealpoints.repository.fixtures.PointsConfigurationRepositoryFixture.INSERT_COMPANY;
+import static com.lealpoints.repository.fixtures.PointsConfigurationRepositoryFixture.INSERT_COMPANY_AND_POINTS_CONFIGURATION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
 
     private PointsConfigurationRepository _pointsConfigurationRepository;
-    private PointsConfigurationRepositoryFixture _pointsConfigurationFixture = new PointsConfigurationRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -28,7 +28,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        executeFixture(_pointsConfigurationFixture.insertCompanyAndPointsConfiguration());
+        executeFixture(INSERT_COMPANY_AND_POINTS_CONFIGURATION);
         PointsConfiguration pointsConfiguration = _pointsConfigurationRepository.getByCompanyId(1);
         assertNotNull(pointsConfiguration);
         assertEquals(0, pointsConfiguration.getPointsToEarn(), 0.00);
@@ -38,7 +38,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testInsert() throws Exception {
         final int companyIdFromFixture = 1;
-        executeFixture(_pointsConfigurationFixture.insertCompany());
+        executeFixture(INSERT_COMPANY);
         PointsConfiguration expectedPointsConfiguration = new PointsConfiguration();
         expectedPointsConfiguration.setCompanyId(companyIdFromFixture);
         expectedPointsConfiguration.setPointsToEarn(10);
@@ -54,7 +54,7 @@ public class PointsConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testUpdate() throws Exception {
         final int companyIdFromFixture = 1;
-        executeFixture(_pointsConfigurationFixture.insertCompanyAndPointsConfiguration());
+        executeFixture(INSERT_COMPANY_AND_POINTS_CONFIGURATION);
         PointsConfiguration expectedPointsConfiguration = getPointFirstConfigurationByCompanyId();
         assertEquals(0, expectedPointsConfiguration.getPointsToEarn(), 0.00);
         assertEquals(0, expectedPointsConfiguration.getRequiredAmount(), 0.00);
