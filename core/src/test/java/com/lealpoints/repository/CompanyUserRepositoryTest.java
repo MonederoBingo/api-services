@@ -2,18 +2,18 @@ package com.lealpoints.repository;
 
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.model.CompanyUser;
-import com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.sql.ResultSet;
 import java.sql.Statement;
+import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY;
+import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE;
+import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE;
 import static org.junit.Assert.*;
 
 public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     private CompanyUserRepository _companyUserRepository;
-    private CompanyUserRepositoryFixture _companyUserFixture = new CompanyUserRepositoryFixture();
 
     @Before
     public void setUp() throws Exception {
@@ -27,7 +27,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testInsert() throws Exception {
         final int companyIdFromFixture = 1;
-        executeFixture(_companyUserFixture.insertCompany());
+        executeFixture(INSERT_COMPANY);
         CompanyUser expectedCompanyUser = new CompanyUser();
         expectedCompanyUser.setCompanyId(companyIdFromFixture);
         expectedCompanyUser.setName("pepe");
@@ -53,7 +53,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
     public void testGetByEmailAndPassword() throws Exception {
         final String email = "a@a.com";
         final String password = "password";
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsTrue());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE);
         CompanyUser companyUser = _companyUserRepository.getByEmailAndPassword(email, password);
         assertNotNull(companyUser);
         assertEquals("a@a.com", companyUser.getEmail());
@@ -63,7 +63,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByEmail() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsTrue());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE);
         CompanyUser companyUser = _companyUserRepository.getByEmail("a@a.com");
         assertNotNull(companyUser);
         assertEquals("a@a.com", companyUser.getEmail());
@@ -80,7 +80,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdateActivateByActivationKey() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsFalse());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
         CompanyUser companyUser = getCompanyUserById(1);
         assertFalse(companyUser.isActive());
         _companyUserRepository.updateActivateByActivationKey("1234");
@@ -90,7 +90,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testClearActivationKey() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsFalse());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
         CompanyUser companyUser = getCompanyUserById(1);
         assertEquals("1234", companyUser.getActivationKey());
         _companyUserRepository.clearActivationKey("1234");
@@ -100,7 +100,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testSetTempPasswordByEmail() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsFalse());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
         CompanyUser beforeUpdateCompanyUser = getCompanyUserById(1);
         _companyUserRepository.updatePasswordByEmail("a@a.com", "newPassword", true);
         CompanyUser afterUpdateCompanyUser = getCompanyUserById(1);
@@ -111,7 +111,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdatePasswordByEmail() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsFalse());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
         CompanyUser beforeUpdateCompanyUser = getCompanyUserById(1);
         _companyUserRepository.updatePasswordByEmail("a@a.com", "newPassword", false);
         CompanyUser afterUpdateCompanyUser = getCompanyUserById(1);
@@ -120,7 +120,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testApiKeyByEmail() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsFalse());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
         CompanyUser beforeUpdateCompanyUser = getCompanyUserById(1);
         _companyUserRepository.updateApiKeyByEmail("a@a.com", "QWER");
         CompanyUser afterUpdateCompanyUser = getCompanyUserById(1);
@@ -129,7 +129,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyUserIdApiKey() throws Exception {
-        executeFixture(_companyUserFixture.insertCompanyAndCompanyUserWhereActiveIsTrue());
+        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE);
         CompanyUser companyUser = _companyUserRepository.getByCompanyUserIdApiKey(1, "ASDQWE");
         assertNotNull(companyUser);
     }
