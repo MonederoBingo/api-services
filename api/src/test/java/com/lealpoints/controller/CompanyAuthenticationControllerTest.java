@@ -15,14 +15,14 @@ import org.springframework.http.ResponseEntity;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
-public class CompanyRegistrationControllerTest {
+public class CompanyAuthenticationControllerTest {
 
     @Test
     public void testRegister() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, new ServiceMessage("1"));
         final CompanyServiceImpl companyService = createCompanyServiceForRegister(expectedServiceResult);
         final CompanyUserServiceImpl companyUserService = createMock(CompanyUserServiceImpl.class);
-        final CompanyRegistrationController companyController = new CompanyRegistrationController(companyUserService, companyService);
+        final CompanyAuthenticationController companyController = new CompanyAuthenticationController(companyUserService, companyService);
 
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setCompanyName("company name");
@@ -47,7 +47,7 @@ public class CompanyRegistrationControllerTest {
         final ServiceResult<CompanyLoginResult> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("name"), loginResult);
         final CompanyUserServiceImpl companyUserService = createCompanyUserForLogin(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
-        final CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
+        final CompanyAuthenticationController companyUserController = new CompanyAuthenticationController(companyUserService, companyService);
 
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
@@ -69,7 +69,7 @@ public class CompanyRegistrationControllerTest {
         final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForSendingActivation(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
-        CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
+        CompanyAuthenticationController companyUserController = new CompanyAuthenticationController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.sendActivationEmail("");
         assertNotNull(serviceResultResponseEntity);
         ServiceResult actualServiceResults = serviceResultResponseEntity.getBody();
@@ -84,7 +84,7 @@ public class CompanyRegistrationControllerTest {
         final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForActivate(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
-        CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
+        CompanyAuthenticationController companyUserController = new CompanyAuthenticationController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.activate("");
         assertNotNull(serviceResultResponseEntity);
         ServiceResult actualServiceResults = serviceResultResponseEntity.getBody();
@@ -99,7 +99,7 @@ public class CompanyRegistrationControllerTest {
         final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForSendingTempPassword(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
-        CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
+        CompanyAuthenticationController companyUserController = new CompanyAuthenticationController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.sendTempPasswordEmail("");
         assertNotNull(serviceResultResponseEntity);
         ServiceResult actualServiceResults = serviceResultResponseEntity.getBody();
@@ -114,7 +114,7 @@ public class CompanyRegistrationControllerTest {
         final ServiceResult expectedServiceResult = new ServiceResult(true, ServiceMessage.EMPTY);
         CompanyUserServiceImpl companyUserService = createCompanyUserForChangingPassword(expectedServiceResult);
         final CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
-        CompanyRegistrationController companyUserController = new CompanyRegistrationController(companyUserService, companyService);
+        CompanyAuthenticationController companyUserController = new CompanyAuthenticationController(companyUserService, companyService);
         final ResponseEntity<ServiceResult> serviceResultResponseEntity = companyUserController.changePassword(new CompanyUserPasswordChanging());
         assertNotNull(serviceResultResponseEntity);
         ServiceResult actualServiceResults = serviceResultResponseEntity.getBody();
