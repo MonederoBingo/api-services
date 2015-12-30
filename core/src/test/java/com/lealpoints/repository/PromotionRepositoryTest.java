@@ -7,10 +7,11 @@ import com.lealpoints.model.Promotion;
 import com.lealpoints.util.DateUtil;
 import org.junit.Before;
 import org.junit.Test;
-
+import static com.lealpoints.repository.fixtures.PromotionRepositoryFixture.INSERT_COMPANY_AND_CLIENT;
 import static org.junit.Assert.assertEquals;
 
 public class PromotionRepositoryTest extends BaseRepositoryTest {
+
     private PromotionRepository _promotionRepository;
 
     @Before
@@ -24,14 +25,13 @@ public class PromotionRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        insertFixture("promotion_repository_insert.sql");
+        executeFixture(INSERT_COMPANY_AND_CLIENT);
         Promotion expectedPromotion = new Promotion();
         expectedPromotion.setCompanyId(1);
         expectedPromotion.setClientId(1);
         expectedPromotion.setDescription("key");
         expectedPromotion.setUsedPoints(1000);
         expectedPromotion.setDate(DateUtil.dateNow());
-
         final long promotionId = _promotionRepository.insert(expectedPromotion);
         Promotion actualPromotion = getPromotionById(promotionId);
         assertEquals(promotionId, actualPromotion.getPromotionId());

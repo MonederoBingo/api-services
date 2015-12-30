@@ -10,10 +10,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.lealpoints.repository.fixtures.CompanyRepositoryFixture.INSERT_CLIENT_TWO_COMPANIES_AND_MAPPING;
+import static com.lealpoints.repository.fixtures.CompanyRepositoryFixture.INSERT_COMPANY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class CompanyRepositoryTest extends BaseRepositoryTest {
+
     private CompanyRepository _companyRepository;
 
     @Before
@@ -40,7 +43,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetPointsInCompanyByClientIdId() throws Exception {
-        insertFixture("company_repository_test_fixture.sql");
+        executeFixture(INSERT_CLIENT_TWO_COMPANIES_AND_MAPPING);
         List<PointsInCompany> companies = _companyRepository.getPointsInCompanyByClientId(1);
         assertNotNull(companies);
         assertEquals(2, companies.size());
@@ -48,7 +51,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testUpdateUrlImageLogo() throws Exception {
-        insertFixture("company_repository_test_update.sql");
+        executeFixture(INSERT_COMPANY);
         Company company = getCompanyById(1);
         assertNotNull(company);
         assertEquals("B", company.getUrlImageLogo());
@@ -60,7 +63,7 @@ public class CompanyRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        insertFixture("company_repository_test_get.sql");
+        executeFixture(INSERT_COMPANY);
         Company company = _companyRepository.getByCompanyId(1);
         assertNotNull(company);
         assertEquals("A", company.getName());

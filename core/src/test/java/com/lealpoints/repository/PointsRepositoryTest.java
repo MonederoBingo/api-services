@@ -8,6 +8,8 @@ import com.lealpoints.util.DateUtil;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.lealpoints.repository.fixtures.PointsRepositoryFixture.INSERT_COMPANY;
+import static com.lealpoints.repository.fixtures.PointsRepositoryFixture.INSERT_COMPANY_CLIENT_AND_POINTS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -26,7 +28,7 @@ public class PointsRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testInsert() throws Exception {
-        insertFixture("points_repository_insert.sql");
+        executeFixture(INSERT_COMPANY);
         Points expectedPoints = new Points();
         expectedPoints.setCompanyId(1);
         expectedPoints.setClientId(1);
@@ -37,7 +39,6 @@ public class PointsRepositoryTest extends BaseRepositoryTest {
         expectedPoints.setEarnedPoints(10);
         expectedPoints.setDate(DateUtil.dateNow());
         final long pointsId = _pointsRepository.insert(expectedPoints);
-
         Points actualPoints = getPointsById(pointsId);
         assertEquals(pointsId, actualPoints.getPointsId());
         assertEquals(expectedPoints.getCompanyId(), actualPoints.getCompanyId());
@@ -52,7 +53,7 @@ public class PointsRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetByCompanyId() throws Exception {
-        insertFixture("points_repository_get_by_company_id_sale_key.sql");
+        executeFixture(INSERT_COMPANY_CLIENT_AND_POINTS);
         Points points = _pointsRepository.getByCompanyIdSaleKey(1, "A123");
         assertNotNull(points);
         assertEquals(1, points.getCompanyId());

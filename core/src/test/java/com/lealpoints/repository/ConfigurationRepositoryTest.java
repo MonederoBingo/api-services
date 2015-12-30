@@ -8,6 +8,7 @@ import com.lealpoints.model.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.lealpoints.repository.fixtures.ConfigurationRepositoryFixture.INSERT_CONFIGURATION;
 import static org.junit.Assert.*;
 
 public class ConfigurationRepositoryTest extends BaseRepositoryTest {
@@ -40,7 +41,7 @@ public class ConfigurationRepositoryTest extends BaseRepositoryTest {
     @Test
     public void testGetAll() throws Exception {
         deleteConfigurationTable();
-        insertFixture("configuration_repository_insert.sql");
+        executeFixture(INSERT_CONFIGURATION);
         final List<Configuration> configurationList = _configurationRepository.getConfigurationList();
         assertNotNull(configurationList);
         assertEquals(3, configurationList.size());
@@ -48,11 +49,10 @@ public class ConfigurationRepositoryTest extends BaseRepositoryTest {
 
     @Test
     public void testGetValueByName() throws Exception {
-        insertFixture("configuration_repository_insert.sql");
+        executeFixture(INSERT_CONFIGURATION);
         final String value = _configurationRepository.getValueByName("name1");
         assertNotNull(value);
         assertEquals("value1", value);
-
         final String value2 = _configurationRepository.getValueByName("name10");
         assertNull(value2);
     }
