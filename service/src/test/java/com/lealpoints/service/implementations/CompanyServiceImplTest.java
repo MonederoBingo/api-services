@@ -32,14 +32,13 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(new DevEnvironment());
-        final ThreadContextService threadContextService = createThreadContextService(queryAgent);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
         PromotionConfigurationRepository promotionConfigurationRepository = createStrictMock(PromotionConfigurationRepository.class);
         expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1L);
         replay(promotionConfigurationRepository);
         CompanyServiceImpl companyService =
                 createCompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, threadContextService, null,
                         promotionConfigurationRepository);
-
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setCompanyName("company name");
         companyRegistration.setUserName("user name");
@@ -369,7 +368,6 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                 null, null, promotionConfigurationRepository, null) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
-
             }
 
             @Override
@@ -398,6 +396,15 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
+        replay(threadContextService);
+        return threadContextService;
+    }
+
+    private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent,
+                                                                          ThreadContext threadContext) throws SQLException {
+        ThreadContextService threadContextService = createMock(ThreadContextService.class);
+        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
+        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(1);
         replay(threadContextService);
         return threadContextService;
     }

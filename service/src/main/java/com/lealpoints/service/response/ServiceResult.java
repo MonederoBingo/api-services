@@ -4,6 +4,7 @@ public class ServiceResult<T> {
 
     private final boolean success;
     private final ServiceMessage message;
+    private String extraInfo;
     private T object;
 
     public ServiceResult(boolean success, ServiceMessage message, T object) {
@@ -22,6 +23,14 @@ public class ServiceResult<T> {
 
     public String getMessage() {
         return message.getMessage();
+    }
+
+    public String getExtraInfo() {
+        return extraInfo;
+    }
+
+    public void setExtraInfo(String extraInfo) {
+        this.extraInfo = extraInfo;
     }
 
     public T getObject() {

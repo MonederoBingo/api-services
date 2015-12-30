@@ -58,9 +58,10 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             ValidationResult validationResult = validateRegistration(companyRegistration);
             if (validationResult.isValid()) {
                 getThreadContextService().getQueryAgent().beginTransaction();
-                long companyId = registerAndInitializeCompany(companyRegistration);
+                final String activationKey = RandomStringUtils.random(60, true, true);
+                long companyId = registerAndInitializeCompany(companyRegistration, activationKey);
                 getQueryAgent().commitTransaction();
-                return new ServiceResult<>(true, getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK), Long.toString(companyId));
+                return createServiceResult(companyId, activationKey);
             } else {
                 return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
@@ -68,6 +69,15 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             logger.error(ex.getMessage(), ex);
             return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
+    }
+
+    private ServiceResult<String> createServiceResult(long companyId, String activationKey) {
+        final ServiceMessage serviceMessage = getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK);
+        final ServiceResult<String> serviceResult = new ServiceResult<>(true, serviceMessage, Long.toString(companyId));
+        if (isFunctionalTestEnvironment()) {
+            serviceResult.setExtraInfo(activationKey);
+        }
+        return serviceResult;
     }
 
     public ServiceResult<List<PointsInCompany>> getPointsInCompanyByPhone(String phone) {
@@ -181,8 +191,8 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
 
     private boolean isValidContentType(String contentType) {
         return contentType.equalsIgnoreCase("image/jpeg") ||
-            contentType.equalsIgnoreCase("image/png") ||
-            contentType.equalsIgnoreCase("image/gif");
+                contentType.equalsIgnoreCase("image/png") ||
+                contentType.equalsIgnoreCase("image/gif");
     }
 
     private String getExtensionFromContentType(String contentType) {
@@ -197,17 +207,16 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         return extension;
     }
 
-    private long registerAndInitializeCompany(CompanyRegistration companyRegistration) throws Exception {
+    private long registerAndInitializeCompany(CompanyRegistration companyRegistration, String activationKey) throws Exception {
         long companyId = registerCompany(companyRegistration);
         registerPointsConfiguration(companyId);
         registerPromotionConfiguration(companyId);
-        final String activationKey = registerCompanyUser(companyRegistration, companyId);
+        registerCompanyUser(companyRegistration, companyId, activationKey);
         sendActivationEmail(companyRegistration.getEmail(), activationKey);
         return companyId;
     }
 
-    private String registerCompanyUser(CompanyRegistration companyRegistration, long companyId) throws Exception {
-        final String activationKey = RandomStringUtils.random(60, true, true);
+    private String registerCompanyUser(CompanyRegistration companyRegistration, long companyId, String activationKey) throws Exception {
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyId(companyId);
         companyUser.setName(companyRegistration.getUserName());
@@ -252,11 +261,15 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         if (isProdEnvironment() || isUATEnvironment()) {
             NotificationEmail notificationEmail = new NotificationEmail();
             notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
-            final String activationUrl = getEnvironment().getClientUrl() + "activate?key=" + activationKey;
+            final String activationUrl = getActivationUrl(activationKey);
             notificationEmail.setBody(getServiceMessage(Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
             notificationEmail.setEmailTo(email);
             EmailUtil.sendEmail(notificationEmail);
         }
+    }
+
+    private String getActivationUrl(String activationKey) {
+        return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
     }
 
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {
