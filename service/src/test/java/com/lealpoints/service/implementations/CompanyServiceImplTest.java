@@ -89,6 +89,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("123456");
         companyRegistration.setPasswordConfirmation("123456");
+        companyRegistration.setEmail("test@lealpoints.com");
         ServiceResult serviceResult = companyService.register(companyRegistration);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());

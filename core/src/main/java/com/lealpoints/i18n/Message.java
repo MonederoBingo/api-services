@@ -169,14 +169,14 @@ public enum Message {
             "Promoción aplicada."
     ),
     EMAIL_IS_EMPTY(
-            "The user email you sent is empty.",
+            "Please specify your email",
 
-            "El email enviado esta vacío."
+            "Ingresa tu correo electrónico"
     ),
     PASSWORD_IS_EMPTY(
-            "The password is empty.",
+            "Please specify your password",
 
-            "El password enviado esta vacío."
+            "Ingresa tu contraseña"
     ),
     MOBILE_APP_AD_MESSAGE(
             "You've got %s points at %s. Install Leal Points to see our promotions. %s",
@@ -197,6 +197,10 @@ public enum Message {
             "10%% off in your next purchase!",
 
             "10%% de descuento en su próxima compra!"
+    ), EMAIL_IS_INVALID(
+            "Specify a valid email",
+
+            "Indique un email válido"
     );
 
     private final String english;
