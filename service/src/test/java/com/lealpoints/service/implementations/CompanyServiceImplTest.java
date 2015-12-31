@@ -61,6 +61,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("123456");
         companyRegistration.setPasswordConfirmation("123457");
+        companyRegistration.setCompanyName("company");
         ServiceResult serviceResult = companyService.register(companyRegistration);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
@@ -74,6 +75,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("12345");
         companyRegistration.setPasswordConfirmation("12345");
+        companyRegistration.setCompanyName("company");
         ServiceResult serviceResult = companyService.register(companyRegistration);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
@@ -89,6 +91,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("123456");
         companyRegistration.setPasswordConfirmation("123456");
+        companyRegistration.setEmail("test@lealpoints.com");
+        companyRegistration.setCompanyName("company");
         ServiceResult serviceResult = companyService.register(companyRegistration);
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
