@@ -274,6 +274,10 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     }
 
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {
+        //Validate company name
+        if (StringUtils.isEmpty(companyRegistration.getCompanyName())) {
+            return new ValidationResult(false, getServiceMessage(Message.COMPANY_NAME_IS_EMPTY));
+        }
         //Validate user password
         if (companyRegistration.getPassword() == null || companyRegistration.getPassword().length() < 6) {
             return new ValidationResult(false, getServiceMessage(Message.PASSWORD_MUST_HAVE_AT_LEAST_6_CHARACTERS));

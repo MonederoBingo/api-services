@@ -201,6 +201,10 @@ public enum Message {
             "Specify a valid email",
 
             "Indique un email válido"
+    ), COMPANY_NAME_IS_EMPTY(
+            "Specify the company name",
+
+            "Indique el nombre de la compañía"
     );
 
     private final String english;
