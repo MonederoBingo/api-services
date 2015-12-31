@@ -14,6 +14,7 @@ import com.lealpoints.util.EmailUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -285,6 +286,12 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             return new ValidationResult(false, getServiceMessage(Message.PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT));
         }
         //Validate user email
+        if (StringUtils.isEmpty(companyRegistration.getEmail())) {
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_EMPTY));
+        }
+        if (!EmailValidator.getInstance().isValid(companyRegistration.getEmail())) {
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_INVALID));
+        }
         if (_companyUserRepository.getByEmail(companyRegistration.getEmail()) != null) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_ALREADY_EXISTS));
         }
