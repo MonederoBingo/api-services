@@ -29,7 +29,7 @@ angular
                                 $window.location.href = "/#/points";
                             }
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.showMessage = true;
                             $scope.isError = true;
                             if(data.object && !data.object.isActive){

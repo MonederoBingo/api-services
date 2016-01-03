@@ -59,7 +59,7 @@ angular
                         console.log(data);
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             if(data.object <= 0) {
                                 $scope.isWarning = true;
                             }
@@ -68,7 +68,7 @@ angular
                             $scope.formData.saleAmount = '';
                             $scope.formData.saleKey = '';
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.showMessage = true;
@@ -98,9 +98,9 @@ angular
                         console.log(data);
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.showMessage = true;
