@@ -20,7 +20,7 @@ public class ClientRegistrationControllerTest {
     public void testRegisterClient() throws Exception {
         final ServiceResult<String> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"));
         final ClientUserServiceImpl clientUserService = createClientUserServiceForRegister(expectedServiceResult);
-        final ClientRegistrationController clientAuthController = new ClientRegistrationController(clientUserService);
+        final ClientAuthenticationController clientAuthController = new ClientAuthenticationController(clientUserService);
 
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
         clientUserRegistration.setPhone("6141112233");
@@ -37,10 +37,10 @@ public class ClientRegistrationControllerTest {
     public void testLoginUser() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(true, new ServiceMessage("name"));
         final ClientUserServiceImpl clientUserService = createUserLoginService(expectedServiceResult);
-        final ClientRegistrationController clientAuthController = new ClientRegistrationController(clientUserService);
+        final ClientAuthenticationController clientAuthController = new ClientAuthenticationController(clientUserService);
 
         ClientUserLogin clientUserLogin = new ClientUserLogin();
-        clientUserLogin.setPhone("6141232222");
+        clientUserLogin.setPhoneNumber("6141232222");
         clientUserLogin.setSmsKey("qwerty");
         clientUserLogin.setEmail("a@a.com");
         clientUserLogin.setPassword("password");
@@ -57,7 +57,7 @@ public class ClientRegistrationControllerTest {
     public void testResendKey() throws Exception {
         ServiceResult<Boolean> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, true);
         ClientUserServiceImpl clientUserService = createUserService(expectedServiceResult);
-        ClientRegistrationController clientAuthController = new ClientRegistrationController(clientUserService);
+        ClientAuthenticationController clientAuthController = new ClientAuthenticationController(clientUserService);
         ResponseEntity<ServiceResult<Boolean>> actualServiceResult = clientAuthController.resendKey(new ClientUserRegistration());
         assertNotNull(actualServiceResult);
         ServiceResult actualServiceResults = actualServiceResult.getBody();

@@ -22,12 +22,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/client")
-public class ClientRegistrationController extends BaseController {
+public class ClientAuthenticationController extends BaseController {
 
     private final ClientUserService _clientUserService;
 
     @Autowired
-    public ClientRegistrationController(ClientUserService clientUserService) {
+    public ClientAuthenticationController(ClientUserService clientUserService) {
         _clientUserService = clientUserService;
     }
 
