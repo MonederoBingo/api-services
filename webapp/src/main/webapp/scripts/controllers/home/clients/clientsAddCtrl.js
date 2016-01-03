@@ -17,9 +17,9 @@ angular
                         console.log(data);
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.formData.phone = '';

@@ -46,11 +46,11 @@ angular
                         console.log(data);
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             getPromotions();
                             $scope.promotions.splice(idx, 1);
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.showMessage = true;
