@@ -60,7 +60,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
 
     public ServiceResult<ClientLoginResult> login(ClientUserLogin clientUserLogin) {
         try {
-            if (clientUserLogin == null || (StringUtils.isEmpty(clientUserLogin.getEmail()) && StringUtils.isEmpty(clientUserLogin.getPhone()))) {
+            if (clientUserLogin == null || (StringUtils.isEmpty(clientUserLogin.getEmail()) && StringUtils.isEmpty(clientUserLogin.getPhoneNumber()))) {
                 return null;
             }
             ClientUser clientUser = authenticateUsingPhone(clientUserLogin);
@@ -113,7 +113,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
     }
 
     private ClientUser authenticateUsingPhone(ClientUserLogin clientUserLogin) throws Exception {
-        return _clientUserRepository.getByPhoneAndKey(clientUserLogin.getPhone(), clientUserLogin.getSmsKey());
+        return _clientUserRepository.getByPhoneAndKey(clientUserLogin.getPhoneNumber(), clientUserLogin.getSmsKey());
     }
 
     private ClientUser authenticateUsingEmail(ClientUserLogin clientUserLogin) throws Exception {

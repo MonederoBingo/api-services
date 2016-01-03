@@ -1,17 +1,17 @@
 package com.lealpoints.service.model;
 
 public class ClientUserLogin {
-    private String phone;
+    private String phoneNumber;
     private String smsKey;
     private String email;
     private String password;
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phone) {
+        this.phoneNumber = phone;
     }
 
     public String getSmsKey() {

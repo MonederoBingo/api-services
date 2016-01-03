@@ -119,7 +119,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                 };
 
         ClientUserLogin clientUserLogin = new ClientUserLogin();
-        clientUserLogin.setPhone("6141112233");
+        clientUserLogin.setPhoneNumber("6141112233");
         clientUserLogin.setSmsKey("qwerty");
         clientUserLogin.setEmail("");
         clientUserLogin.setPassword("");
@@ -155,7 +155,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                 };
 
         ClientUserLogin clientUserLogin = new ClientUserLogin();
-        clientUserLogin.setPhone("6141112233");
+        clientUserLogin.setPhoneNumber("6141112233");
         clientUserLogin.setSmsKey("qwerty");
         clientUserLogin.setEmail("");
         clientUserLogin.setPassword("");
@@ -186,7 +186,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                 };
 
         ClientUserLogin clientUserLogin = new ClientUserLogin();
-        clientUserLogin.setPhone("");
+        clientUserLogin.setPhoneNumber("");
         clientUserLogin.setSmsKey("");
         clientUserLogin.setEmail("a@a.com");
         clientUserLogin.setPassword("password");
@@ -222,7 +222,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                 };
 
         ClientUserLogin clientUserLogin = new ClientUserLogin();
-        clientUserLogin.setPhone("");
+        clientUserLogin.setPhoneNumber("");
         clientUserLogin.setSmsKey("");
         clientUserLogin.setEmail("a@a.com");
         clientUserLogin.setPassword("password");
