@@ -259,7 +259,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     }
 
     void sendActivationEmail(String email, String activationKey) throws MessagingException {
-        if (isProdEnvironment() || isUATEnvironment()) {
+        if (canSendActivationEmail()) {
             NotificationEmail notificationEmail = new NotificationEmail();
             notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
             final String activationUrl = getActivationUrl(activationKey);
@@ -267,6 +267,10 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             notificationEmail.setEmailTo(email);
             EmailUtil.sendEmail(notificationEmail);
         }
+    }
+
+    private boolean canSendActivationEmail() {
+        return isProdEnvironment() || isUATEnvironment() || isDevEnvironment();
     }
 
     private String getActivationUrl(String activationKey) {
