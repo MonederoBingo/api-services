@@ -17,7 +17,7 @@ angular
                     if (data.success) {
                         $scope.clients = data.object;
                     } else {
-                        $scope.message = data.message;
+                        $scope.message = data.message.message;
                         $scope.isError = true;
                     }
                 })
@@ -41,10 +41,10 @@ angular
                         console.log(data);
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $("#send_button_" + idx).hide();
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.showMessage = true;

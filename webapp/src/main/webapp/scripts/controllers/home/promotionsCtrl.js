@@ -20,7 +20,7 @@ angular
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.promotions = data.object;
                             if($scope.promotions.length == 0) {
                                 $scope.isWarning = true;
@@ -29,7 +29,7 @@ angular
                                 PromotionsService.getClientPoints($scope.formData.phone);
                             }
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                             $scope.showMessage = true;
                         }
@@ -53,12 +53,12 @@ angular
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             PromotionsService.getClientPoints($scope.applyData.phone);
                             $scope.promotions.splice(idx, 1);
                             $scope.formData.phone = '';
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.showMessage = true;

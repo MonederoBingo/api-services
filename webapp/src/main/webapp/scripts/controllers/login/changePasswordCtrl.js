@@ -18,12 +18,12 @@ angular
                     .success(function(data) {
                         $scope.isProcessing = false;
                         if (data.success) {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $timeout(function(){
                                 window.location.href = "/#/points";
                             }, 3000);
                         } else {
-                            $scope.message = data.message;
+                            $scope.message = data.message.message;
                             $scope.isError = true;
                         }
                         $scope.showMessage = true;
