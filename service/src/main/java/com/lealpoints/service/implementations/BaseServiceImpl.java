@@ -3,10 +3,7 @@ package com.lealpoints.service.implementations;
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
-import com.lealpoints.environments.Environment;
-import com.lealpoints.environments.FunctionalTestEnvironment;
-import com.lealpoints.environments.ProdEnvironment;
-import com.lealpoints.environments.UATEnvironment;
+import com.lealpoints.environments.*;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.service.BaseService;
 import com.lealpoints.service.response.ServiceMessage;
@@ -29,6 +26,10 @@ public class BaseServiceImpl implements BaseService {
 
     public boolean isUATEnvironment() {
         return _threadContextService.getThreadContext().getEnvironment() instanceof UATEnvironment;
+    }
+
+    public boolean isDevEnvironment() {
+        return _threadContextService.getThreadContext().getEnvironment() instanceof DevEnvironment;
     }
 
     public boolean isFunctionalTestEnvironment() {
