@@ -35,4 +35,8 @@ public class ServiceMessage {
     public String toString() {
         return message;
     }
+
+    public String getTranslation(Language language) {
+        return translations.get(language.getLangId());
+    }
 }
