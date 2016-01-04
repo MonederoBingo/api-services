@@ -2,7 +2,7 @@
 
 *.iml
 
-target/*
+target/
 
 *.class
 
@@ -10,5 +10,6 @@ app.log
 
 .ant-targets-build.xml
 
-api/src/main/webapp/images/*
+*.DS_Store
 
+api/src/main/webapp/images/*
