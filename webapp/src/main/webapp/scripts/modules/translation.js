@@ -53,7 +53,13 @@ angular.module('translation', ['pascalprecht.translate'])
             SEND_SMS_WITH_PROMO: 'Send SMS to client',
             CHANGE: 'Change',
             PROMOTION_LIST: 'Promotion list',
-            ENTER_INFORMATION: 'Enter information'
+            ENTER_INFORMATION: 'Enter information',
+            USERS: 'Users',
+            USER_NAME: 'User name',
+            ADD_A_USER: 'Add a user',
+            USERS_LIST: 'Users list',
+            NAME: 'Name',
+            ADD_NEW_USER: 'Add new user'
 
         })
             .translations('es', {
@@ -109,7 +115,13 @@ angular.module('translation', ['pascalprecht.translate'])
                 SEND_SMS_WITH_PROMO: 'Enviar SMS al cliente',
                 CHANGE: 'Modificar',
                 PROMOTION_LIST: 'Lista de promociones',
-                ENTER_INFORMATION: 'Ingrese los datos'
+                ENTER_INFORMATION: 'Ingrese los datos',
+                USERS: 'Usuarios',
+                USER_NAME: 'Nombre de usuario',
+                ADD_A_USER: 'Agregar un usuario',
+                USERS_LIST: 'Lista de usuarios',
+                NAME: 'Nombre',
+                ADD_NEW_USER: 'Agregar nuevo usuario'
             });
         $translateProvider.preferredLanguage('es');
     });
