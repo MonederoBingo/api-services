@@ -223,7 +223,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         companyUser.setName(companyRegistration.getUserName());
         companyUser.setPassword(companyRegistration.getPassword());
         companyUser.setEmail(companyRegistration.getEmail());
-        companyUser.setActive(false);
+        setUserActivation(companyUser);
         companyUser.setActivationKey(activationKey);
         String language = companyRegistration.getLanguage();
         if (StringUtils.isNotEmpty(language)) {
@@ -233,6 +233,14 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         companyUser.setMustChangePassword(false);
         _companyUserRepository.insert(companyUser);
         return activationKey;
+    }
+
+    private void setUserActivation(CompanyUser companyUser) {
+        if (isDevEnvironment()) {
+            companyUser.setActive(true);
+        } else {
+            companyUser.setActive(false);
+        }
     }
 
     private void registerPromotionConfiguration(long companyId) throws Exception {
@@ -259,7 +267,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     }
 
     void sendActivationEmail(String email, String activationKey) throws MessagingException {
-        if (canSendActivationEmail()) {
+        if (isProdEnvironment() || isUATEnvironment()) {
             NotificationEmail notificationEmail = new NotificationEmail();
             notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
             final String activationUrl = getActivationUrl(activationKey);
@@ -267,10 +275,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             notificationEmail.setEmailTo(email);
             EmailUtil.sendEmail(notificationEmail);
         }
-    }
-
-    private boolean canSendActivationEmail() {
-        return isProdEnvironment() || isUATEnvironment() || isDevEnvironment();
     }
 
     private String getActivationUrl(String activationKey) {
