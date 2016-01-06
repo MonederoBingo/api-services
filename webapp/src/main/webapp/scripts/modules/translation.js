@@ -119,7 +119,6 @@ angular.module('translation', ['pascalprecht.translate'])
                 USERS: 'Usuarios',
                 USER_NAME: 'Nombre de usuario',
                 ADD_A_USER: 'Agregar un usuario',
-                USERS_LIST: 'Lista de usuarios',
                 NAME: 'Nombre',
                 ADD_NEW_USER: 'Agregar nuevo usuario'
             });
