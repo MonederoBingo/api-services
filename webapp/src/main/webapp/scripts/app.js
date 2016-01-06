@@ -225,6 +225,38 @@ angular
                         }
                     }
                 })
+                .state('settings_users', {
+                    url: '/settings/users',
+                    views: {
+                        header: {
+                            templateUrl: '/templates/home/nav.html',
+                            controller: 'navCtrl'
+                        },
+                        content: {
+                            templateUrl: '/templates/home/settings/users/users.html'
+                        },
+                        footer: {
+                            templateUrl: '/templates/home/footer.html',
+                            controller: 'footerCtrl'
+                        }
+                    }
+                })
+                .state('settings_users_add', {
+                    url: '/settings/users/add',
+                    views: {
+                        header: {
+                            templateUrl: '/templates/home/nav.html',
+                            controller: 'navCtrl'
+                        },
+                        content: {
+                            templateUrl: '/templates/home/settings/users/add.html'
+                        },
+                        footer: {
+                            templateUrl: '/templates/home/footer.html',
+                            controller: 'footerCtrl'
+                        }
+                    }
+                })
                 .state('settings_my_logo', {
                     url: '/settings/my_logo',
                     views: {

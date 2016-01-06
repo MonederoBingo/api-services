@@ -1,0 +1,38 @@
+<div class="container">
+    <ul class="nav nav-tabs">
+        <li role="presentation">
+            <a ui-sref="settings_points_configuration">{{'POINTS_STRATEGY' | translate}}</a>
+        </li>
+        <li role="presentation">
+            <a ui-sref="settings_promotions">{{'PROMOTION_LIST' | translate}}</a>
+        </li>
+        <li role="presentation" class="active">
+            <a ui-sref="settings_users">{{'USERS' | translate}}</a>
+        </li>
+        <li role="presentation">
+            <a ui-sref="settings_my_logo">{{'LOGO' | translate}}</a>
+        </li>
+    </ul>
+
+    <a ui-sref="settings_users_add">{{'ADD_NEW_USER' | translate}}</a>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>{{'NAME' | translate}}</th>
+            <th>{{'EMAIL' | translate}}</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="user in users">
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            <td>
+                <button type="submit" class="btn btn-danger" ng-click="deleteUser($index, true)">NOT SUPPORTED YET</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div ng-include="'/templates/common/messageHandling.html'"></div>
+</div>
