@@ -33,7 +33,7 @@ public class CompanyUserControllerTest {
         testList.add("none");
         ServiceResult<List<String>> expectedServiceResult = new ServiceResult<>(false,
                 new ServiceMessage("Operation not supported yet"), testList);
-        ResponseEntity<ServiceResult<List<String>>> responseEntity = new CompanyUserController().get(new Long(1));
+        ResponseEntity<ServiceResult<List<String>>> responseEntity = new CompanyUserController().get(1L);
         assertNotNull(responseEntity);
         ServiceResult actualServiceResults = responseEntity.getBody();
         assertNotNull(actualServiceResults);
