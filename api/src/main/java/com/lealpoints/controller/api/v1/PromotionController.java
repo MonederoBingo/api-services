@@ -18,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/v1/promotions")
+@RequestMapping("/api/v1/promotions")
 public class PromotionController extends BaseController {
 
     private final PromotionService _promotionService;

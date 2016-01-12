@@ -19,7 +19,7 @@ import java.util.List;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-@RequestMapping("/v1/points_in_company")
+@RequestMapping("/api/v1/points_in_company")
 @MultipartConfig
 public class PointsInCompanyController extends BaseController {
 

@@ -18,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/v1/points")
+@RequestMapping("/api/v1/points")
 public class PointsController extends BaseController {
 
     private PointsService _pointsService;
