@@ -39,7 +39,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
         replayAll();
         PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setCompanyId(1);
-        pointsAwarding.setPhone("12345");
+        pointsAwarding.setPhoneNumber("12345");
         pointsAwarding.setSaleAmount(100);
         pointsAwarding.setSaleKey("A123");
 

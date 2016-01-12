@@ -71,7 +71,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         if (pointsConfiguration == null) {
             throw new IllegalArgumentException("Points configuration doesn't exist");
         }
-        Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhone(), true);
+        Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhoneNumber(), true);
         //Inserting company client mapping if it doesn't exist
         _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), client.getClientId());
 
@@ -108,7 +108,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
     }
 
     private ValidationResult validateRegistration(PointsAwarding pointsAwarding) throws Exception {
-        final ValidationResult phoneValidation = _phoneValidatorService.validate(pointsAwarding.getPhone());
+        final ValidationResult phoneValidation = _phoneValidatorService.validate(pointsAwarding.getPhoneNumber());
         if (phoneValidation.isInvalid()) {
             return phoneValidation;
         }
