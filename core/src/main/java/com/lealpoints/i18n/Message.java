@@ -205,6 +205,10 @@ public enum Message {
             "Specify the company name",
 
             "Indique el nombre de la compañía"
+    ), EMPTY_SALE_KEY(
+            "You should specify a sale key",
+
+            "Indique el número de venta."
     );
 
     private final String english;

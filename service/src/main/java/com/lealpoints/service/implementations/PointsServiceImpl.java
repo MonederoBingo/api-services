@@ -17,6 +17,7 @@ import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,9 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         final ValidationResult phoneValidation = _phoneValidatorService.validate(pointsAwarding.getPhoneNumber());
         if (phoneValidation.isInvalid()) {
             return phoneValidation;
+        }
+        if (StringUtils.isEmpty(pointsAwarding.getSaleKey())) {
+            return new ValidationResult(false, getServiceMessage(Message.EMPTY_SALE_KEY));
         }
         Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
         if (points != null) {
