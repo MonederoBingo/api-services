@@ -3,6 +3,16 @@ package com.lealpoints.service.model;
 public class CompanyUserRegistration {
     private String name;
     private String email;
+    private long companyId;
+    private String language;
+
+    public long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(long companyId) {
+        this.companyId = companyId;
+    }
 
     public String getEmail() {
         return email;
@@ -18,5 +28,13 @@ public class CompanyUserRegistration {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

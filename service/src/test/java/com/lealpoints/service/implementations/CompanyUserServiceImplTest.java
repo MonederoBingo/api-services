@@ -1,15 +1,16 @@
 package com.lealpoints.service.implementations;
 
+import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
+import com.lealpoints.environments.DevEnvironment;
+import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.CompanyUser;
-import com.lealpoints.repository.CompanyRepository;
-import com.lealpoints.repository.CompanyUserRepository;
-import com.lealpoints.service.model.CompanyLoginResult;
-import com.lealpoints.service.model.CompanyUserLogin;
-import com.lealpoints.service.model.CompanyUserPasswordChanging;
+import com.lealpoints.model.PointsConfiguration;
+import com.lealpoints.repository.*;
+import com.lealpoints.service.model.*;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
@@ -353,5 +354,100 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         companyUser.setLanguage(language);
         companyUser.setMustChangePassword(mustChangePassword);
         return companyUser;
+    }
+
+    @Test
+    public void testRegister() throws Exception {
+        final CompanyUserRepository companyUserRepository = createCompanyUserRepository();
+        final QueryAgent queryAgent = createQueryAgent();
+        ThreadContext threadContext = new ThreadContext();
+        threadContext.setEnvironment(new DevEnvironment());
+        threadContext.setLanguage(Language.ENGLISH);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
+        CompanyServiceImpl companyService =
+                createCompanyService(null, companyUserRepository, createPointsConfigurationRepository(),
+                        threadContextService, null, createStrictMock(PromotionConfigurationRepository.class));
+        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
+                threadContextService, null, companyService);
+        final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
+        companyUserRegistration.setName("user name");
+        companyUserRegistration.setEmail("email@test.com");
+        ServiceResult serviceResult = companyUserService.register(companyUserRegistration);
+        assertNotNull(serviceResult);
+        assertTrue(serviceResult.isSuccess());
+        assertNotNull(serviceResult.getMessage());
+        assertEquals(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK.get(Language.ENGLISH), serviceResult.getMessage());
+        verify(companyUserRepository, threadContextService, queryAgent);
+    }
+
+    @Test
+    public void testRegisterWhenThereIsAnExistentEmail() throws Exception {
+        final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
+        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null);
+        final QueryAgent queryAgent = createQueryAgent();
+        ThreadContext threadContext = new ThreadContext();
+        threadContext.setEnvironment(new DevEnvironment());
+        threadContext.setLanguage(Language.ENGLISH);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
+        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
+                threadContextService, null, companyService);
+        final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
+        companyUserRegistration.setName("name");
+        companyUserRegistration.setEmail("test@lealpoints.com");
+        ServiceResult serviceResult = companyUserService.register(companyUserRegistration);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Message.EMAIL_ALREADY_EXISTS.get(Language.ENGLISH), serviceResult.getMessage());
+        assertNull(serviceResult.getObject());
+        verify(companyUserRepository);
+    }
+
+    private CompanyUserRepository createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail() throws Exception {
+        final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
+        expect(companyUserRepository.getByEmail(anyString())).andReturn(new CompanyUser()).times(1);
+        replay(companyUserRepository);
+        return companyUserRepository;
+    }
+
+    private PointsConfigurationRepository createPointsConfigurationRepository() throws Exception {
+        PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
+        expect(pointsConfigurationRepository.insert((PointsConfiguration) anyObject())).andReturn(1L);
+        replay(pointsConfigurationRepository);
+        return pointsConfigurationRepository;
+    }
+
+    private CompanyServiceImpl createCompanyService(
+            final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
+            final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
+            ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
+        return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository,
+                clientRepository, threadContextService,
+                null, null, promotionConfigurationRepository, null) {
+            @Override
+            void sendActivationEmail(String email, String activationKey) throws MessagingException {
+            }
+
+            @Override
+            public ServiceMessage getServiceMessage(Message message, String... params) {
+                return new ServiceMessage(message.name());
+            }
+        };
+    }
+
+    private CompanyUserRepository createCompanyUserRepository() throws Exception {
+        final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
+        expect(companyUserRepository.insert((CompanyUser) anyObject())).andReturn(1L).times(1);
+        expect(companyUserRepository.getByEmail(anyString())).andReturn(null).times(1);
+        replay(companyUserRepository);
+        return companyUserRepository;
+    }
+
+    private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent,
+                                                                          ThreadContext threadContext) throws SQLException {
+        ThreadContextService threadContextService = createMock(ThreadContextService.class);
+        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
+        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(7);
+        replay(threadContextService);
+        return threadContextService;
     }
 }

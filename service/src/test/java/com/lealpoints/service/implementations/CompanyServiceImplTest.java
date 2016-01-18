@@ -397,13 +397,6 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         return clientRepository;
     }
 
-    private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
-        ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
-        replay(threadContextService);
-        return threadContextService;
-    }
-
     private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent,
                                                                           ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);

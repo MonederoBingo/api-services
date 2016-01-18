@@ -205,6 +205,10 @@ public enum Message {
             "Specify the company name",
 
             "Indique el nombre de la compañía"
+    ), TEMPORAL_PASSWORD(
+            "Your temporal password is (you must to change it after loggin in): ",
+
+            "Su contraseña temporal es (debes cambiarla después de iniciar sesión): "
     );
 
     private final String english;

@@ -10,9 +10,9 @@ import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import com.lealpoints.service.util.ServiceUtil;
 import com.lealpoints.util.EmailUtil;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +37,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
     private final ConfigurationServiceImpl _configurationManager;
+    private final ServiceUtil _serviceUtil = new ServiceUtil();
 
     @Autowired
     public CompanyServiceImpl(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
@@ -59,7 +60,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             ValidationResult validationResult = validateRegistration(companyRegistration);
             if (validationResult.isValid()) {
                 getThreadContextService().getQueryAgent().beginTransaction();
-                final String activationKey = RandomStringUtils.random(60, true, true);
+                final String activationKey = _serviceUtil.generateActivationKey();
                 long companyId = registerAndInitializeCompany(companyRegistration, activationKey);
                 getQueryAgent().commitTransaction();
                 return createServiceResult(companyId, activationKey);
@@ -235,7 +236,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         return activationKey;
     }
 
-    private void setUserActivation(CompanyUser companyUser) {
+    protected void setUserActivation(CompanyUser companyUser) {
         if (isDevEnvironment()) {
             companyUser.setActive(true);
         } else {
@@ -277,7 +278,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         }
     }
 
-    private String getActivationUrl(String activationKey) {
+    protected String getActivationUrl(String activationKey) {
         return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
     }
 
