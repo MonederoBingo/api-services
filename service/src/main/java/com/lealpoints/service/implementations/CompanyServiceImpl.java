@@ -37,13 +37,13 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
     private final ConfigurationServiceImpl _configurationManager;
-    private final ServiceUtil _serviceUtil = new ServiceUtil();
+    private final ServiceUtil _serviceUtil;
 
     @Autowired
     public CompanyServiceImpl(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
                               PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
                               SMSServiceImpl smsService, CompanyClientMappingRepository companyClientMappingRepository,
-                              PromotionConfigurationRepository promotionConfigurationRepository, ConfigurationServiceImpl configurationManager) {
+                              PromotionConfigurationRepository promotionConfigurationRepository, ConfigurationServiceImpl configurationManager, ServiceUtil serviceUtil) {
         super(threadContextService);
         _companyRepository = companyRepository;
         _companyUserRepository = companyUserRepository;
@@ -53,6 +53,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         _companyClientMappingRepository = companyClientMappingRepository;
         _promotionConfigurationRepository = promotionConfigurationRepository;
         _configurationManager = configurationManager;
+        _serviceUtil = serviceUtil;
     }
 
     public ServiceResult<String> register(CompanyRegistration companyRegistration) {
@@ -236,7 +237,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         return activationKey;
     }
 
-    protected void setUserActivation(CompanyUser companyUser) {
+    void setUserActivation(CompanyUser companyUser) {
         if (isDevEnvironment()) {
             companyUser.setActive(true);
         } else {
@@ -278,7 +279,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         }
     }
 
-    protected String getActivationUrl(String activationKey) {
+    String getActivationUrl(String activationKey) {
         return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
     }
 

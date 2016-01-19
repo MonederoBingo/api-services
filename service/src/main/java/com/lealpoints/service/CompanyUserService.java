@@ -8,7 +8,7 @@ import com.lealpoints.service.response.ServiceResult;
 
 public interface CompanyUserService extends BaseService {
 
-    ServiceResult<String> register(CompanyUserRegistration companyUserRegistration) throws Exception;
+    ServiceResult<String> register(CompanyUserRegistration companyUserRegistration);
 
     ServiceResult<CompanyLoginResult> loginUser(CompanyUserLogin companyUserLogin);
 

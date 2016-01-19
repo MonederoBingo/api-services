@@ -10,6 +10,7 @@ import com.lealpoints.repository.*;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import com.lealpoints.service.util.ServiceUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -216,7 +217,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        configurationManager) {
+                        configurationManager, null) {
 
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -239,7 +240,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         ConfigurationServiceImpl configurationManager = createStrictMock(ConfigurationServiceImpl.class);
         expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("false");
         replay(configurationManager);
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, configurationManager) {
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, configurationManager, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -279,7 +280,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        configurationManager) {
+                        configurationManager, null) {
 
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -299,7 +300,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testGetSMSMessage() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
@@ -310,7 +311,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Leal Points to see our promotions. " +
                 "https://goo.gl/JRssA6", smsMessage);
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
@@ -320,7 +321,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at TG. Install Leal Points to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
@@ -334,7 +335,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testGetSMSMessageWithInvalidTranslation() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
@@ -349,7 +350,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                             "much much much much much much much much much much much much much more. %s", e.getMessage());
         }
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much much " +
@@ -369,7 +370,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                                                     final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
                                                     ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, null) {
+                null, null, promotionConfigurationRepository, null, new ServiceUtil()) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
             }

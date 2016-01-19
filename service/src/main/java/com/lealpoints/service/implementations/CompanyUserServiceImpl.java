@@ -28,15 +28,16 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
     private final CompanyUserRepository _companyUserRepository;
     private final CompanyRepository _companyRepository;
     private final CompanyServiceImpl _companyService;
-    private final ServiceUtil _serviceUtil = new ServiceUtil();
+    private final ServiceUtil _serviceUtil;
 
     @Autowired
     public CompanyUserServiceImpl(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService,
-                                  CompanyRepository companyRepository, CompanyServiceImpl companyService) {
+                                  CompanyRepository companyRepository, CompanyServiceImpl companyService, ServiceUtil serviceUtil) {
         super(threadContextService);
         _companyUserRepository = companyUserRepository;
         _companyRepository = companyRepository;
         _companyService = companyService;
+        _serviceUtil= serviceUtil;
     }
 
     public ServiceResult<CompanyLoginResult> loginUser(CompanyUserLogin companyUserLogin) {
@@ -186,7 +187,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
-    public ServiceResult<String> register(CompanyUserRegistration companyUserRegistration) throws Exception {
+    public ServiceResult<String> register(CompanyUserRegistration companyUserRegistration) {
         try {
             ValidationResult validationResult = validateRegistration(companyUserRegistration);
             if (validationResult.isValid()) {
@@ -205,8 +206,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     private ServiceResult<String> createServiceResult(long companyUserId) {
         final ServiceMessage serviceMessage = getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK);
-        final ServiceResult<String> serviceResult = new ServiceResult<>(true, serviceMessage, Long.toString(companyUserId));
-        return serviceResult;
+        return new ServiceResult<>(true, serviceMessage, Long.toString(companyUserId));
     }
 
     private ValidationResult validateRegistration(CompanyUserRegistration companyUserRegistration) throws Exception {

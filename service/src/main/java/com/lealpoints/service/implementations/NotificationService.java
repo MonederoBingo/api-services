@@ -10,7 +10,7 @@ import javax.mail.MessagingException;
 
 public class NotificationService extends BaseServiceImpl{
     private final CompanyServiceImpl _companyService = new CompanyServiceImpl(null,null,null,null,
-            getThreadContextService(),null,null,null,null);
+            getThreadContextService(),null,null,null,null, null);
 
     @Autowired
     public NotificationService(ThreadContextService threadContextService) {

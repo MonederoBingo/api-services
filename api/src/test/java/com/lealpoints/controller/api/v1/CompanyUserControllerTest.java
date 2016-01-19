@@ -18,7 +18,7 @@ public class CompanyUserControllerTest {
     @Test
     public void testRegister() throws Exception {
         final ServiceResult expectedServiceResult = new ServiceResult(false,
-                new ServiceMessage("Operation not supported yet"));
+                new ServiceMessage("Operation not supported yet"), 1L);
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
         companyUserRegistration.setName("name");
         companyUserRegistration.setEmail("email@test.com");

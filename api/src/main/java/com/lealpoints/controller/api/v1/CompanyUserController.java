@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -29,7 +31,7 @@ public class CompanyUserController extends BaseController {
         _companyUserService = companyUserService;
     }
 
-    @RequestMapping(value="/register", method = POST, headers = ACCEPT_HEADER)
+    @RequestMapping(value = "/register", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> register(@RequestBody CompanyUserRegistration companyUserRegistration) throws Exception {
         ServiceResult serviceResult = _companyUserService.register(companyUserRegistration);
@@ -41,7 +43,7 @@ public class CompanyUserController extends BaseController {
     public ResponseEntity<ServiceResult<List<String>>> get(@PathVariable("companyId") Long companyId) {
         List<String> namesList = new ArrayList<>();
         namesList.add("none");
-        return new ResponseEntity<>(new ServiceResult<>(false,new ServiceMessage("Operation not supported yet"),
+        return new ResponseEntity<>(new ServiceResult<>(false, new ServiceMessage("Operation not supported yet"),
                 namesList), HttpStatus.OK);
     }
 

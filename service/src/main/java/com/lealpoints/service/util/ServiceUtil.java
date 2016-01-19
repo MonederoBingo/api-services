@@ -1,9 +1,11 @@
 package com.lealpoints.service.util;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
+@Component
 public class ServiceUtil {
     private final Random random = new Random();
 
