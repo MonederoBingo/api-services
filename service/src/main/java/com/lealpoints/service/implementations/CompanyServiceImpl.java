@@ -38,12 +38,14 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
     private final ConfigurationServiceImpl _configurationManager;
     private final ServiceUtil _serviceUtil;
+    private final NotificationService _notificationService;
 
     @Autowired
     public CompanyServiceImpl(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
                               PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
                               SMSServiceImpl smsService, CompanyClientMappingRepository companyClientMappingRepository,
-                              PromotionConfigurationRepository promotionConfigurationRepository, ConfigurationServiceImpl configurationManager, ServiceUtil serviceUtil) {
+                              PromotionConfigurationRepository promotionConfigurationRepository, ConfigurationServiceImpl configurationManager, ServiceUtil serviceUtil,
+                              NotificationService notificationService) {
         super(threadContextService);
         _companyRepository = companyRepository;
         _companyUserRepository = companyUserRepository;
@@ -54,6 +56,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         _promotionConfigurationRepository = promotionConfigurationRepository;
         _configurationManager = configurationManager;
         _serviceUtil = serviceUtil;
+        _notificationService = notificationService;
     }
 
     public ServiceResult<String> register(CompanyRegistration companyRegistration) {
@@ -272,15 +275,11 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         if (isProdEnvironment() || isUATEnvironment()) {
             NotificationEmail notificationEmail = new NotificationEmail();
             notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
-            final String activationUrl = getActivationUrl(activationKey);
+            final String activationUrl = _notificationService.getActivationUrl(activationKey);
             notificationEmail.setBody(getServiceMessage(Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
             notificationEmail.setEmailTo(email);
             EmailUtil.sendEmail(notificationEmail);
         }
-    }
-
-    String getActivationUrl(String activationKey) {
-        return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
     }
 
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {

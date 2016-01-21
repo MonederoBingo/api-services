@@ -373,7 +373,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
         CompanyServiceImpl companyService =
                 createCompanyService(null, companyUserRepository, createPointsConfigurationRepository(),
-                        threadContextService, null, createStrictMock(PromotionConfigurationRepository.class));
+                        threadContextService, null, createStrictMock(PromotionConfigurationRepository.class),
+                        new NotificationService(threadContextService));
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
                 threadContextService, null, companyService, new ServiceUtil());
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
@@ -390,12 +391,13 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
-        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null);
         final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(new DevEnvironment());
         threadContext.setLanguage(Language.ENGLISH);
         final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
+        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null,
+                new NotificationService(threadContextService));
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
                 threadContextService, null, companyService, new ServiceUtil());
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
@@ -426,10 +428,11 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     private CompanyServiceImpl createCompanyService(
             final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
             final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
-            ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
+            ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository,
+            NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository,
                 clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, null, new ServiceUtil()) {
+                null, null, promotionConfigurationRepository, null, new ServiceUtil(), notificationService) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
             }

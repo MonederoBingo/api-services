@@ -39,7 +39,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         replay(promotionConfigurationRepository);
         CompanyServiceImpl companyService =
                 createCompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, threadContextService, null,
-                        promotionConfigurationRepository);
+                        promotionConfigurationRepository, new NotificationService(threadContextService));
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setCompanyName("company name");
         companyRegistration.setUserName("user name");
@@ -58,7 +58,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testRegisterWhenPasswordIsDifferentFromConfirmation() throws Exception {
-        final CompanyServiceImpl companyService = createCompanyService(null, null, null, null, null, null);
+        final CompanyServiceImpl companyService = createCompanyService(null, null, null, null, null, null, null);
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("123456");
         companyRegistration.setPasswordConfirmation("123457");
@@ -72,7 +72,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testRegisterWhenPasswordIsShort() throws Exception {
-        CompanyServiceImpl companyService = createCompanyService(null, null, null, null, null, null);
+        CompanyServiceImpl companyService = createCompanyService(null, null, null, null, null, null, null);
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("12345");
         companyRegistration.setPasswordConfirmation("12345");
@@ -87,7 +87,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     @Test
     public void testRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
-        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null);
+        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null, null);
 
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("123456");
@@ -111,7 +111,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
         ClientRepository clientRepository = createClientRepository();
         CompanyServiceImpl companyService =
-                createCompanyService(companyRepository, null, pointsConfigurationRepository, null, clientRepository, null);
+                createCompanyService(companyRepository, null, pointsConfigurationRepository, null, clientRepository, null, null);
 
         ServiceResult<List<PointsInCompany>> serviceResult = companyService.getPointsInCompanyByPhone("1234567890");
         assertNotNull(serviceResult);
@@ -138,7 +138,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(new DevEnvironment());
         ThreadContextService threadContextService = createThreadContextService(threadContext);
-        CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, threadContextService, null, null);
+        CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, threadContextService,
+                null, null, null);
         List<FileItem> fileItems = new ArrayList<>();
         final FileItem fileItem = createFileItem();
         fileItems.add(fileItem);
@@ -155,7 +156,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         company.setName("name");
         company.setUrlImageLogo("logo.png");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
-        CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, null, null, null);
+        CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, null, null, null, null);
         ServiceResult<Company> serviceResult = companyService.getByCompanyId(1);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
@@ -174,7 +175,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
         CompanyServiceImpl companyService =
-                createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
+                createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null, null);
         final File logo = companyService.getLogo(1);
         assertNotNull(logo);
     }
@@ -189,7 +190,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
         CompanyServiceImpl companyService =
-                createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null);
+                createCompanyService(companyRepository, null, null, createThreadContextService(threadContext), null, null, null);
         final File logo = companyService.getLogo(1);
         assertNotNull(logo);
     }
@@ -217,7 +218,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        configurationManager, null) {
+                        configurationManager, null, null) {
 
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -240,7 +241,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         ConfigurationServiceImpl configurationManager = createStrictMock(ConfigurationServiceImpl.class);
         expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("false");
         replay(configurationManager);
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, configurationManager, null) {
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
+                configurationManager, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -280,7 +282,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        configurationManager, null) {
+                        configurationManager, null, null) {
 
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -300,7 +302,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testGetSMSMessage() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null,
+                null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
@@ -311,7 +314,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Leal Points to see our promotions. " +
                 "https://goo.gl/JRssA6", smsMessage);
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
@@ -321,7 +324,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at TG. Install Leal Points to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
@@ -335,7 +338,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testGetSMSMessageWithInvalidTranslation() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
+                null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
@@ -350,7 +354,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                             "much much much much much much much much much much much much much more. %s", e.getMessage());
         }
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much much " +
@@ -368,9 +372,10 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     private CompanyServiceImpl createCompanyService(final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
                                                     final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
-                                                    ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository) {
+                                                    ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository,
+                                                    NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, null, new ServiceUtil()) {
+                null, null, promotionConfigurationRepository, null, new ServiceUtil(), notificationService) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
             }

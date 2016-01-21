@@ -5,12 +5,12 @@ import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.util.EmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
 
+@Component
 public class NotificationService extends BaseServiceImpl{
-    private final CompanyServiceImpl _companyService = new CompanyServiceImpl(null,null,null,null,
-            getThreadContextService(),null,null,null,null, null);
 
     @Autowired
     public NotificationService(ThreadContextService threadContextService) {
@@ -21,10 +21,14 @@ public class NotificationService extends BaseServiceImpl{
         if (isProdEnvironment() || isUATEnvironment()) {
             NotificationEmail notificationEmail = new NotificationEmail();
             notificationEmail.setSubject(messageSubject);
-            final String activationUrl = _companyService.getActivationUrl(companyUser.getActivationKey());
+            final String activationUrl = getActivationUrl(companyUser.getActivationKey());
             notificationEmail.setBody(messageBody + "\n\n" + activationUrl + "\n\n" + temporalPassword);
             notificationEmail.setEmailTo(companyUser.getEmail());
             EmailUtil.sendEmail(notificationEmail);
         }
+    }
+
+    String getActivationUrl(String activationKey) {
+        return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
     }
 }
