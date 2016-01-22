@@ -20,7 +20,7 @@ public class PointsControllerTest {
         PointsController pointsController = new PointsController(pointsService);
         PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setSaleKey("A1234");
-        pointsAwarding.setPhone("1234567890");
+        pointsAwarding.setPhoneNumber("1234567890");
         pointsAwarding.setSaleAmount(100);
 
         ResponseEntity<ServiceResult<Float>> responseEntity = pointsController.awardPoints(pointsAwarding);

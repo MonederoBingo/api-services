@@ -58,7 +58,7 @@ public class ClientAuthenticationController extends BaseController {
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Boolean>> resendKey(@RequestBody ClientUserRegistration clientUserRegistration) {
         try {
-            ServiceResult<Boolean> serviceResult = _clientUserService.resendKey(clientUserRegistration.getPhone());
+            ServiceResult<Boolean> serviceResult = _clientUserService.resendKey(clientUserRegistration.getPhoneNumber());
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ServiceResult<Boolean>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);

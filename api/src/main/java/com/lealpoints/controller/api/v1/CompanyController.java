@@ -24,7 +24,7 @@ import java.util.List;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/v1/companies")
+@RequestMapping("/api/v1/companies")
 @MultipartConfig
 public class CompanyController extends BaseController {
 

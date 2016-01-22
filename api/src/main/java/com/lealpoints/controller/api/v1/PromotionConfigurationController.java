@@ -20,7 +20,7 @@ import java.util.List;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @RestController
-@RequestMapping("/v1/promotion_configuration")
+@RequestMapping("/api/v1/promotion_configuration")
 public class PromotionConfigurationController extends BaseController {
 
     private final PromotionConfigurationService _promotionConfigurationService;

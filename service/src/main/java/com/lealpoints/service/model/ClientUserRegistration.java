@@ -1,13 +1,13 @@
 package com.lealpoints.service.model;
 
 public class ClientUserRegistration {
-    private String phone;
+    private String phoneNumber;
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

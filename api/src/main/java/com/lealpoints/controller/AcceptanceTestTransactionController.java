@@ -1,7 +1,11 @@
 package com.lealpoints.controller;
 
 import com.lealpoints.service.FunctionalTestTransactionService;
+import com.lealpoints.service.response.ServiceMessage;
+import com.lealpoints.service.response.ServiceResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,16 +25,26 @@ public class AcceptanceTestTransactionController {
     }
 
     @RequestMapping(value = "/begin", method = GET)
-    public void begin(HttpServletRequest request) throws Exception {
-        if (request.getServerName().equals("test.localhost")) {
-            _functionalTestTransactionService.beginTransaction();
+    public ResponseEntity<ServiceResult<Object>> begin(HttpServletRequest request) throws Exception {
+        try {
+            if (request.getServerName().equals("test.localhost")) {
+                _functionalTestTransactionService.beginTransaction();
+            }
+            return new ResponseEntity<>(new ServiceResult<>(true, new ServiceMessage("")), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ServiceResult<>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @RequestMapping(value = "/rollback", method = GET)
-    public void rollback(HttpServletRequest request) throws Exception {
-        if (request.getServerName().equals("test.localhost")) {
-            _functionalTestTransactionService.rollbackTransaction();
+    public ResponseEntity<ServiceResult<Object>> rollback(HttpServletRequest request) throws Exception {
+        try {
+            if (request.getServerName().equals("test.localhost")) {
+                _functionalTestTransactionService.rollbackTransaction();
+            }
+            return new ResponseEntity<>(new ServiceResult<>(true, new ServiceMessage("")), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ServiceResult<>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-@RequestMapping("/v1/test")
+@RequestMapping("/api/v1/test")
 public class TestController extends BaseController {
 
     @RequestMapping(method = GET)

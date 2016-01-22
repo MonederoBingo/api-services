@@ -17,6 +17,7 @@ import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.DateUtil;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         if (pointsConfiguration == null) {
             throw new IllegalArgumentException("Points configuration doesn't exist");
         }
-        Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhone(), true);
+        Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhoneNumber(), true);
         //Inserting company client mapping if it doesn't exist
         _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), client.getClientId());
 
@@ -108,9 +109,12 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
     }
 
     private ValidationResult validateRegistration(PointsAwarding pointsAwarding) throws Exception {
-        final ValidationResult phoneValidation = _phoneValidatorService.validate(pointsAwarding.getPhone());
+        final ValidationResult phoneValidation = _phoneValidatorService.validate(pointsAwarding.getPhoneNumber());
         if (phoneValidation.isInvalid()) {
             return phoneValidation;
+        }
+        if (StringUtils.isEmpty(pointsAwarding.getSaleKey())) {
+            return new ValidationResult(false, getServiceMessage(Message.EMPTY_SALE_KEY));
         }
         Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
         if (points != null) {

@@ -98,16 +98,16 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
     }
 
     private String registerClientAndClientUser(ClientUserRegistration clientUserRegistration) throws Exception {
-        Client client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhone(), true);
+        Client client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhoneNumber(), true);
         ClientUser clientUser = _clientUserRepository.getByClientId(client.getClientId());
-        final String smsKey = generateAndSendRegistrationSMS(clientUserRegistration.getPhone());
+        final String smsKey = generateAndSendRegistrationSMS(clientUserRegistration.getPhoneNumber());
         if (clientUser == null) {
             clientUser = new ClientUser();
             clientUser.setClientId(client.getClientId());
             clientUser.setSmsKey(smsKey);
             _clientUserRepository.insert(clientUser);
         } else {
-            _clientUserRepository.updateSmsKey(smsKey, clientUserRegistration.getPhone());
+            _clientUserRepository.updateSmsKey(smsKey, clientUserRegistration.getPhoneNumber());
         }
         return smsKey;
     }
@@ -127,7 +127,10 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
             _smsService.sendSMSMessage(phone, message);
             sendKeyToEmail(key, phone);
         }
-        logger.info("Env: " + getEnvironment().getClass().getSimpleName() + ". New phone number: " + phone + ". New key: " + key);
+        if (isDevEnvironment()) {
+            logger.info("Env: " + getEnvironment().getClass().getSimpleName() + ". New phone number: " + phone + ". New key: " + key);
+            System.out.println(key);
+        }
         return key;
     }
 
@@ -140,7 +143,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
     }
 
     private ValidationResult validateRegistration(ClientUserRegistration clientUserRegistration) {
-        if (clientUserRegistration.getPhone() != null && clientUserRegistration.getPhone().length() != 10) {
+        if (clientUserRegistration.getPhoneNumber() != null && clientUserRegistration.getPhoneNumber().length() != 10) {
             return new ValidationResult(false, getServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS));
         }
         return new ValidationResult(true, ServiceMessage.EMPTY);
