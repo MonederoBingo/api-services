@@ -47,7 +47,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                     }
                 };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
-        clientUserRegistration.setPhone("1234567890");
+        clientUserRegistration.setPhoneNumber("1234567890");
         ServiceResult<String> serviceResult = clientUserService.register(clientUserRegistration);
         assertNotNull(serviceResult);
         assertEquals("123456", serviceResult.getObject());
@@ -72,7 +72,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                     }
                 };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
-        clientUserRegistration.setPhone("1234567890");
+        clientUserRegistration.setPhoneNumber("1234567890");
         ServiceResult<String> serviceResult = clientUserService.register(new ClientUserRegistration());
         assertNotNull(serviceResult);
         assertEquals("123456", serviceResult.getObject());
@@ -93,7 +93,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
             }
         };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
-        clientUserRegistration.setPhone("123");
+        clientUserRegistration.setPhoneNumber("123");
         ServiceResult<String> serviceResult = clientUserService.register(clientUserRegistration);
         assertNotNull(serviceResult);
         assertEquals(Message.PHONE_MUST_HAVE_10_DIGITS.name(), serviceResult.getMessage());
@@ -256,7 +256,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
     public void testGenerateAndSendRegistrationSMS() throws Exception {
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(new DevEnvironment());
-        ThreadContextService threadContextService = createThreadContextService(threadContext, 2);
+        ThreadContextService threadContextService = createThreadContextService(threadContext, 3);
         ClientUserServiceImpl clientUserService =
                 new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null) {
 
