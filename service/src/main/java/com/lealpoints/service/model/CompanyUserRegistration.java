@@ -4,7 +4,6 @@ public class CompanyUserRegistration {
     private String name;
     private String email;
     private long companyId;
-    private String language;
 
     public long getCompanyId() {
         return companyId;
@@ -28,13 +27,5 @@ public class CompanyUserRegistration {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
     }
 }

@@ -17,13 +17,12 @@ import static org.junit.Assert.*;
 public class CompanyUserControllerTest {
     @Test
     public void testRegister() throws Exception {
-        final ServiceResult expectedServiceResult = new ServiceResult(false,
-                new ServiceMessage("Operation not supported yet"), 1L);
+        final ServiceResult expectedServiceResult = new ServiceResult<>(false,
+                new ServiceMessage("Operation not supported yet"));
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
         companyUserRegistration.setName("name");
         companyUserRegistration.setEmail("email@test.com");
         companyUserRegistration.setCompanyId(1);
-        companyUserRegistration.setLanguage("es");
         final CompanyUserServiceImpl companyUserService = createCompanyUserServiceForRegister(expectedServiceResult);
         final CompanyUserController companyUserController = new CompanyUserController(companyUserService);
         ResponseEntity<ServiceResult> responseEntity = companyUserController.register(companyUserRegistration);

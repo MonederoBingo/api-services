@@ -241,14 +241,11 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyId(companyUserRegistration.getCompanyId());
         companyUser.setName(companyUserRegistration.getName());
-        companyUser.setPassword(_serviceUtil.setPassword());
+        companyUser.setPassword(_serviceUtil.generatePassword());
         companyUser.setEmail(companyUserRegistration.getEmail());
         _companyService.setUserActivation(companyUser);
         companyUser.setActivationKey(_serviceUtil.generateActivationKey());
-        String language = companyUserRegistration.getLanguage();
-        if (StringUtils.isNotEmpty(language)) {
-            language = language.substring(0, 2);
-        }
+        String language = getThreadContext().getLanguage().getLangId();
         companyUser.setLanguage(language);
         companyUser.setMustChangePassword(true);
         _companyUserRepository.insert(companyUser);

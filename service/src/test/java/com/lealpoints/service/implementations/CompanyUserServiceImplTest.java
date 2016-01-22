@@ -456,7 +456,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
                                                                           ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
-        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(7);
+        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(8);
         replay(threadContextService);
         return threadContextService;
     }
