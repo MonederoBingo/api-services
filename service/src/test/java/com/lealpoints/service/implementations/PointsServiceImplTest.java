@@ -39,7 +39,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
         replayAll();
         PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setCompanyId(1);
-        pointsAwarding.setPhone("12345");
+        pointsAwarding.setPhoneNumber("12345");
         pointsAwarding.setSaleAmount(100);
         pointsAwarding.setSaleKey("A123");
 
@@ -52,7 +52,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
     }
 
     @Test
-    public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
+    public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
         PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null,
                 createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name()))) {
 
@@ -70,20 +70,40 @@ public class PointsServiceImplTest extends EasyMockSupport {
     }
 
     @Test
-    public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
+    public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
         PointsServiceImpl pointsService =
                 new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null,
                         createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
-                @Override
-                public ServiceMessage getServiceMessage(Message message, String... params) {
-                    return new ServiceMessage(message.name());
-                }
-            };
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
+                };
+        replayAll();
+        final PointsAwarding pointsAwarding = new PointsAwarding();
+        pointsAwarding.setSaleKey("ABC");
+        ServiceResult<Float> serviceResult = pointsService.awardPoints(pointsAwarding);
+        assertNotNull(serviceResult);
+        assertFalse(serviceResult.isSuccess());
+        assertEquals(Message.SALE_KEY_ALREADY_EXISTS.name(), serviceResult.getMessage());
+        verifyAll();
+    }
+
+    @Test
+    public void testAwardPointsWhenTheSaleKeyIsEmpty() throws Exception {
+        PointsServiceImpl pointsService =
+                new PointsServiceImpl(null, null, null, null, null,
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
+                };
         replayAll();
         ServiceResult<Float> serviceResult = pointsService.awardPoints(new PointsAwarding());
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Message.SALE_KEY_ALREADY_EXISTS.name(), serviceResult.getMessage());
+        assertEquals(Message.EMPTY_SALE_KEY.name(), serviceResult.getMessage());
         verifyAll();
     }
 

@@ -22,7 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/v1/clients")
+@RequestMapping("/api/v1/clients")
 public class ClientController extends BaseController {
 
     private ClientService _clientService;

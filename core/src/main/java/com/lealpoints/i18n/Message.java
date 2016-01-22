@@ -209,6 +209,11 @@ public enum Message {
             "Your temporal password is (you must change it after loggin in): ",
 
             "Su contraseña temporal es (debes cambiarla después de iniciar sesión): "
+    ),
+    EMPTY_SALE_KEY(
+            "You should specify a sale key",
+
+            "Indique el número de venta."
     );
 
     private final String english;

@@ -22,7 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
-@RequestMapping("/v1/company_users")
+@RequestMapping("/api/v1/company_users")
 public class CompanyUserController extends BaseController {
     private CompanyUserService _companyUserService;
 

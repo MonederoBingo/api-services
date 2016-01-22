@@ -2,7 +2,7 @@ package com.lealpoints.service.model;
 
 public class PointsAwarding {
     private long companyId;
-    private String phone;
+    private String phoneNumber;
     private float saleAmount;
     private String saleKey;
 
@@ -14,12 +14,12 @@ public class PointsAwarding {
         this.companyId = companyId;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phone) {
+        this.phoneNumber = phone;
     }
 
     public float getSaleAmount() {

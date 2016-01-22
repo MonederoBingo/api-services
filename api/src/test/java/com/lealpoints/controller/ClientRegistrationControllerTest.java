@@ -23,7 +23,7 @@ public class ClientRegistrationControllerTest {
         final ClientAuthenticationController clientAuthController = new ClientAuthenticationController(clientUserService);
 
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
-        clientUserRegistration.setPhone("6141112233");
+        clientUserRegistration.setPhoneNumber("6141112233");
         ResponseEntity<ServiceResult<String>> responseEntity = clientAuthController.register(clientUserRegistration, null);
         assertNotNull(responseEntity);
         ServiceResult actualServiceResults = responseEntity.getBody();
