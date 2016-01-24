@@ -205,10 +205,20 @@ public enum Message {
             "Specify the company name",
 
             "Indique el nombre de la compañía"
-    ), EMPTY_SALE_KEY(
+    ), TEMPORAL_PASSWORD(
+            "Your temporal password is (you must change it after loggin in): ",
+
+            "Su contraseña temporal es (debes cambiarla después de iniciar sesión): "
+    ),
+    EMPTY_SALE_KEY(
             "You should specify a sale key",
 
             "Indique el número de venta."
+    ),
+    USER_SUCCESSFULLY_ADDED(
+            "The user was successfully added.",
+
+            "El usuario fue agregado exitosamente."
     );
 
     private final String english;

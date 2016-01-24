@@ -7,15 +7,14 @@ import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.repository.CompanyUserRepository;
 import com.lealpoints.service.CompanyUserService;
-import com.lealpoints.service.model.CompanyLoginResult;
-import com.lealpoints.service.model.CompanyUserLogin;
-import com.lealpoints.service.model.CompanyUserPasswordChanging;
-import com.lealpoints.service.model.ValidationResult;
+import com.lealpoints.service.model.*;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import com.lealpoints.service.util.ServiceUtil;
 import com.lealpoints.util.EmailUtil;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,14 +28,16 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
     private final CompanyUserRepository _companyUserRepository;
     private final CompanyRepository _companyRepository;
     private final CompanyServiceImpl _companyService;
+    private final ServiceUtil _serviceUtil;
 
     @Autowired
     public CompanyUserServiceImpl(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService,
-                                  CompanyRepository companyRepository, CompanyServiceImpl companyService) {
+                                  CompanyRepository companyRepository, CompanyServiceImpl companyService, ServiceUtil serviceUtil) {
         super(threadContextService);
         _companyUserRepository = companyUserRepository;
         _companyRepository = companyRepository;
         _companyService = companyService;
+        _serviceUtil = serviceUtil;
     }
 
     public ServiceResult<CompanyLoginResult> loginUser(CompanyUserLogin companyUserLogin) {
@@ -186,6 +187,42 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
+    public ServiceResult<String> register(CompanyUserRegistration companyUserRegistration) {
+        try {
+            ValidationResult validationResult = validateRegistration(companyUserRegistration);
+            if (validationResult.isValid()) {
+                getThreadContextService().getQueryAgent().beginTransaction();
+                long companyUserId = registerCompanyUser(companyUserRegistration);
+                getQueryAgent().commitTransaction();
+                return new ServiceResult<>(true, getServiceMessage(Message.USER_SUCCESSFULLY_ADDED),
+                        Long.toString(companyUserId));
+            } else {
+                return new ServiceResult<>(false, validationResult.getServiceMessage());
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
+        }
+    }
+
+    private ValidationResult validateRegistration(CompanyUserRegistration companyUserRegistration) throws Exception {
+        //Validate name
+        if (StringUtils.isEmpty(companyUserRegistration.getName())) {
+            return new ValidationResult(false, getServiceMessage(Message.COMPANY_NAME_IS_EMPTY));
+        }
+        //Validate user email
+        if (StringUtils.isEmpty(companyUserRegistration.getEmail())) {
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_EMPTY));
+        }
+        if (!EmailValidator.getInstance().isValid(companyUserRegistration.getEmail())) {
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_INVALID));
+        }
+        if (_companyUserRepository.getByEmail(companyUserRegistration.getEmail()) != null) {
+            return new ValidationResult(false, getServiceMessage(Message.EMAIL_ALREADY_EXISTS));
+        }
+        return new ValidationResult(true, ServiceMessage.EMPTY);
+    }
+
     private String updateApiKey(CompanyUser companyUser) throws Exception {
         String apiKey = RandomStringUtils.random(20, true, true) + "com";
         final int updatedRows = _companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
@@ -194,5 +231,25 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
             throw new RuntimeException(getServiceMessage(Message.COMMON_USER_ERROR).getMessage());
         }
         return apiKey;
+    }
+
+    public Long registerCompanyUser(CompanyUserRegistration companyUserRegistration) throws Exception {
+        CompanyUser companyUser = new CompanyUser();
+        companyUser.setCompanyId(companyUserRegistration.getCompanyId());
+        companyUser.setName(companyUserRegistration.getName());
+        companyUser.setPassword(_serviceUtil.generatePassword());
+        companyUser.setEmail(companyUserRegistration.getEmail());
+        _companyService.setUserActivation(companyUser);
+        companyUser.setActivationKey(_serviceUtil.generateActivationKey());
+        String language = getThreadContext().getLanguage().getLangId();
+        companyUser.setLanguage(language);
+        companyUser.setMustChangePassword(true);
+        companyUser.setCompanyUserId(_companyUserRepository.insert(companyUser));
+        NotificationService notificationService = new NotificationService(getThreadContextService());
+        notificationService.sendActivationEmail(companyUser,
+                getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage(),
+                getServiceMessage(Message.TEMPORAL_PASSWORD).getMessage() + "  " + companyUser.getPassword(),
+                getServiceMessage(Message.ACTIVATION_EMAIL_BODY).getMessage());
+        return companyUser.getCompanyUserId();
     }
 }

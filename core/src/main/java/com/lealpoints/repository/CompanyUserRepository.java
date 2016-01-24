@@ -95,14 +95,13 @@ public class CompanyUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.company_user_id = ?");
-                sql.append(" AND company_user.api_key = ").append(encryptForSelect("api_key", "?")).append(";");
+                sql.append(" WHERE company_user.api_key = ").append(encryptForSelect("api_key", "?")).append(";");
                 return sql.toString();
             }
 
             @Override
             public Object[] values() {
-                return new Object[]{companyUserId, apiKey};
+                return new Object[]{apiKey};
             }
 
             @Override
