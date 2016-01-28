@@ -1,6 +1,7 @@
 package com.lealpoints.controller.api.v1;
 
 import com.lealpoints.controller.base.BaseController;
+import com.lealpoints.model.CompanyUser;
 import com.lealpoints.service.CompanyUserService;
 import com.lealpoints.service.model.CompanyUserRegistration;
 import com.lealpoints.service.response.ServiceMessage;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -34,17 +34,18 @@ public class CompanyUserController extends BaseController {
     @RequestMapping(value = "/register", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> register(@RequestBody CompanyUserRegistration companyUserRegistration) throws Exception {
-        ServiceResult serviceResult = _companyUserService.register(companyUserRegistration);
-        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
+        try {
+            ServiceResult serviceResult = _companyUserService.register(companyUserRegistration);
+            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<String>>> get(@PathVariable("companyId") Long companyId) {
-        List<String> namesList = new ArrayList<>();
-        namesList.add("none");
-        return new ResponseEntity<>(new ServiceResult<>(false, new ServiceMessage("Operation not supported yet"),
-                namesList), HttpStatus.OK);
+    public ResponseEntity<ServiceResult<List<CompanyUser>>> get(@PathVariable("companyId") long companyId) {
+        ServiceResult<List<CompanyUser>> serviceResult = _companyUserService.getByCompanyId(companyId);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
-
 }
