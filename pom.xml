@@ -1,60 +1,64 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>lealpoints-web-client</groupId>
-  <artifactId>lealpoints-web-client</artifactId>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.lealpoints</groupId>
+    <artifactId>lealpoints-services</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>api</module>
+        <module>migrations</module>
         <module>core</module>
         <module>service</module>
-        <module>migrations</module>
+        <module>api</module>
     </modules>
-    <name>Archetype - lealpoints-web-client</name>
-  <url>http://maven.apache.org</url>
-
-    <build>
-        <finalName>api</finalName>
-        <plugins>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-            </plugin>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <url>http://localhost:8080</url>
-                    <port>8080</port>
-                    <server>localhost</server>
-                    <path>/</path>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <name>Archetype - backend</name>
+    <url>http://maven.apache.org</url>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <spring.version>4.1.4.RELEASE</spring.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.easymock</groupId>
+            <artifactId>easymock</artifactId>
+            <version>3.3.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.collections</groupId>
+            <artifactId>collections-generic</artifactId>
+            <version>4.01</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.2</version>
+        </dependency>
+    </dependencies>
     <profiles>
         <profile>
             <!-- When built in OpenShift the 'openshift' profile will be used when
-                    invoking mvn. -->
-            <!-- Use this profile for any OpenShift specific customization your app
-                    will need. -->
-            <!-- By default that is to put the resulting archive into the 'webapps'
-                    folder. -->
-            <!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
+                    invoking mvn. --><!-- Use this profile for any OpenShift specific customization your app
+                    will need. --><!-- By default that is to put the resulting archive into the 'webapps'
+                    folder. --><!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
             <id>openshift</id>
             <build>
-                <finalName>web</finalName>
+                <finalName>services</finalName>
                 <plugins>
+                    <!--<plugin>--><!--<artifactId>maven-antrun-plugin</artifactId>--><!--<version>1.7</version>--><!--<dependencies>--><!--<dependency>--><!--<groupId>com.sun</groupId>--><!--<artifactId>tools</artifactId>--><!--<version>1.5.0</version>--><!--<scope>system</scope>--><!--<systemPath>${env.JAVA_HOME}/lib/tools.jar</systemPath>--><!--</dependency>--><!--</dependencies>--><!--<executions>--><!--<execution>--><!--<phase>test-compile</phase>--><!--<configuration>--><!--<tasks>--><!--<ant antfile="build.xml" target="prod_migrate" dir="migrations"/>--><!--</tasks>--><!--</configuration>--><!--<goals>--><!--<goal>run</goal>--><!--</goals>--><!--</execution>--><!--</executions>--><!--</plugin>-->
                     <plugin>
                         <artifactId>maven-war-plugin</artifactId>
                         <version>2.1.1</version>
@@ -67,4 +71,18 @@
             </build>
         </profile>
     </profiles>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
