@@ -6,7 +6,10 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>webapp</module>
+        <module>api</module>
+        <module>core</module>
+        <module>service</module>
+        <module>migrations</module>
     </modules>
     <name>Archetype - lealpoints-web-client</name>
   <url>http://maven.apache.org</url>
