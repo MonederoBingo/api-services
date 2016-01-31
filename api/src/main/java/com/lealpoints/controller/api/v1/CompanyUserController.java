@@ -37,15 +37,21 @@ public class CompanyUserController extends BaseController {
         try {
             ServiceResult serviceResult = _companyUserService.register(companyUserRegistration);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        }catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<List<CompanyUser>>> get(@PathVariable("companyId") long companyId) {
-        ServiceResult<List<CompanyUser>> serviceResult = _companyUserService.getByCompanyId(companyId);
-        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
+        try {
+            ServiceResult<List<CompanyUser>> serviceResult = _companyUserService.getByCompanyId(companyId);
+            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ServiceResult<List<CompanyUser>>(false, new ServiceMessage(e.getMessage())),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
