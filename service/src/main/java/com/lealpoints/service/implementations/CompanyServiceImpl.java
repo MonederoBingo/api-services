@@ -225,7 +225,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private String registerCompanyUser(CompanyRegistration companyRegistration, long companyId, String activationKey) throws Exception {
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyId(companyId);
-        companyUser.setName(companyRegistration.getUserName());
+        companyUser.setName(companyRegistration.getUsername());
         companyUser.setPassword(companyRegistration.getPassword());
         companyUser.setEmail(companyRegistration.getEmail());
         setUserActivation(companyUser);

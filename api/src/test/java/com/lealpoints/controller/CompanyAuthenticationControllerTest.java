@@ -26,7 +26,7 @@ public class CompanyAuthenticationControllerTest {
 
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setCompanyName("company name");
-        companyRegistration.setUserName("user name");
+        companyRegistration.setUsername("user name");
         companyRegistration.setEmail("email@test.com");
         companyRegistration.setPassword("Pa$$w0rd");
         companyRegistration.setUrlImageLogo("images/logo.png");

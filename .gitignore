@@ -8,5 +8,5 @@ build/
 *.class
 
 webapp/src/main/webapp/node_modules/*
-../Frontend_android/*
 .DS_Store
+*.log
