@@ -6,6 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
+
+import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_TWO_COMPANY_USERS;
 import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY;
 import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE;
 import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE;
@@ -138,6 +141,18 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest {
     public void testGetByCompanyUserIdApiKeyWhenDoesNotExist() throws Exception {
         CompanyUser companyUser = _companyUserRepository.getByCompanyUserIdApiKey(1, "ASDQWE");
         assertNull(companyUser);
+    }
+
+    @Test
+    public void testGetByCompanyId() throws Exception {
+        executeFixture(INSERT_COMPANY_AND_TWO_COMPANY_USERS);
+        List<CompanyUser> companyUserList = _companyUserRepository.getByCompanyId(1);
+        assertNotNull(companyUserList);
+        assertEquals(2, companyUserList.size());
+        assertEquals("name", companyUserList.get(0).getName());
+        assertEquals("a@a.com", companyUserList.get(0).getEmail());
+        assertEquals("second name", companyUserList.get(1).getName());
+        assertEquals("f@a.com", companyUserList.get(1).getEmail());
     }
 
     private CompanyUser getCompanyUserById(long companyUserId) throws Exception {

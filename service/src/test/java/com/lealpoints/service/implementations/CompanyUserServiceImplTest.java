@@ -6,9 +6,7 @@ import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Company;
-import com.lealpoints.model.CompanyUser;
-import com.lealpoints.model.PointsConfiguration;
+import com.lealpoints.model.*;
 import com.lealpoints.repository.*;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyUserLogin;
@@ -22,6 +20,8 @@ import org.junit.Test;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -51,6 +51,29 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         assertTrue(loginResult.isMustChangePassword());
         assertFalse(loginResult.getApiKey().isEmpty());
         verify(companyUserRepository, companyRepository);
+    }
+
+    @Test
+    public void testGetByCompanyId() throws Exception {
+        final List<CompanyUser> expectedUsers = new ArrayList<>();
+        expectedUsers.add(createCompanyUser("fernando", "fernando@monederobingo.com"));
+        expectedUsers.add(createCompanyUser("alonso", "alonso@monederobingo.com"));
+        final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForGet(expectedUsers);
+        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null
+                , null);
+        ServiceResult<List<CompanyUser>> serviceResult = companyUserService.getByCompanyId(1);
+        assertNotNull(serviceResult);
+        assertTrue(serviceResult.isSuccess());
+        assertEquals("", serviceResult.getMessage());
+        assertNotNull(serviceResult.getObject());
+
+        List<CompanyUser> actualUsers = serviceResult.getObject();
+        assertEquals(2, actualUsers.size());
+        assertEquals("fernando", actualUsers.get(0).getName());
+        assertEquals("fernando@monederobingo.com", actualUsers.get(0).getEmail());
+        assertEquals("alonso", actualUsers.get(1).getName());
+        assertEquals("alonso@monederobingo.com", actualUsers.get(1).getEmail());
+        verify(companyUserRepository);
     }
 
     @Test
@@ -462,5 +485,19 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(8);
         replay(threadContextService);
         return threadContextService;
+    }
+
+    public CompanyUser createCompanyUser(String name, String email) {
+        CompanyUser companyUser = new CompanyUser();
+        companyUser.setName(name);
+        companyUser.setEmail(email);
+        return companyUser;
+    }
+
+    private CompanyUserRepository createCompanyUserRepositoryForGet(List<CompanyUser> companyUserList) throws Exception {
+        CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
+        expect(companyUserRepository.getByCompanyId(anyLong())).andReturn(companyUserList).anyTimes();
+        replay(companyUserRepository);
+        return companyUserRepository;
     }
 }

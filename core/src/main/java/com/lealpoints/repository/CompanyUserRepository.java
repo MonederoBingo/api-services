@@ -6,13 +6,15 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 @Component
 public class CompanyUserRepository extends BaseRepository {
 
     public long insert(CompanyUser companyUser) throws Exception {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO company_user(company_id, name, email, password, active, activation_key, language, must_change_password)");
+        sql.append("INSERT INTO company_user(company_id, name, email, " +
+                "password, active, activation_key, language, must_change_password)");
         sql.append(" VALUES (");
         sql.append(companyUser.getCompanyId()).append(", ");
         sql.append("'").append(companyUser.getName()).append("', ");
@@ -24,6 +26,29 @@ public class CompanyUserRepository extends BaseRepository {
         sql.append("'").append(companyUser.getMustChangePassword()).append("');");
 
         return getQueryAgent().executeInsert(sql.toString(), "company_user_id");
+    }
+
+    public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {
+        return getQueryAgent().selectList(new DbBuilder<CompanyUser>() {
+            @Override
+            public String sql() {return "SELECT * FROM company_user WHERE company_id = ? ;";}
+
+            @Override
+            public Object[] values() {
+                return new Object[]{companyId};
+            }
+
+            @Override
+            public CompanyUser build(ResultSet resultSet) throws SQLException {
+                CompanyUser companyUser = new CompanyUser();
+                companyUser.setCompanyId(resultSet.getLong("company_id"));
+                companyUser.setCompanyUserId(resultSet.getLong("company_user_id"));
+                companyUser.setActive(resultSet.getBoolean("active"));
+                companyUser.setEmail(resultSet.getString("email"));
+                companyUser.setName(resultSet.getString("name"));
+                return companyUser;
+            }
+        });
     }
 
     public CompanyUser getByEmailAndPassword(final String email, final String password) throws Exception {

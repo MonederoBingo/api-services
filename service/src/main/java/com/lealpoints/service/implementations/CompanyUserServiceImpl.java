@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
+import java.util.List;
 
 @Component
 public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUserService {
@@ -200,6 +201,16 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
                 return new ServiceResult<>(false, validationResult.getServiceMessage());
             }
         } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
+        }
+    }
+
+    public ServiceResult<List<CompanyUser>> getByCompanyId(long companyId) {
+        try {
+            final List<CompanyUser> companyUsers = _companyUserRepository.getByCompanyId(companyId);
+            return new ServiceResult<>(true, ServiceMessage.EMPTY, companyUsers);
+        } catch (Exception ex){
             logger.error(ex.getMessage(), ex);
             return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
         }
