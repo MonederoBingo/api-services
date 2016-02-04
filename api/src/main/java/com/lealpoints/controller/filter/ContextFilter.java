@@ -39,8 +39,11 @@ public class ContextFilter implements Filter {
     }
 
     private void setHeaders(HttpServletResponse response, HttpServletRequest request) {
-        List<String> incomingURLs =
-                Arrays.asList("http://localhost:8080", "http://test.localhost:8080", "http://www.lealpoints.com", "http://test.lealpoints.com");
+        List<String> incomingURLs = Arrays.asList(
+                "http://localhost:8080", //
+                "http://test.localhost:8080", //
+                "http://www.monederobingo.com", //
+                "http://test.monederobingo.com");
         String clientOrigin = request.getHeader("origin") != null ? request.getHeader("origin") : request.getHeader("referer");
         int myIndex = incomingURLs.indexOf(clientOrigin);
         if (myIndex != -1) {
@@ -56,9 +59,9 @@ public class ContextFilter implements Filter {
     private Environment getEnvironment(HttpServletRequest request) {
         EnvironmentFactory environmentFactory = new EnvironmentFactoryImpl();
         switch (request.getServerName()) {
-            case "services.lealpoints.com":
+            case "services.monederobingo.com":
                 return environmentFactory.getProdEnvironment();
-            case "test.services.lealpoints.com":
+            case "test.services.monederobingo.com":
                 return environmentFactory.getUATEnvironment();
             case "test.localhost":
                 return environmentFactory.getFunctionalTestEnvironment();
