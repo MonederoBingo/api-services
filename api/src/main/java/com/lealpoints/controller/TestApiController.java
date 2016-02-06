@@ -12,6 +12,6 @@ public class TestApiController extends BaseController {
 
     @RequestMapping(method = GET)
     public String test() {
-        return "it works! :)";
+        throw new RuntimeException("chale");
     }
 }

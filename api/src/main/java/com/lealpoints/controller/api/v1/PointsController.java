@@ -31,13 +31,9 @@ public class PointsController extends BaseController {
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Float>> awardPoints(@RequestBody PointsAwarding pointsAwarding) {
-        try {
-            long companyId = pointsAwarding.getCompanyId();
-            pointsAwarding.setCompanyId(companyId);
-            ServiceResult<Float> serviceResult = _pointsService.awardPoints(pointsAwarding);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Float>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        long companyId = pointsAwarding.getCompanyId();
+        pointsAwarding.setCompanyId(companyId);
+        ServiceResult<Float> serviceResult = _pointsService.awardPoints(pointsAwarding);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

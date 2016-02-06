@@ -34,35 +34,23 @@ public class ClientAuthenticationController extends BaseController {
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<String>> register(@RequestBody ClientUserRegistration clientUserRegistration,
-        HttpServletRequest servletRequest) {
-        try {
-            ServiceResult<String> serviceResult = _clientUserService.register(clientUserRegistration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<String>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+                                                          HttpServletRequest servletRequest) {
+        ServiceResult<String> serviceResult = _clientUserService.register(clientUserRegistration);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/login", method = POST, headers = ACCEPT_HEADER)
+    @RequestMapping(value = "/login", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<ClientLoginResult>> loginUser(@RequestBody ClientUserLogin clientUserLogin) throws Exception {
-        try {
-            ServiceResult<ClientLoginResult> serviceResult = _clientUserService.login(clientUserLogin);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<ClientLoginResult>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<ClientLoginResult> serviceResult = _clientUserService.login(clientUserLogin);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/resend_key", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Boolean>> resendKey(@RequestBody ClientUserRegistration clientUserRegistration) {
-        try {
-            ServiceResult<Boolean> serviceResult = _clientUserService.resendKey(clientUserRegistration.getPhoneNumber());
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Boolean>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<Boolean> serviceResult = _clientUserService.resendKey(clientUserRegistration.getPhoneNumber());
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
 }

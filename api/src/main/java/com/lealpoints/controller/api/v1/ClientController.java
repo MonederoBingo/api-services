@@ -35,12 +35,8 @@ public class ClientController extends BaseController {
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> register(@RequestBody ClientRegistration clientRegistration) {
-        try {
-            ServiceResult serviceResult = _clientService.register(clientRegistration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _clientService.register(clientRegistration);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{companyId}", method = GET)
@@ -53,7 +49,7 @@ public class ClientController extends BaseController {
     @RequestMapping(value = "/{companyId}/{phone}", method = GET)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<CompanyClientMapping>> getByCompanyIdPhone(@PathVariable("companyId") long companyId,
-        @PathVariable("phone") String phone) {
+                                                                                   @PathVariable("phone") String phone) {
         ServiceResult<CompanyClientMapping> serviceResult = _clientService.getByCompanyIdPhone(companyId, phone);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }

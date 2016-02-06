@@ -24,9 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -44,86 +42,58 @@ public class CompanyAuthenticationController extends BaseController {
         _companyService = companyService;
     }
 
-    @RequestMapping(value="/register", method = POST, headers = ACCEPT_HEADER)
+    @RequestMapping(value = "/register", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> register(@RequestBody CompanyRegistration companyRegistration) {
-        try {
-            ServiceResult serviceResult = _companyService.register(companyRegistration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _companyService.register(companyRegistration);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
 
-    @RequestMapping(value="/login", method = POST, headers = ACCEPT_HEADER)
+    @RequestMapping(value = "/login", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<CompanyLoginResult>> login(@RequestBody CompanyUserLogin companyUserLogin) {
-        try {
-            ServiceResult<CompanyLoginResult> serviceResult = _companyUserService.loginUser(companyUserLogin);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<CompanyLoginResult>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<CompanyLoginResult> serviceResult = _companyUserService.loginUser(companyUserLogin);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/send_activation_email", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> sendActivationEmail(@RequestBody String email) {
-        try {
-            ServiceResult serviceResult = _companyUserService.sendActivationEmail(email);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _companyUserService.sendActivationEmail(email);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/activate/{activationKey}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> activate(@PathVariable("activationKey") String activationKey) {
-        try {
-            ServiceResult serviceResult = _companyUserService.activateUser(activationKey);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _companyUserService.activateUser(activationKey);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/send_temp_password_email", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> sendTempPasswordEmail(@RequestBody String email) {
-        try {
-            ServiceResult serviceResult = _companyUserService.sendTempPasswordEmail(email);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _companyUserService.sendTempPasswordEmail(email);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/change_password", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> changePassword(@RequestBody CompanyUserPasswordChanging passwordChanging) {
-        try {
-            ServiceResult serviceResult = _companyUserService.changePassword(passwordChanging);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _companyUserService.changePassword(passwordChanging);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/logo/{companyId}", method = GET)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<byte[]> getLogo(@PathVariable("companyId") long companyId, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            File file = _companyService.getLogo(companyId);
-            InputStream input = new FileInputStream(file);
-            final HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(getMediaTypeFromExtension(FilenameUtils.getExtension(file.getName())));
-            return new ResponseEntity<>(IOUtils.toByteArray(input), headers, HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<byte[]> getLogo(@PathVariable("companyId") long companyId, HttpServletRequest request,
+                                          HttpServletResponse response) throws IOException {
+        File file = _companyService.getLogo(companyId);
+        InputStream input = new FileInputStream(file);
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(getMediaTypeFromExtension(FilenameUtils.getExtension(file.getName())));
+        return new ResponseEntity<>(IOUtils.toByteArray(input), headers, HttpStatus.CREATED);
     }
 
     private org.springframework.http.MediaType getMediaTypeFromExtension(String extension) {

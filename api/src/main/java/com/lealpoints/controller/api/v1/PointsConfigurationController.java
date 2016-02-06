@@ -33,23 +33,15 @@ public class PointsConfigurationController extends BaseController {
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<PointsConfiguration>> get(@PathVariable("companyId") long companyId) {
-        try {
-            ServiceResult<PointsConfiguration> serviceResult = _pointsConfigurationService.getByCompanyId(companyId);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<PointsConfiguration>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<PointsConfiguration> serviceResult = _pointsConfigurationService.getByCompanyId(companyId);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(method = PUT, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Boolean>> update(@RequestBody PointsConfiguration pointsConfiguration) {
-        try {
-            pointsConfiguration.setCompanyId(pointsConfiguration.getCompanyId());
-            ServiceResult<Boolean> serviceResult = _pointsConfigurationService.update(pointsConfiguration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Boolean>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        pointsConfiguration.setCompanyId(pointsConfiguration.getCompanyId());
+        ServiceResult<Boolean> serviceResult = _pointsConfigurationService.update(pointsConfiguration);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

@@ -33,45 +33,31 @@ public class PromotionConfigurationController extends BaseController {
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<List<PromotionConfiguration>>> get(@PathVariable("companyId") long companyId) {
-        try {
-            ServiceResult<List<PromotionConfiguration>> serviceResult = _promotionConfigurationService.getByCompanyId(companyId);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<List<PromotionConfiguration>>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<List<PromotionConfiguration>> serviceResult = _promotionConfigurationService.getByCompanyId(companyId);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{companyId}/{phone}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<PromotionConfiguration>>> getAvailableByPhone(@PathVariable("companyId") long companyId,
-        @PathVariable("phone") String phone) {
-        try {
-            ServiceResult<List<PromotionConfiguration>> serviceResult = _promotionConfigurationService.getByCompanyIdRequiredPoints(companyId, phone);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<List<PromotionConfiguration>>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ServiceResult<List<PromotionConfiguration>>> getAvailableByPhone(
+            @PathVariable("companyId") long companyId, @PathVariable("phone") String phone) {
+
+        ServiceResult<List<PromotionConfiguration>> serviceResult =
+                _promotionConfigurationService.getByCompanyIdRequiredPoints(companyId, phone);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Long>> insert(@RequestBody PromotionConfiguration promotionConfiguration) {
-        try {
-            ServiceResult<Long> serviceResult = _promotionConfigurationService.insert(promotionConfiguration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Long>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<Long> serviceResult = _promotionConfigurationService.insert(promotionConfiguration);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
-    @RequestMapping(value="/{promotionConfigurationId}", method = DELETE, headers = ACCEPT_HEADER)
+    @RequestMapping(value = "/{promotionConfigurationId}", method = DELETE, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Boolean>> delete(@PathVariable("promotionConfigurationId") long promotionConfigurationId) {
-        try {
-            ServiceResult<Boolean> serviceResult = _promotionConfigurationService.deletePromotionConfiguration(promotionConfigurationId);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Boolean>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<Boolean> serviceResult = _promotionConfigurationService.deletePromotionConfiguration(promotionConfigurationId);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

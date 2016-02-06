@@ -34,24 +34,14 @@ public class CompanyUserController extends BaseController {
     @RequestMapping(value = "/register", method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult> register(@RequestBody CompanyUserRegistration companyUserRegistration) throws Exception {
-        try {
-            ServiceResult serviceResult = _companyUserService.register(companyUserRegistration);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult serviceResult = _companyUserService.register(companyUserRegistration);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<List<CompanyUser>>> get(@PathVariable("companyId") long companyId) {
-        try {
-            ServiceResult<List<CompanyUser>> serviceResult = _companyUserService.getByCompanyId(companyId);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<List<CompanyUser>>(false, new ServiceMessage(e.getMessage())),
-                    HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<List<CompanyUser>> serviceResult = _companyUserService.getByCompanyId(companyId);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

@@ -31,11 +31,7 @@ public class PromotionController extends BaseController {
     @RequestMapping(method = POST, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Long>> applyPromotion(@RequestBody PromotionApplying promotionApplying) {
-        try {
-            ServiceResult<Long> serviceResult = _promotionService.applyPromotion(promotionApplying);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Long>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<Long> serviceResult = _promotionService.applyPromotion(promotionApplying);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

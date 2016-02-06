@@ -6,6 +6,7 @@ import com.lealpoints.service.CompanyService;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,25 +39,19 @@ public class CompanyController extends BaseController {
     @RequestMapping(value = "/{companyId}", method = GET)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Company>> get(@PathVariable("companyId") long companyId) {
-        try {
-            ServiceResult<Company> serviceResult = _companyService.getByCompanyId(companyId);
-            return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<Company>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ServiceResult<Company> serviceResult = _companyService.getByCompanyId(companyId);
+        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/logo/{companyId}", method = POST)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult> updateLogo(@PathVariable("companyId") long companyId, HttpServletRequest httpServletRequest) {
-        try {
+    public ResponseEntity<ServiceResult> updateLogo(@PathVariable("companyId") long companyId,
+                                                    HttpServletRequest httpServletRequest) throws FileUploadException {
             ServletFileUpload servletFileUpload = getServletFileUpload();
             List<FileItem> items = servletFileUpload.parseRequest(httpServletRequest);
             final ServiceResult serviceResult = _companyService.updateLogo(items, companyId);
             return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
     }
 
     @RequestMapping(value = "/{companyId}/{phone}/send_promo_sms", method = PUT)

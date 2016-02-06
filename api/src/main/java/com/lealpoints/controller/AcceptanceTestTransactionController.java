@@ -26,25 +26,17 @@ public class AcceptanceTestTransactionController {
 
     @RequestMapping(value = "/begin", method = GET)
     public ResponseEntity<ServiceResult<Object>> begin(HttpServletRequest request) throws Exception {
-        try {
-            if (request.getServerName().equals("test.localhost")) {
-                _functionalTestTransactionService.beginTransaction();
-            }
-            return new ResponseEntity<>(new ServiceResult<>(true, new ServiceMessage("")), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
+        if (request.getServerName().equals("test.localhost")) {
+            _functionalTestTransactionService.beginTransaction();
         }
+        return new ResponseEntity<>(new ServiceResult<>(true, new ServiceMessage("")), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/rollback", method = GET)
     public ResponseEntity<ServiceResult<Object>> rollback(HttpServletRequest request) throws Exception {
-        try {
-            if (request.getServerName().equals("test.localhost")) {
-                _functionalTestTransactionService.rollbackTransaction();
-            }
-            return new ResponseEntity<>(new ServiceResult<>(true, new ServiceMessage("")), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ServiceResult<>(false, new ServiceMessage(e.getMessage())), HttpStatus.INTERNAL_SERVER_ERROR);
+        if (request.getServerName().equals("test.localhost")) {
+            _functionalTestTransactionService.rollbackTransaction();
         }
+        return new ResponseEntity<>(new ServiceResult<>(true, new ServiceMessage("")), HttpStatus.OK);
     }
 }
