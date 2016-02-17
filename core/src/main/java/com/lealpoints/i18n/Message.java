@@ -3,10 +3,10 @@ package com.lealpoints.i18n;
 public enum Message {
     COMMON_USER_ERROR(
             ":/ We are very sorry, there was an error. We're trying to solve it. " +
-                    "You can email us to support@lealpoints.com if you want to be updated about this.",
+                    "You can email us to support@monederobingo.com if you want to be updated about this.",
 
             ":/ Los sentimos, hubo un error. Estamos tratando de resolverlo, " +
-                    "puede enviarnos un correo a support@lealpoints.com si desea saber mas al respecto."
+                    "puede enviarnos un correo a support@monederobingo.com si desea saber mas al respecto."
     ),
     LOGIN_FAILED(
             "Login failed! Please verify your information.",
@@ -15,15 +15,15 @@ public enum Message {
     ),
     WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK(
             "We've sent you an email. Open it up to activate your account. " +
-                    "If you do not receive that email within 1 hour, please email support@lealpoints.com",
+                    "If you do not receive that email within 1 hour, please email support@monederobingo.com",
 
             "Se ha enviado un link de activación a su correo. Si no lo recibe dentro de una hora, " +
-                    "favor de enviar un correo a support@lealpoints.com"
+                    "favor de enviar un correo a support@monederobingo.com"
     ),
     EMAIL_ALREADY_EXISTS(
-            "This email is already being used on Leal Points.",
+            "This email is already being used on Monedero Bingo.",
 
-            "Este correo ya se esta utilizando en Leal Points."),
+            "Este correo ya se esta utilizando en Monedero Bingo."),
     PASSWORD_AND_CONFIRMATION_ARE_DIFFERENT(
             "Password and confirmation are different.",
 
@@ -124,24 +124,24 @@ public enum Message {
             "La promoción no pudo ser eliminada."
     ),
     WELCOME_TO_LEALPOINTS_YOUR_KEY_IS(
-            "Welcome to Leal Points, your key is:",
+            "Welcome to Monedero Bingo, your key is:",
 
-            "Bienvenido a Leal Points, su clave es:"
+            "Bienvenido a Monedero Bingo, su clave es:"
     ),
     ACTIVATION_EMAIL_SUBJECT(
-            "Leal Points activation.",
+            "Monedero Bingo activation.",
 
-            "Activación de Leal Points."
+            "Activación de Monedero Bingo."
     ),
     ACTIVATION_EMAIL_BODY(
-            "Thank you for joining Leal Points. Click the link below to activate your account.",
+            "Thank you for joining Monedero Bingo. Click the link below to activate your account.",
 
-            "Gracias por registrarse en Leal Points. Para activar su cuenta, haga clic en este link:"
+            "Gracias por registrarse en Monedero Bingo. Para activar su cuenta, haga clic en este link:"
     ),
     KEY_EMAIL_SMS_MESSAGE(
-            "Thank you for joining Leal Points. This is your login key:",
+            "Thank you for joining Monedero Bingo. This is your login key:",
 
-            "Gracias por registrarse en Leal Points. Esta es su clave de acceso:"
+            "Gracias por registrarse en Monedero Bingo. Esta es su clave de acceso:"
     ),
     WE_HAVE_SENT_YOU_A_NEW_PASSWORD_TO_YOUR_EMAIL(
             "We have sent you a new password to your email.",
@@ -179,19 +179,19 @@ public enum Message {
             "Ingresa tu contraseña"
     ),
     MOBILE_APP_AD_MESSAGE(
-            "You've got %s points at %s. Install Leal Points to see our promotions. %s",
+            "You've got %s points at %s. Install Monedero Bingo to see our promotions. %s",
 
-            "Tienes %s puntos en %s. Instala Leal Points para ver las promociones. %s"
+            "Tienes %s puntos en %s. Instala Monedero Bingo para ver las promociones. %s"
     ),
     MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY(
             "Mobile app ad message was sent successfully",
 
-            "El mensaje de promoción de Leal Points fue enviado exitosamente."
+            "El mensaje de promoción de Monedero Bingo fue enviado exitosamente."
     ),
     MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY(
             "There was an error while sending the mobile app ad message, try again.",
 
-            "Ocurrió un error al enviar el mensaje de promoción de Leal Points, intente de nuevo."
+            "Ocurrió un error al enviar el mensaje de promoción de Monedero Bingo, intente de nuevo."
     ),
     DEFAULT_PROMOTION_MESSAGE(
             "10%% off in your next purchase!",
@@ -230,6 +230,9 @@ public enum Message {
     }
 
     public String get(Language language) {
+        if(language == null) {
+            return this.english;
+        }
         switch (language.getLangId()) {
             case "en":
                 return this.english;
