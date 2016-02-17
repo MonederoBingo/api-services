@@ -306,34 +306,34 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                 null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
+                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
             }
         };
         String smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name", 1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Leal Points to see our promotions. " +
+        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Monedero Bingo to see our promotions. " +
                 "https://goo.gl/JRssA6", smsMessage);
 
         companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
+                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
             }
         };
         smsMessage = companyService.getSMSMessage("TG", 1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at TG. Install Leal Points to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
+        assertEquals("You've got 1000 points at TG. Install Monedero Bingo to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
 
         companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions. %s");
+                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
             }
         };
         smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does not .... " +
-                "Install Leal Points to see our promotions. https://goo.gl/JRssA6", smsMessage);
+        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does n.... " +
+                "Install Monedero Bingo to see our promotions. https://goo.gl/JRssA6", smsMessage);
     }
 
     @Test
@@ -342,7 +342,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                 null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much " +
+                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions and much much much much much much much much much " +
                         "much much much much much much more. %s");
             }
         };
@@ -350,21 +350,21 @@ public class CompanyServiceImplTest extends BaseServiceTest {
             companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
         } catch (IllegalArgumentException e) {
             assertEquals(
-                    "Message length must be less than 160 in: You've got %s points at %s. Install Leal Points to see our promotions and much much " +
+                    "Message length must be less than 160 in: You've got %s points at %s. Install Monedero Bingo to see our promotions and much much " +
                             "much much much much much much much much much much much much much more. %s", e.getMessage());
         }
 
         companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Leal Points to see our promotions and much much much much much much much much much much " +
+                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions and much much much much much much much much much much " +
                         "much much much much much much much much much much much much much much much much much much much much more. %s");
             }
         };
         try {
             companyService.getSMSMessage("TG", 1000);
         } catch (IllegalArgumentException e) {
-            assertEquals("Message length must be less than 160 in: You've got %s points at %s. Install Leal Points to see our promotions and much " +
+            assertEquals("Message length must be less than 160 in: You've got %s points at %s. Install Monedero Bingo to see our promotions and much " +
                     "much much much much much much much much much much much much much much much much much much much much much much much much much much " +
                     "much much much more. %s", e.getMessage());
         }

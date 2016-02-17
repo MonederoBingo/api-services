@@ -16,7 +16,8 @@ public class ServiceMessage {
     }
 
     public static ServiceMessage createServiceMessage(Message message, Language defaultLanguage, String... params) {
-        ServiceMessage serviceMessage = new ServiceMessage(String.format(message.get(defaultLanguage), params));
+        String formatted = String.format(message.get(defaultLanguage), params);
+        ServiceMessage serviceMessage = new ServiceMessage(formatted);
         for (Language language : Language.values()) {
             serviceMessage.addTranslation(language, String.format(message.get(language), params));
         }
