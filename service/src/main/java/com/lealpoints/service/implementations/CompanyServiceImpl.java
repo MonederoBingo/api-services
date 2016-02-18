@@ -36,7 +36,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private final SMSServiceImpl _smsService;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
-    private final ConfigurationServiceImpl _configurationManager;
     private final ServiceUtil _serviceUtil;
     private final NotificationService _notificationService;
 
@@ -44,7 +43,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     public CompanyServiceImpl(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
                               PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
                               SMSServiceImpl smsService, CompanyClientMappingRepository companyClientMappingRepository,
-                              PromotionConfigurationRepository promotionConfigurationRepository, ConfigurationServiceImpl configurationManager, ServiceUtil serviceUtil,
+                              PromotionConfigurationRepository promotionConfigurationRepository, ServiceUtil serviceUtil,
                               NotificationService notificationService) {
         super(threadContextService);
         _companyRepository = companyRepository;
@@ -54,7 +53,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         _smsService = smsService;
         _companyClientMappingRepository = companyClientMappingRepository;
         _promotionConfigurationRepository = promotionConfigurationRepository;
-        _configurationManager = configurationManager;
         _serviceUtil = serviceUtil;
         _notificationService = notificationService;
     }
@@ -134,10 +132,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         }
     }
 
-    @OnlyProduction
     public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
-        final boolean sendPromoSmsInUat = Boolean.parseBoolean(_configurationManager.getUncachedConfiguration("send_promo_sms_in_uat"));
-        if (isProdEnvironment() || sendPromoSmsInUat) {
             try {
                 final Company company = _companyRepository.getByCompanyId(companyId);
                 long clientId = _clientRepository.getByPhone(phone).getClientId();
@@ -147,6 +142,8 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
                     logger.info("Promo SMS sent to: " + phone);
                     _smsService.sendSMSMessage(phone, smsMessage);
                     _clientRepository.updateCanReceivePromoSms(clientId, false);
+                    return new ServiceResult<>(true, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY),
+                            0, smsMessage);
                 } else {
                     logger.error("None company has the companyId: " + companyId);
                     return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
@@ -155,9 +152,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
                 logger.error(ex.getMessage(), ex);
                 return new ServiceResult(false, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY));
             }
-            return new ServiceResult(true, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY));
-        }
-        return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
     }
 
     public String getSMSMessage(String companyName, double points) {

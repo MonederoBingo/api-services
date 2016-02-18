@@ -458,7 +458,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository,
                 clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, null, new ServiceUtil(), notificationService) {
+                null, null, promotionConfigurationRepository, new ServiceUtil(), notificationService) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
             }

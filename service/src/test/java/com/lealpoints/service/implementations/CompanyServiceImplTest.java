@@ -211,14 +211,11 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
         expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
 
-        ConfigurationServiceImpl configurationManager = createStrictMock(ConfigurationServiceImpl.class);
-        expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("false");
-
-        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository, configurationManager);
+        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        configurationManager, null, null) {
+                        null, null) {
 
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -233,16 +230,15 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
-        verify(smsService, clientRepository, configurationManager);
+        verify(smsService, clientRepository);
     }
 
     @Test
     public void testSendMobileAppAdMessageWhenIsNotProdEnv() throws Exception {
         ConfigurationServiceImpl configurationManager = createStrictMock(ConfigurationServiceImpl.class);
-        expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("false");
         replay(configurationManager);
         CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
-                configurationManager, null, null) {
+                null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -255,7 +251,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         };
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertFalse(serviceResult.isSuccess());
-        assertEquals(Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
+        assertEquals(Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
         verify(configurationManager);
     }
 
@@ -275,14 +271,11 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
         expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
 
-        ConfigurationServiceImpl configurationManager = createStrictMock(ConfigurationServiceImpl.class);
-        expect(configurationManager.getUncachedConfiguration(anyString())).andReturn("true");
-
-        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository, configurationManager);
+        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
 
         CompanyServiceImpl companyService =
                 new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        configurationManager, null, null) {
+                        null, null) {
 
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -297,12 +290,12 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
-        verify(smsService, clientRepository, configurationManager);
+        verify(smsService, clientRepository);
     }
 
     @Test
     public void testGetSMSMessage() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null,
+        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
                 null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -314,7 +307,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Monedero Bingo to see our promotions. " +
                 "https://goo.gl/JRssA6", smsMessage);
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
@@ -324,7 +317,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertNotNull(smsMessage);
         assertEquals("You've got 1000 points at TG. Install Monedero Bingo to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
@@ -339,7 +332,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     @Test
     public void testGetSMSMessageWithInvalidTranslation() {
         CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
-                null, null, null) {
+                null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions and much much much much much much much much much " +
@@ -354,7 +347,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                             "much much much much much much much much much much much much much more. %s", e.getMessage());
         }
 
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null, null) {
+        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions and much much much much much much much much much much " +
@@ -375,7 +368,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
                                                     ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository,
                                                     NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, null, new ServiceUtil(), notificationService) {
+                null, null, promotionConfigurationRepository, new ServiceUtil(), notificationService) {
             @Override
             void sendActivationEmail(String email, String activationKey) throws MessagingException {
             }

@@ -2,7 +2,9 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.common.PropertyManager;
 import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.service.ConfigurationService;
 import com.lealpoints.service.SMSService;
+import com.lealpoints.service.annotation.OnlyProduction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,28 +19,35 @@ import java.nio.charset.Charset;
 
 @Component
 public class SMSServiceImpl extends BaseServiceImpl implements SMSService {
+    private final ConfigurationService configurationService;
 
     @Autowired
-    public SMSServiceImpl(ThreadContextService threadContextService) {
+    public SMSServiceImpl(ThreadContextService threadContextService, ConfigurationService configurationService) {
         super(threadContextService);
+        this.configurationService = configurationService;
     }
 
+    @OnlyProduction
     public void sendSMSMessage(String phone, String message) throws IOException, MessagingException {
-        HttpURLConnection connection = null;
-        try {
-            message = message.replaceAll(" ", "%20");
-            URL url = getUrl(phone, message);
-            connection = getHttpURLConnection(url);
-            connection.setRequestMethod("GET");
-            String response = getResponse(connection);
-            if (!response.contains("OK")) {
-                throw new IllegalArgumentException("SMS Message could not be sent. phone: " + phone + ". message: " + message);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("SMS Message could not be sent. phone: " + phone + ". message: " + message);
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
+        final boolean sendPromoSmsInUat =
+                Boolean.parseBoolean(configurationService.getUncachedConfiguration("send_promo_sms_in_uat"));
+        if (isProdEnvironment() || sendPromoSmsInUat) {
+            HttpURLConnection connection = null;
+            try {
+                message = message.replaceAll(" ", "%20");
+                URL url = getUrl(phone, message);
+                connection = getHttpURLConnection(url);
+                connection.setRequestMethod("GET");
+                String response = getResponse(connection);
+                if (!response.contains("OK")) {
+                    throw new IllegalArgumentException("SMS Message could not be sent. phone: " + phone + ". message: " + message);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("SMS Message could not be sent. phone: " + phone + ". message: " + message);
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
             }
         }
     }

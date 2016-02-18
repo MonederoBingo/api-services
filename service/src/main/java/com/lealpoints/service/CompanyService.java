@@ -20,7 +20,6 @@ public interface CompanyService extends BaseService {
 
     ServiceResult<Boolean> updateLogo(List<FileItem> fileItems, long companyId);
 
-    @OnlyProduction
     ServiceResult sendMobileAppAdMessage(long companyId, String phone);
 
     String getSMSMessage(String companyName, double points);

@@ -1,5 +1,11 @@
 package com.lealpoints.service.implementations;
 
+import com.lealpoints.context.ThreadContext;
+import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.environments.Environment;
+import com.lealpoints.environments.ProdEnvironment;
+import com.lealpoints.environments.UnitTestEnvironment;
+import com.lealpoints.service.ConfigurationService;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -13,14 +19,16 @@ import java.net.URL;
 
 import static org.easymock.EasyMock.*;
 
-public class SMSServiceImplTest {
+public class SMSServiceImplTest extends ServiceBaseTest {
 
     @Test
     public void testSendSMSMessage() throws IOException, MessagingException {
 
         final HttpURLConnection httpURLConnection = creteHttpURLConnection();
-
-        SMSServiceImpl smsService = new SMSServiceImpl(null) {
+        final ConfigurationService configurationService = createConfigurationService();
+        final ThreadContext threadContext = createThreadContext();
+        final ThreadContextService threadContextService = createThreadContextService(threadContext);
+        SMSServiceImpl smsService = new SMSServiceImpl(threadContextService, configurationService) {
 
             @Override
             URL getUrl(String phone, String message) throws MalformedURLException {
@@ -45,6 +53,20 @@ public class SMSServiceImplTest {
 
         smsService.sendSMSMessage("6623471507", "message");
         verify(httpURLConnection);
+    }
+
+    private ThreadContext createThreadContext() {
+        ThreadContext threadContext = createMock(ThreadContext.class);
+        expect(threadContext.getEnvironment()).andReturn(new ProdEnvironment());
+        replay(threadContext);
+        return threadContext;
+    }
+
+    private ConfigurationService createConfigurationService() {
+        ConfigurationService configurationService = createMock(ConfigurationService.class);
+        expect(configurationService.getUncachedConfiguration(anyString())).andReturn("false");
+        replay(configurationService);
+        return configurationService;
     }
 
     private HttpURLConnection creteHttpURLConnection() throws ProtocolException {
