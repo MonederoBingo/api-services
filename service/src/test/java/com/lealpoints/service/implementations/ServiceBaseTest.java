@@ -9,10 +9,14 @@ import static org.easymock.EasyMock.replay;
 
 public class ServiceBaseTest {
 
-    protected static ThreadContextService createThreadContextService(ThreadContext threadContext) {
+    protected static ThreadContextService createThreadContextService(ThreadContext threadContext, int times) {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getThreadContext()).andReturn(threadContext);
+        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(times);
         replay(threadContextService);
         return threadContextService;
+    }
+
+    protected static ThreadContextService createThreadContextService(ThreadContext threadContext) {
+        return createThreadContextService(threadContext, 1);
     }
 }

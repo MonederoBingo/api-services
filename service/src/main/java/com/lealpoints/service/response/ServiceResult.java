@@ -8,15 +8,15 @@ public class ServiceResult<T> {
     private final T object;
     private String extraInfo;
 
-    public ServiceResult(boolean success, ServiceMessage serviceMessage, T object, String extraInfo) {
+    public ServiceResult(boolean success, ServiceMessage serviceMessage, T object) {
+        this(success, serviceMessage, object, "");
+    }
+
+    private ServiceResult(boolean success, ServiceMessage serviceMessage, T object, String extraInfo) {
         this.success = success;
         this.message = serviceMessage;
         this.object = object;
         this.extraInfo = extraInfo;
-    }
-
-    public ServiceResult(boolean success, ServiceMessage serviceMessage, T object) {
-        this(success, serviceMessage, object, "");
     }
 
     public ServiceResult(boolean success, ServiceMessage serviceMessage) {

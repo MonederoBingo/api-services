@@ -1,6 +1,7 @@
 package com.lealpoints.service;
 
 import com.lealpoints.model.Company;
+import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.PointsInCompany;
 import com.lealpoints.service.annotation.OnlyProduction;
 import com.lealpoints.service.model.CompanyRegistration;
@@ -20,9 +21,7 @@ public interface CompanyService extends BaseService {
 
     ServiceResult<Boolean> updateLogo(List<FileItem> fileItems, long companyId);
 
-    ServiceResult sendMobileAppAdMessage(long companyId, String phone);
-
-    String getSMSMessage(String companyName, double points);
-
     File getLogo(long companyId);
+
+    void setUserActivation(CompanyUser companyUser);
 }

@@ -6,7 +6,9 @@ import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.repository.CompanyUserRepository;
+import com.lealpoints.service.CompanyService;
 import com.lealpoints.service.CompanyUserService;
+import com.lealpoints.service.NotificationService;
 import com.lealpoints.service.model.*;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
@@ -26,18 +28,20 @@ import java.util.List;
 @Component
 public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUserService {
     private static final Logger logger = LogManager.getLogger(CompanyUserServiceImpl.class.getName());
-    private final CompanyUserRepository _companyUserRepository;
-    private final CompanyRepository _companyRepository;
-    private final CompanyServiceImpl _companyService;
+    private final CompanyUserRepository companyUserRepository;
+    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
+    private final NotificationService notificationService;
     private final ServiceUtil _serviceUtil;
 
     @Autowired
     public CompanyUserServiceImpl(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService,
-                                  CompanyRepository companyRepository, CompanyServiceImpl companyService, ServiceUtil serviceUtil) {
+                                  CompanyRepository companyRepository, CompanyService companyService, NotificationService notificationService, ServiceUtil serviceUtil) {
         super(threadContextService);
-        _companyUserRepository = companyUserRepository;
-        _companyRepository = companyRepository;
-        _companyService = companyService;
+        this.companyUserRepository = companyUserRepository;
+        this.companyRepository = companyRepository;
+        this.companyService = companyService;
+        this.notificationService = notificationService;
         _serviceUtil = serviceUtil;
     }
 
@@ -48,7 +52,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
             if (validateCredentials.isInvalid()) {
                 return new ServiceResult<>(false, validateCredentials.getServiceMessage());
             } else {
-                CompanyUser companyUser = _companyUserRepository.getByEmailAndPassword(companyUserLogin.getEmail(), companyUserLogin.getPassword());
+                CompanyUser companyUser = companyUserRepository.getByEmailAndPassword(companyUserLogin.getEmail(), companyUserLogin.getPassword());
                 final ValidationResult validateLogin = validateUserLogin(companyUser, loginResult);
                 if (validateLogin.isInvalid()) {
                     return new ServiceResult<>(false, validateLogin.getServiceMessage(), loginResult);
@@ -60,7 +64,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
                     loginResult.setCompanyId(companyUser.getCompanyId());
                     loginResult.setCompanyUserId(companyUser.getCompanyUserId());
                     loginResult.setLanguage(companyUser.getLanguage());
-                    loginResult.setCompanyName(_companyRepository.getByCompanyId(companyUser.getCompanyId()).getName());
+                    loginResult.setCompanyName(companyRepository.getByCompanyId(companyUser.getCompanyId()).getName());
                     loginResult.setApiKey(apiKey);
                     return new ServiceResult<>(true, ServiceMessage.EMPTY, loginResult);
                 }
@@ -74,9 +78,9 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
     public ServiceResult activateUser(String activationKey) {
         try {
             getQueryAgent().beginTransaction();
-            int updatedRows = _companyUserRepository.updateActivateByActivationKey(activationKey);
+            int updatedRows = companyUserRepository.updateActivateByActivationKey(activationKey);
             if (updatedRows > 0) {
-                _companyUserRepository.clearActivationKey(activationKey);
+                companyUserRepository.clearActivationKey(activationKey);
                 getQueryAgent().commitTransaction();
                 return new ServiceResult(true, getServiceMessage(Message.YOUR_USER_HAS_BEEN_ACTIVATED));
             } else {
@@ -91,11 +95,11 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     public ServiceResult sendActivationEmail(String email) {
         try {
-            final CompanyUser companyUser = _companyUserRepository.getByEmail(email);
+            final CompanyUser companyUser = companyUserRepository.getByEmail(email);
             if (companyUser == null) {
                 return new ServiceResult(false, getServiceMessage(Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
-            _companyService.sendActivationEmail(email, companyUser.getActivationKey());
+            notificationService.sendActivationEmail(email, companyUser.getActivationKey());
             return new ServiceResult(true, getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -105,12 +109,12 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     public ServiceResult sendTempPasswordEmail(String email) {
         try {
-            final CompanyUser companyUser = _companyUserRepository.getByEmail(email);
+            final CompanyUser companyUser = companyUserRepository.getByEmail(email);
             if (companyUser == null) {
                 return new ServiceResult(false, getServiceMessage(Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
             final String tempPassword = RandomStringUtils.random(8, true, true);
-            final int updatedRows = _companyUserRepository.updatePasswordByEmail(email, tempPassword, true);
+            final int updatedRows = companyUserRepository.updatePasswordByEmail(email, tempPassword, true);
             if (updatedRows > 0) {
                 sendTempPasswordEmail(email, tempPassword);
             } else {
@@ -128,7 +132,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
             final ValidationResult validationResult = validatePassword(passwordChanging);
             if (validationResult.isValid()) {
                 final int updatedRows =
-                    _companyUserRepository.updatePasswordByEmail(passwordChanging.getEmail(), passwordChanging.getNewPassword(), false);
+                    companyUserRepository.updatePasswordByEmail(passwordChanging.getEmail(), passwordChanging.getNewPassword(), false);
                 if (updatedRows > 0) {
                     return new ServiceResult<>(true, getServiceMessage(Message.YOUR_PASSWORD_HAS_BEEN_CHANGED));
                 } else {
@@ -208,7 +212,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     public ServiceResult<List<CompanyUser>> getByCompanyId(long companyId) {
         try {
-            final List<CompanyUser> companyUsers = _companyUserRepository.getByCompanyId(companyId);
+            final List<CompanyUser> companyUsers = companyUserRepository.getByCompanyId(companyId);
             return new ServiceResult<>(true, ServiceMessage.EMPTY, companyUsers);
         } catch (Exception ex){
             logger.error(ex.getMessage(), ex);
@@ -228,7 +232,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         if (!EmailValidator.getInstance().isValid(companyUserRegistration.getEmail())) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_INVALID));
         }
-        if (_companyUserRepository.getByEmail(companyUserRegistration.getEmail()) != null) {
+        if (companyUserRepository.getByEmail(companyUserRegistration.getEmail()) != null) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_ALREADY_EXISTS));
         }
         return new ValidationResult(true, ServiceMessage.EMPTY);
@@ -236,7 +240,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     private String updateApiKey(CompanyUser companyUser) throws Exception {
         String apiKey = RandomStringUtils.random(20, true, true) + "com";
-        final int updatedRows = _companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
+        final int updatedRows = companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
         if (updatedRows != 1) {
             logger.error("The company user api key could not be updated. updatedRows: " + updatedRows);
             throw new RuntimeException(getServiceMessage(Message.COMMON_USER_ERROR).getMessage());
@@ -250,13 +254,12 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         companyUser.setName(companyUserRegistration.getName());
         companyUser.setPassword(_serviceUtil.generatePassword());
         companyUser.setEmail(companyUserRegistration.getEmail());
-        _companyService.setUserActivation(companyUser);
+        companyService.setUserActivation(companyUser);
         companyUser.setActivationKey(_serviceUtil.generateActivationKey());
         String language = getThreadContext().getLanguage().getLangId();
         companyUser.setLanguage(language);
         companyUser.setMustChangePassword(true);
-        companyUser.setCompanyUserId(_companyUserRepository.insert(companyUser));
-        NotificationService notificationService = new NotificationService(getThreadContextService());
+        companyUser.setCompanyUserId(companyUserRepository.insert(companyUser));
         notificationService.sendActivationEmail(companyUser,
                 getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage(),
                 getServiceMessage(Message.TEMPORAL_PASSWORD).getMessage() + "  " + companyUser.getPassword(),

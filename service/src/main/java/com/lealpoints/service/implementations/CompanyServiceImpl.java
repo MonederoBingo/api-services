@@ -5,13 +5,12 @@ import com.lealpoints.i18n.Message;
 import com.lealpoints.model.*;
 import com.lealpoints.repository.*;
 import com.lealpoints.service.CompanyService;
-import com.lealpoints.service.annotation.OnlyProduction;
+import com.lealpoints.service.NotificationService;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.service.util.ServiceUtil;
-import com.lealpoints.util.EmailUtil;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -20,9 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.mail.MessagingException;
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -33,16 +30,13 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     private final CompanyUserRepository _companyUserRepository;
     private final PointsConfigurationRepository _pointsConfigurationRepository;
     private final ClientRepository _clientRepository;
-    private final SMSServiceImpl _smsService;
-    private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PromotionConfigurationRepository _promotionConfigurationRepository;
     private final ServiceUtil _serviceUtil;
-    private final NotificationService _notificationService;
+    private final NotificationService notificationService;
 
     @Autowired
     public CompanyServiceImpl(CompanyRepository companyRepository, CompanyUserRepository companyUserRepository,
                               PointsConfigurationRepository pointsConfigurationRepository, ClientRepository clientRepository, ThreadContextService threadContextService,
-                              SMSServiceImpl smsService, CompanyClientMappingRepository companyClientMappingRepository,
                               PromotionConfigurationRepository promotionConfigurationRepository, ServiceUtil serviceUtil,
                               NotificationService notificationService) {
         super(threadContextService);
@@ -50,11 +44,9 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         _companyUserRepository = companyUserRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
-        _smsService = smsService;
-        _companyClientMappingRepository = companyClientMappingRepository;
         _promotionConfigurationRepository = promotionConfigurationRepository;
         _serviceUtil = serviceUtil;
-        _notificationService = notificationService;
+        this.notificationService = notificationService;
     }
 
     public ServiceResult<String> register(CompanyRegistration companyRegistration) {
@@ -132,44 +124,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         }
     }
 
-    public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
-            try {
-                final Company company = _companyRepository.getByCompanyId(companyId);
-                long clientId = _clientRepository.getByPhone(phone).getClientId();
-                final double points = _companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
-                if (company != null) {
-                    final String smsMessage = getSMSMessage(company.getName(), points);
-                    logger.info("Promo SMS sent to: " + phone);
-                    _smsService.sendSMSMessage(phone, smsMessage);
-                    _clientRepository.updateCanReceivePromoSms(clientId, false);
-                    return new ServiceResult<>(true, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY),
-                            0, smsMessage);
-                } else {
-                    logger.error("None company has the companyId: " + companyId);
-                    return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
-                }
-            } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
-                return new ServiceResult(false, getServiceMessage(Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY));
-            }
-    }
-
-    public String getSMSMessage(String companyName, double points) {
-        final String translation = getServiceMessage(Message.MOBILE_APP_AD_MESSAGE).getMessage();
-        int SMS_MESSAGE_MAX_CHAR = 160;
-        final String appUrl = "https://goo.gl/JRssA6";
-        final int formattedMessageLength = String.format(translation, points, "", appUrl).length();
-        if (formattedMessageLength >= SMS_MESSAGE_MAX_CHAR) {
-            throw new IllegalArgumentException("Message length must be less than " + SMS_MESSAGE_MAX_CHAR + " in: " + translation);
-        }
-        final int maxCompanyNameLength = SMS_MESSAGE_MAX_CHAR - formattedMessageLength;
-        String trimmedCompanyName = "";
-        if (maxCompanyNameLength > 0) {
-            trimmedCompanyName = StringUtils.abbreviate(companyName, Math.max(Math.min(maxCompanyNameLength, companyName.length()), 4));
-        }
-        return String.format(translation, new DecimalFormat("#.#").format(points), trimmedCompanyName, appUrl);
-    }
-
     public File getLogo(long companyId) {
         try {
             final Company company = _companyRepository.getByCompanyId(companyId);
@@ -212,7 +166,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         registerPointsConfiguration(companyId);
         registerPromotionConfiguration(companyId);
         registerCompanyUser(companyRegistration, companyId, activationKey);
-        sendActivationEmail(companyRegistration.getEmail(), activationKey);
+        notificationService.sendActivationEmail(companyRegistration.getEmail(), activationKey);
         return companyId;
     }
 
@@ -234,7 +188,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         return activationKey;
     }
 
-    void setUserActivation(CompanyUser companyUser) {
+    public void setUserActivation(CompanyUser companyUser) {
         if (isDevEnvironment()) {
             companyUser.setActive(true);
         } else {
@@ -263,17 +217,6 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         company.setName(companyRegistration.getCompanyName());
         company.setUrlImageLogo(companyRegistration.getUrlImageLogo());
         return _companyRepository.insert(company);
-    }
-
-    void sendActivationEmail(String email, String activationKey) throws MessagingException {
-        if (isProdEnvironment() || isUATEnvironment()) {
-            NotificationEmail notificationEmail = new NotificationEmail();
-            notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
-            final String activationUrl = _notificationService.getActivationUrl(activationKey);
-            notificationEmail.setBody(getServiceMessage(Message.ACTIVATION_EMAIL_BODY) + "\n\n" + activationUrl);
-            notificationEmail.setEmailTo(email);
-            EmailUtil.sendEmail(notificationEmail);
-        }
     }
 
     private ValidationResult validateRegistration(CompanyRegistration companyRegistration) throws Exception {

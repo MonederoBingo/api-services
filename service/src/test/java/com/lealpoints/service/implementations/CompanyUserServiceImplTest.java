@@ -8,6 +8,7 @@ import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.*;
 import com.lealpoints.repository.*;
+import com.lealpoints.service.NotificationService;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyUserLogin;
 import com.lealpoints.service.model.CompanyUserPasswordChanging;
@@ -34,7 +35,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository(companyUser);
         CompanyRepository companyRepository = createCompanyRepository();
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null,
-                companyRepository, null, new ServiceUtil());
+                companyRepository, null, null, new ServiceUtil());
         replay(companyUserRepository);
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
@@ -59,8 +60,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         expectedUsers.add(createCompanyUser("fernando", "fernando@monederobingo.com"));
         expectedUsers.add(createCompanyUser("alonso", "alonso@monederobingo.com"));
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForGet(expectedUsers);
-        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null
-                , null);
+        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null, null);
         ServiceResult<List<CompanyUser>> serviceResult = companyUserService.getByCompanyId(1);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
@@ -78,7 +78,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testUserLoginWithoutEmail() throws Exception {
-        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(null, null, null, null, null) {
+        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -96,7 +96,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testUserLoginWithoutPassword() throws Exception {
-        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(null, null, null, null, null) {
+        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(null, null, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -117,7 +117,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", false, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryIsNotActive(companyUser);
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null,
-                null, null, null) {
+                null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -143,7 +143,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null,
-                null, null, null) {
+                null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -167,7 +167,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final QueryAgent queryAgent = createQueryAgent();
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
-                threadContextService, null, null, null) {
+                threadContextService, null, null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -180,9 +180,10 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void sendActivationEmail() throws Exception {
-        CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendActivation();
-        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null,
-                createCompanyService(), null) {
+        final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendActivation();
+        final NotificationServiceImpl notificationService = createNotificationService();
+        final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null,
+                null, notificationService, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -193,19 +194,19 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         assertTrue(serviceResult.isSuccess());
     }
 
-    private CompanyServiceImpl createCompanyService() throws MessagingException {
-        CompanyServiceImpl companyService = createNiceMock(CompanyServiceImpl.class);
-        companyService.sendActivationEmail(anyString(), anyString());
+    private NotificationServiceImpl createNotificationService() throws MessagingException {
+        NotificationServiceImpl notificationService = createNiceMock(NotificationServiceImpl.class);
+        notificationService.sendActivationEmail(anyString(), anyString());
         expectLastCall();
-        replay(companyService);
-        return companyService;
+        replay(notificationService);
+        return notificationService;
     }
 
     @Test
     public void testSendActivationEmailWhenEmailDoesNotExist() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingActivationWhenEmailDoesNotExist();
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null,
-                createCompanyService(), null) {
+                null, null, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -221,7 +222,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     public void testSendTestPasswordEmail() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
-                null, null, null, null) {
+                null, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
 
@@ -242,7 +243,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testChangePassword() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null) {
+        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
 
@@ -266,7 +267,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testChangePasswordWithInvalidPasswords() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null) {
+        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
 
@@ -290,7 +291,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testChangePasswordWithNotSamePasswords() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingTempPasswordEmail();
-        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null) {
+        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null, null) {
             @Override
             void sendTempPasswordEmail(String email, String tempPassword) throws MessagingException {
             }
@@ -393,16 +394,9 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     public void testRegister() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository();
         final QueryAgent queryAgent = createQueryAgent();
-        ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
-        threadContext.setLanguage(Language.ENGLISH);
-        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
-        CompanyServiceImpl companyService =
-                createCompanyService(null, companyUserRepository, createPointsConfigurationRepository(),
-                        threadContextService, null, createStrictMock(PromotionConfigurationRepository.class),
-                        new NotificationService(threadContextService));
-        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
-                threadContextService, null, companyService, new ServiceUtil());
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent);
+        final CompanyServiceImpl companyService = createCompanyService(companyUserRepository, threadContextService);
+        final CompanyUserServiceImpl companyUserService = createCompanyUserService(companyUserRepository, threadContextService, companyService);
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
         companyUserRegistration.setName("user name");
         companyUserRegistration.setEmail("email@test.com");
@@ -414,18 +408,26 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         verify(companyUserRepository, threadContextService, queryAgent);
     }
 
+    private CompanyUserServiceImpl createCompanyUserService(CompanyUserRepository companyUserRepository,
+                                                            ThreadContextService threadContextService,
+                                                            CompanyServiceImpl companyService) throws MessagingException {
+        return new CompanyUserServiceImpl(companyUserRepository,
+                    threadContextService, null, companyService, createNotificationService(), new ServiceUtil());
+    }
+
+    private CompanyServiceImpl createCompanyService(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService) throws Exception {
+        return createCompanyService(null, companyUserRepository, createPointsConfigurationRepository(),
+                threadContextService, null, createStrictMock(PromotionConfigurationRepository.class), null);
+    }
+
     @Test
     public void testRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
         final QueryAgent queryAgent = createQueryAgent();
-        ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
-        threadContext.setLanguage(Language.ENGLISH);
-        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent);
         CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null,
-                new NotificationService(threadContextService));
-        CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
-                threadContextService, null, companyService, new ServiceUtil());
+                null);
+        CompanyUserServiceImpl companyUserService = createCompanyUserService(companyUserRepository, threadContextService, companyService);
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
         companyUserRegistration.setName("name");
         companyUserRegistration.setEmail("test@lealpoints.com");
@@ -458,11 +460,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository,
                 clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, new ServiceUtil(), notificationService) {
-            @Override
-            void sendActivationEmail(String email, String activationKey) throws MessagingException {
-            }
-
+                promotionConfigurationRepository, new ServiceUtil(), notificationService) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
@@ -478,11 +476,13 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         return companyUserRepository;
     }
 
-    private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent,
-                                                                          ThreadContext threadContext) throws SQLException {
+    private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent) throws SQLException {
+        ThreadContext threadContext = new ThreadContext();
+        threadContext.setEnvironment(new DevEnvironment());
+        threadContext.setLanguage(Language.ENGLISH);
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
-        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(8);
+        expect(threadContextService.getThreadContext()).andReturn(threadContext).times(6);
         replay(threadContextService);
         return threadContextService;
     }

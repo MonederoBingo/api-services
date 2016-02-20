@@ -54,13 +54,6 @@ public class CompanyController extends BaseController {
 
     }
 
-    @RequestMapping(value = "/{companyId}/{phone}/send_promo_sms", method = PUT)
-    @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult> sendMobileAppAdMessage(@PathVariable("companyId") long companyId, @PathVariable("phone") String phone) {
-        ServiceResult serviceResult = _companyService.sendMobileAppAdMessage(companyId, phone);
-        return new ResponseEntity<>(serviceResult, HttpStatus.OK);
-    }
-
     ServletFileUpload getServletFileUpload() {
         return new ServletFileUpload(new DiskFileItemFactory());
     }

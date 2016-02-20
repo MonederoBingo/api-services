@@ -7,6 +7,7 @@ import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.*;
 import com.lealpoints.repository.*;
+import com.lealpoints.service.NotificationService;
 import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
@@ -37,9 +38,10 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         PromotionConfigurationRepository promotionConfigurationRepository = createStrictMock(PromotionConfigurationRepository.class);
         expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1L);
         replay(promotionConfigurationRepository);
+        NotificationService notificationService = createNotificationService();
         CompanyServiceImpl companyService =
                 createCompanyService(companyRepository, companyUserRepository, pointsConfigurationRepository, threadContextService, null,
-                        promotionConfigurationRepository, new NotificationService(threadContextService));
+                        promotionConfigurationRepository, notificationService);
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setCompanyName("company name");
         companyRegistration.setUsername("user name");
@@ -54,6 +56,14 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertNotNull(serviceResult.getMessage());
         assertEquals(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK.name(), serviceResult.getMessage());
         verify(companyRepository, companyUserRepository, threadContextService, queryAgent, pointsConfigurationRepository);
+    }
+
+    private NotificationService createNotificationService() throws MessagingException {
+        NotificationService notificationService = createMock(NotificationService.class);
+        notificationService.sendActivationEmail(anyString(), anyString());
+        expectLastCall();
+        replay(notificationService);
+        return notificationService;
     }
 
     @Test
@@ -195,183 +205,15 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertNotNull(logo);
     }
 
-    @Test
-    public void testSendMobileAppAdMessage() throws Exception {
-        SMSServiceImpl smsService = createStrictMock(SMSServiceImpl.class);
-        smsService.sendSMSMessage(anyString(), anyString());
-        expectLastCall();
-
-        CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
-
-        CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
-
-        ClientRepository clientRepository = createStrictMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
-        expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
-
-        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
-
-        CompanyServiceImpl companyService =
-                new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        null, null) {
-
-                    @Override
-                    public ServiceMessage getServiceMessage(Message message, String... params) {
-                        return new ServiceMessage(message.name());
-                    }
-
-                    @Override
-                    public boolean isProdEnvironment() {
-                        return true;
-                    }
-                };
-        final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
-        assertTrue(serviceResult.isSuccess());
-        assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
-        verify(smsService, clientRepository);
-    }
-
-    @Test
-    public void testSendMobileAppAdMessageWhenIsNotProdEnv() throws Exception {
-        ConfigurationServiceImpl configurationManager = createStrictMock(ConfigurationServiceImpl.class);
-        replay(configurationManager);
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
-                null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage(message.name());
-            }
-
-            @Override
-            public boolean isProdEnvironment() {
-                return false;
-            }
-        };
-        final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
-        assertFalse(serviceResult.isSuccess());
-        assertEquals(Message.MOBILE_APP_AD_MESSAGE_WAS_NOT_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
-        verify(configurationManager);
-    }
-
-    @Test
-    public void testSendMobileAppAdMessageWhenConfIsEnabled() throws Exception {
-        SMSServiceImpl smsService = createStrictMock(SMSServiceImpl.class);
-        smsService.sendSMSMessage(anyString(), anyString());
-        expectLastCall();
-
-        CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
-
-        CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
-
-        ClientRepository clientRepository = createStrictMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
-        expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
-
-        replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
-
-        CompanyServiceImpl companyService =
-                new CompanyServiceImpl(companyRepository, null, null, clientRepository, null, smsService, companyClientMappingRepository, null,
-                        null, null) {
-
-                    @Override
-                    public ServiceMessage getServiceMessage(Message message, String... params) {
-                        return new ServiceMessage(message.name());
-                    }
-
-                    @Override
-                    public boolean isProdEnvironment() {
-                        return false;
-                    }
-                };
-        final ServiceResult serviceResult = companyService.sendMobileAppAdMessage(0, "6623471507");
-        assertTrue(serviceResult.isSuccess());
-        assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
-        verify(smsService, clientRepository);
-    }
-
-    @Test
-    public void testGetSMSMessage() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
-                null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
-            }
-        };
-        String smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name", 1000);
-        assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Monedero Bingo to see our promotions. " +
-                "https://goo.gl/JRssA6", smsMessage);
-
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
-            }
-        };
-        smsMessage = companyService.getSMSMessage("TG", 1000);
-        assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at TG. Install Monedero Bingo to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
-
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
-            }
-        };
-        smsMessage = companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
-        assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does n.... " +
-                "Install Monedero Bingo to see our promotions. https://goo.gl/JRssA6", smsMessage);
-    }
-
-    @Test
-    public void testGetSMSMessageWithInvalidTranslation() {
-        CompanyServiceImpl companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null,
-                null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions and much much much much much much much much much " +
-                        "much much much much much much more. %s");
-            }
-        };
-        try {
-            companyService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
-        } catch (IllegalArgumentException e) {
-            assertEquals(
-                    "Message length must be less than 160 in: You've got %s points at %s. Install Monedero Bingo to see our promotions and much much " +
-                            "much much much much much much much much much much much much much more. %s", e.getMessage());
-        }
-
-        companyService = new CompanyServiceImpl(null, null, null, null, null, null, null, null, null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions and much much much much much much much much much much " +
-                        "much much much much much much much much much much much much much much much much much much much much more. %s");
-            }
-        };
-        try {
-            companyService.getSMSMessage("TG", 1000);
-        } catch (IllegalArgumentException e) {
-            assertEquals("Message length must be less than 160 in: You've got %s points at %s. Install Monedero Bingo to see our promotions and much " +
-                    "much much much much much much much much much much much much much much much much much much much much much much much much much much " +
-                    "much much much more. %s", e.getMessage());
-        }
-    }
-
-    private CompanyServiceImpl createCompanyService(final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
-                                                    final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
-                                                    ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository,
+    private CompanyServiceImpl createCompanyService(final CompanyRepository companyRepository,
+                                                    final CompanyUserRepository companyUserRepository,
+                                                    final PointsConfigurationRepository pointsConfigurationRepository,
+                                                    final ThreadContextService threadContextService,
+                                                    ClientRepository clientRepository,
+                                                    PromotionConfigurationRepository promotionConfigurationRepository,
                                                     NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository, clientRepository, threadContextService,
-                null, null, promotionConfigurationRepository, new ServiceUtil(), notificationService) {
-            @Override
-            void sendActivationEmail(String email, String activationKey) throws MessagingException {
-            }
+                promotionConfigurationRepository, new ServiceUtil(), notificationService) {
 
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
