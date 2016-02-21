@@ -179,12 +179,12 @@ public enum Message {
             "Ingresa tu contraseña"
     ),
     MOBILE_APP_AD_MESSAGE(
-            "You've got %s points at %s. Install Monedero Bingo to see our promotions. %s",
+            "You've got %s points. Install Monedero Bingo to see our promotions. %s",
 
-            "Tienes %s puntos en %s. Instala Monedero Bingo para ver las promociones. %s"
+            "Has obtenido %s puntos. Instala Monedero Bingo para ver las promociones. %s"
     ),
     MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY(
-            "Mobile app ad message was sent successfully",
+            "Mobile app ad message was successfully sent.",
 
             "El mensaje de promoción de Monedero Bingo fue enviado exitosamente."
     ),

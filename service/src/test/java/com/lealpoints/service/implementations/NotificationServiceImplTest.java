@@ -1,5 +1,8 @@
 package com.lealpoints.service.implementations;
 
+import com.lealpoints.context.ThreadContext;
+import com.lealpoints.context.ThreadContextService;
+import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.Company;
@@ -107,38 +110,27 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
     }
 
     @Test
-    public void testGetSMSMessage() {
-        NotificationServiceImpl notificationService = new NotificationServiceImpl(null, null, null, null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
-            }
-        };
-        String smsMessage = notificationService.getSMSMessage("New Company From an Awesome Place and a Big Name", 1000);
+    public void getSMSMessageSpanish() {
+        ThreadContext threadContext = createMock(ThreadContext.class);
+        expect(threadContext.getLanguage()).andReturn(Language.SPANISH);
+        replay(threadContext);
+        ThreadContextService threadContextService = createThreadContextService(threadContext);
+        NotificationServiceImpl notificationService = new NotificationServiceImpl(threadContextService, null, null, null, null);
+        String smsMessage = notificationService.getSMSMessage(1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name. Install Monedero Bingo to see our promotions. " +
-                "https://goo.gl/JRssA6", smsMessage);
+        assertEquals("Has obtenido 1000 puntos. Instala Monedero Bingo para ver las promociones. https://goo.gl/JRssA6", smsMessage);
+    }
 
-        notificationService = new NotificationServiceImpl(null, null, null, null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
-            }
-        };
-        smsMessage = notificationService.getSMSMessage("TG", 1000);
+    @Test
+    public void getSMSMessageEnglish() {
+        ThreadContext threadContext = createMock(ThreadContext.class);
+        expect(threadContext.getLanguage()).andReturn(Language.ENGLISH);
+        replay(threadContext);
+        ThreadContextService threadContextService = createThreadContextService(threadContext);
+        NotificationServiceImpl notificationService = new NotificationServiceImpl(threadContextService, null, null, null, null);
+        String smsMessage = notificationService.getSMSMessage(1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at TG. Install Monedero Bingo to see our promotions. " + "https://goo.gl/JRssA6", smsMessage);
-
-        notificationService = new NotificationServiceImpl(null, null, null, null, null) {
-            @Override
-            public ServiceMessage getServiceMessage(Message message, String... params) {
-                return new ServiceMessage("You've got %s points at %s. Install Monedero Bingo to see our promotions. %s");
-            }
-        };
-        smsMessage = notificationService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
-        assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points at New Company From an Awesome Place and a Big Name that does n.... " +
-                "Install Monedero Bingo to see our promotions. https://goo.gl/JRssA6", smsMessage);
+        assertEquals("You've got 1000 points. Install Monedero Bingo to see our promotions. https://goo.gl/JRssA6", smsMessage);
     }
 
     @Test
@@ -151,7 +143,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
             }
         };
         try {
-            notificationService.getSMSMessage("New Company From an Awesome Place and a Big Name that does not fit in the message", 1000);
+            notificationService.getSMSMessage(1000);
         } catch (IllegalArgumentException e) {
             assertEquals(
                     "Message length must be less than 160 in: You've got %s points at %s. Install Monedero Bingo to see our promotions and much much " +
@@ -166,7 +158,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
             }
         };
         try {
-            notificationService.getSMSMessage("TG", 1000);
+            notificationService.getSMSMessage(1000);
         } catch (IllegalArgumentException e) {
             assertEquals("Message length must be less than 160 in: You've got %s points at %s. Install Monedero Bingo to see our promotions and much " +
                     "much much much much much much much much much much much much much much much much much much much much much much much much much much " +

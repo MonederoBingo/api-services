@@ -14,7 +14,7 @@ public interface NotificationService extends BaseService {
 
     String getActivationUrl(String activationKey);
 
-    String getSMSMessage(String companyName, double points);
+    String getSMSMessage(double points);
 
     void sendActivationEmail(String email, String activationKey) throws MessagingException;
 }

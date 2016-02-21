@@ -2,6 +2,7 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
+import com.lealpoints.model.Client;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
@@ -41,10 +42,14 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
     public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
         try {
             final Company company = companyRepository.getByCompanyId(companyId);
-            long clientId = clientRepository.getByPhone(phone).getClientId();
+            final Client client = clientRepository.getByPhone(phone);
+            if (client == null) {
+                return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
+            }
+            long clientId = client.getClientId();
             final double points = companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
             if (company != null) {
-                final String smsMessage = getSMSMessage(company.getName(), points);
+                final String smsMessage = getSMSMessage(points);
                 logger.info("Promo SMS sent to: " + phone);
                 _smsService.sendSMSMessage(phone, smsMessage);
                 clientRepository.updateCanReceivePromoSms(clientId, false);
@@ -77,20 +82,10 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
         return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
     }
 
-    public String getSMSMessage(String companyName, double points) {
+    public String getSMSMessage(double points) {
         final String appUrl = "https://goo.gl/JRssA6";
-        final String translation = getServiceMessage(Message.MOBILE_APP_AD_MESSAGE, String.valueOf(points), "", appUrl).getMessage();
-        final int SMS_MESSAGE_MAX_CHAR = 160;
-        final int formattedMessageLength = String.format(translation, points, "", appUrl).length();
-        if (formattedMessageLength >= SMS_MESSAGE_MAX_CHAR) {
-            throw new IllegalArgumentException("Message length must be less than " + SMS_MESSAGE_MAX_CHAR + " in: " + translation);
-        }
-        final int maxCompanyNameLength = SMS_MESSAGE_MAX_CHAR - formattedMessageLength;
-        String trimmedCompanyName = "";
-        if (maxCompanyNameLength > 0) {
-            trimmedCompanyName = StringUtils.abbreviate(companyName, Math.max(Math.min(maxCompanyNameLength, companyName.length()), 4));
-        }
-        return String.format(translation, new DecimalFormat("#.#").format(points), trimmedCompanyName, appUrl);
+        return getServiceMessage(Message.MOBILE_APP_AD_MESSAGE, new DecimalFormat("#.#").format(points), appUrl)
+                .getMessage();
     }
 
     public void sendActivationEmail(String email, String activationKey) throws MessagingException {
