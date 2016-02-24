@@ -14,14 +14,14 @@ import static org.junit.Assert.assertNotNull;
 public class PromotionControllerTest {
 
     @Test
-    public void testAwardPoints() throws Exception {
+    public void applyPromotion() throws Exception {
         ServiceResult<Long> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, 1L);
         PromotionServiceImpl promotionService = createPromotionService(expectedServiceResult);
         PromotionController pointsController = new PromotionController(promotionService);
         PromotionApplying pointsAwarding = new PromotionApplying();
         pointsAwarding.setPromotionConfigurationId(1);
         pointsAwarding.setCompanyId(1);
-        pointsAwarding.setPhone("1234567890");
+        pointsAwarding.setPhoneNumber("1234567890");
 
         ResponseEntity<ServiceResult<Long>> responseEntity = pointsController.applyPromotion(pointsAwarding);
         assertNotNull(responseEntity);

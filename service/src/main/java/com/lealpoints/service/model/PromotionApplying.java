@@ -3,7 +3,7 @@ package com.lealpoints.service.model;
 public class PromotionApplying {
     private long promotionConfigurationId;
     private long companyId;
-    private String phone;
+    private String phoneNumber;
 
     public long getPromotionConfigurationId() {
         return promotionConfigurationId;
@@ -22,10 +22,10 @@ public class PromotionApplying {
     }
 
     public String getPhone() {
-        return phone;
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phone) {
+        this.phoneNumber = phoneNumber;
     }
 }

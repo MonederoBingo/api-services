@@ -43,7 +43,7 @@ public class PromotionServiceImplTest extends BaseServiceTest {
         PromotionApplying promotionApplying = new PromotionApplying();
         promotionApplying.setPromotionConfigurationId(1);
         promotionApplying.setCompanyId(1);
-        promotionApplying.setPhone("1234567890");
+        promotionApplying.setPhoneNumber("1234567890");
 
         ServiceResult<Long> serviceResult = promotionService.applyPromotion(promotionApplying);
         assertNotNull(serviceResult);
