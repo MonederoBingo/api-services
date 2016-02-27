@@ -55,7 +55,9 @@ public class PromotionServiceImplTest extends BaseServiceTest {
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository() throws Exception {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+        CompanyClientMapping companyClientMapping = new CompanyClientMapping();
+        companyClientMapping.setClient(new Client());
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(companyClientMapping);
         expect(companyClientMappingRepository.updatePoints((CompanyClientMapping) anyObject())).andReturn(1);
         replay(companyClientMappingRepository);
         return companyClientMappingRepository;

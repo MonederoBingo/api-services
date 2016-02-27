@@ -43,10 +43,19 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
             final QueryAgent queryAgent = getQueryAgent();
             final Client client = _clientRepository.getByPhone(promotionApplying.getPhone());
             if (client == null) {
-                throw new IllegalArgumentException("Client doesn't exist.");
+                return new ServiceResult<>(true, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
+            }
+
+            CompanyClientMapping companyClientMapping = _companyClientMappingRepository.getByCompanyIdClientId(
+                    promotionApplying.getCompanyId(), client.getClientId());
+            PromotionConfiguration promotionConfiguration = _promotionConfigurationRepository.getById(
+                    promotionApplying.getPromotionConfigurationId());
+
+            if (companyClientMapping.getPoints() < promotionConfiguration.getRequiredPoints()) {
+                return new ServiceResult<>(true, getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_ENOUGH_POINTS));
             }
             queryAgent.beginTransaction();
-            long promotionId = insertPromotionAndUpdatePoints(promotionApplying, client);
+            long promotionId = insertPromotionAndUpdatePoints(promotionConfiguration, companyClientMapping);
             queryAgent.commitTransaction();
             return new ServiceResult<>(true, getServiceMessage(Message.PROMOTION_APPLIED), promotionId);
         } catch (Exception ex) {
@@ -55,22 +64,20 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
         }
     }
 
-    private long insertPromotionAndUpdatePoints(PromotionApplying promotionApplying, Client client) throws Exception {
-        PromotionConfiguration promotionConfiguration = _promotionConfigurationRepository.getById(promotionApplying.getPromotionConfigurationId());
+    private long insertPromotionAndUpdatePoints(PromotionConfiguration promotionConfiguration,
+                                                CompanyClientMapping companyClientMapping) throws Exception {
+
         if (promotionConfiguration == null) {
             throw new IllegalArgumentException("promotionConfiguration doesn't exist");
         }
         Promotion promotion = new Promotion();
-        promotion.setCompanyId(promotionApplying.getCompanyId());
-        promotion.setClientId(client.getClientId());
+        promotion.setCompanyId(promotionConfiguration.getCompanyId());
+        promotion.setClientId(companyClientMapping.getClient().getClientId());
         promotion.setDescription(promotionConfiguration.getDescription());
         promotion.setUsedPoints(promotionConfiguration.getRequiredPoints());
         promotion.setDate(DateUtil.dateNow());
         long promotionId = _promotionRepository.insert(promotion);
 
-        //Updating points in client table
-        CompanyClientMapping companyClientMapping =
-            _companyClientMappingRepository.getByCompanyIdClientId(promotionApplying.getCompanyId(), client.getClientId());
         if (companyClientMapping == null) {
             throw new IllegalArgumentException("CompanyClientMapping doesn't exist.");
         }
