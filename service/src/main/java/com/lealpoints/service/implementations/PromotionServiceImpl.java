@@ -43,7 +43,7 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
             final QueryAgent queryAgent = getQueryAgent();
             final Client client = _clientRepository.getByPhone(promotionApplying.getPhone());
             if (client == null) {
-                return new ServiceResult<>(true, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
+                return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
 
             CompanyClientMapping companyClientMapping = _companyClientMappingRepository.getByCompanyIdClientId(
@@ -52,7 +52,7 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
                     promotionApplying.getPromotionConfigurationId());
 
             if (companyClientMapping.getPoints() < promotionConfiguration.getRequiredPoints()) {
-                return new ServiceResult<>(true, getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_ENOUGH_POINTS));
+                return new ServiceResult<>(false, getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_ENOUGH_POINTS));
             }
             queryAgent.beginTransaction();
             long promotionId = insertPromotionAndUpdatePoints(promotionConfiguration, companyClientMapping);

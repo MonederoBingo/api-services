@@ -118,7 +118,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         NotificationServiceImpl notificationService = new NotificationServiceImpl(threadContextService, null, null, null, null);
         String smsMessage = notificationService.getSMSMessage(1000);
         assertNotNull(smsMessage);
-        assertEquals("Has obtenido 1000 puntos. Instala Monedero Bingo para ver las promociones. https://goo.gl/JRssA6", smsMessage);
+        assertEquals("Has obtenido 1000 puntos. Instala Monedero Bingo para ver las promociones. https://goo.gl/tjyahK", smsMessage);
     }
 
     @Test
@@ -130,7 +130,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         NotificationServiceImpl notificationService = new NotificationServiceImpl(threadContextService, null, null, null, null);
         String smsMessage = notificationService.getSMSMessage(1000);
         assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points. Install Monedero Bingo to see our promotions. https://goo.gl/JRssA6", smsMessage);
+        assertEquals("You've got 1000 points. Install Monedero Bingo to see our promotions. https://goo.gl/tjyahK", smsMessage);
     }
 
     @Test
