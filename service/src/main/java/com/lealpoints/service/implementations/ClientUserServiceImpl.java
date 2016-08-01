@@ -138,7 +138,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
         NotificationEmail notificationEmail = new NotificationEmail();
         notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
         notificationEmail.setBody("Phone: " + phone + ", Key:" + key);
-        notificationEmail.setEmailTo("aayala@lealpoints.com");
+        notificationEmail.setEmailTo("alonso.ayala@monederobingo.com");
         EmailUtil.sendEmail(notificationEmail);
     }
 

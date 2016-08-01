@@ -83,7 +83,7 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
     }
 
     public String getSMSMessage(double points) {
-        final String appUrl = "https://goo.gl/JRssA6";
+        final String appUrl = "https://goo.gl/tjyahK";
         return getServiceMessage(Message.MOBILE_APP_AD_MESSAGE, new DecimalFormat("#.#").format(points), appUrl)
                 .getMessage();
     }

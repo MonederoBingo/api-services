@@ -221,7 +221,7 @@ public enum Message {
             "El usuario fue agregado exitosamente."
     ),
     CLIENT_DOES_NOT_HAVE_ENOUGH_POINTS(
-            "The client does not have enought points.",
+            "The client does not have enough points.",
 
             "El cliente no tiene suficientes puntos."
             );
