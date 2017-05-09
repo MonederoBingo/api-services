@@ -177,7 +177,7 @@ public class SavepointPgProxyDriverTest {
     private Properties getInfoProperties() {
         Properties info = new Properties();
         info.setProperty("user", "postgres");
-        info.setProperty("password", "1234");
+        info.setProperty("password", "root");
         return info;
     }
 
