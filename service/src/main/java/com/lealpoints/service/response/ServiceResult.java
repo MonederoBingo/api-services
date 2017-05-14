@@ -12,7 +12,7 @@ public class ServiceResult<T> {
         this(success, serviceMessage, object, "");
     }
 
-    private ServiceResult(boolean success, ServiceMessage serviceMessage, T object, String extraInfo) {
+    public ServiceResult(boolean success, ServiceMessage serviceMessage, T object, String extraInfo) {
         this.success = success;
         this.message = serviceMessage;
         this.object = object;
