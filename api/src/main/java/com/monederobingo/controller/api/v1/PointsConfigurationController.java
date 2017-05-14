@@ -39,7 +39,6 @@ public class PointsConfigurationController extends BaseController {
     @RequestMapping(method = PUT, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<ServiceResult<Boolean>> update(@RequestBody PointsConfiguration pointsConfiguration) {
-        pointsConfiguration.setCompanyId(pointsConfiguration.getCompanyId());
         ServiceResult<Boolean> serviceResult = _pointsConfigurationService.update(pointsConfiguration);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
