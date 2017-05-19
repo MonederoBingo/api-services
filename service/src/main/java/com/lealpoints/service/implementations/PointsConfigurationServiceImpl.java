@@ -63,7 +63,7 @@ public class PointsConfigurationServiceImpl implements PointsConfigurationServic
 
     public ServiceResult<Boolean> update(PointsConfiguration pointsConfiguration) {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:20000/";
+        String url = "http://test.localhost:20000/";
         restTemplate.put(url, pointsConfiguration, emptyMap());
         return new ServiceResult<>(true, new ServiceMessage(""), true);
     }

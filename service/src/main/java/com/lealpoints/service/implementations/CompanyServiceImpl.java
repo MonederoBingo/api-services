@@ -17,7 +17,9 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.util.Date;
@@ -204,12 +206,16 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         _promotionConfigurationRepository.insert(promotionConfiguration);
     }
 
-    private void registerPointsConfiguration(long companyId) throws Exception {
+    void registerPointsConfiguration(long companyId) throws Exception {
         PointsConfiguration pointsConfiguration = new PointsConfiguration();
         pointsConfiguration.setCompanyId(companyId);
         pointsConfiguration.setPointsToEarn(1);
         pointsConfiguration.setRequiredAmount(1);
-        _pointsConfigurationRepository.insert(pointsConfiguration);
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://test.localhost:20000/" + companyId;
+        ResponseEntity<String> response = restTemplate.postForEntity(url, pointsConfiguration, String.class);
+        System.out.println(response);
     }
 
     private long registerCompany(CompanyRegistration companyRegistration) throws Exception {

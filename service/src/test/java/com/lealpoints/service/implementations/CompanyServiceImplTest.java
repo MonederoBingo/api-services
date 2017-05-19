@@ -55,7 +55,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertTrue(serviceResult.isSuccess());
         assertNotNull(serviceResult.getMessage());
         assertEquals(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK.name(), serviceResult.getMessage());
-        verify(companyRepository, companyUserRepository, threadContextService, queryAgent, pointsConfigurationRepository);
+        verify(companyRepository, companyUserRepository, threadContextService, queryAgent);
     }
 
     private NotificationService createNotificationService() throws MessagingException {
@@ -218,6 +218,11 @@ public class CompanyServiceImplTest extends BaseServiceTest {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
+            }
+
+            @Override void registerPointsConfiguration(long companyId) throws Exception
+            {
+                //Do nothing
             }
         };
     }

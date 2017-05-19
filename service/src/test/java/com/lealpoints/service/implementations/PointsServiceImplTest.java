@@ -11,6 +11,7 @@ import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
+import com.lealpoints.service.PointsConfigurationService;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
@@ -25,12 +26,16 @@ import static org.junit.Assert.*;
 
 public class PointsServiceImplTest extends EasyMockSupport {
 
+    private final PointsConfigurationServiceImpl pointsConfigurationService = createMock(PointsConfigurationServiceImpl.class);
+
     @Test
     public void testAwardPoints() throws Exception {
+        expect(pointsConfigurationService.getByCompanyId(anyInt()))
+                .andReturn(new ServiceResult<>(true, new ServiceMessage(""), createPointsConfiguration(10, 100)));
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(createPointsRepository(), createPointsConfigurationRepository(createPointsConfiguration(10, 100)),
+                new PointsServiceImpl(createPointsRepository(), null,
                         createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()),
-                        createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY), pointsConfigurationService) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
                         return new ServiceMessage(String.format(message.name(), params));
@@ -54,7 +59,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
         PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null,
-                createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name()))) {
+                createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name())), null) {
 
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -73,7 +78,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
         PointsServiceImpl pointsService =
                 new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null,
-                        createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
                         return new ServiceMessage(message.name());
@@ -93,7 +98,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
     public void testAwardPointsWhenTheSaleKeyIsEmpty() throws Exception {
         PointsServiceImpl pointsService =
                 new PointsServiceImpl(null, null, null, null, null,
-                        createPhoneValidatorService(true, ServiceMessage.EMPTY)) {
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
                         return new ServiceMessage(message.name());
@@ -147,12 +152,6 @@ public class PointsServiceImplTest extends EasyMockSupport {
         ClientRepository clientRepository = createMock(ClientRepository.class);
         expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(new Client());
         return clientRepository;
-    }
-
-    private PointsConfigurationRepository createPointsConfigurationRepository(PointsConfiguration pointsConfiguration) throws Exception {
-        PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
-        expect(pointsConfigurationRepository.getByCompanyId(anyLong())).andReturn(pointsConfiguration);
-        return pointsConfigurationRepository;
     }
 
     private PointsRepository createPointsRepository() throws Exception {

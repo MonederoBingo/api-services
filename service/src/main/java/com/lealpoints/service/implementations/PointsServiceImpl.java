@@ -31,17 +31,19 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
     private final ClientRepository _clientRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PhoneValidatorServiceImpl _phoneValidatorService;
+    private final PointsConfigurationServiceImpl pointsConfigurationService;
 
     @Autowired
     public PointsServiceImpl(PointsRepository pointsRepository, PointsConfigurationRepository pointsConfigurationRepository,
-                             ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
-                             PhoneValidatorServiceImpl phoneValidatorService) {
+            ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
+            PhoneValidatorServiceImpl phoneValidatorService, PointsConfigurationServiceImpl pointsConfigurationService) {
         super(threadContextService);
         _pointsRepository = pointsRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
         _phoneValidatorService = phoneValidatorService;
+        this.pointsConfigurationService = pointsConfigurationService;
     }
 
     public ServiceResult<Float> awardPoints(PointsAwarding pointsAwarding) {
@@ -68,7 +70,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
 
     private float awardPointsAndUpdateClientStatus(PointsAwarding pointsAwarding) throws Exception {
         //Inserting client if it doesn't exist
-        PointsConfiguration pointsConfiguration = _pointsConfigurationRepository.getByCompanyId(pointsAwarding.getCompanyId());
+        PointsConfiguration pointsConfiguration = pointsConfigurationService.getByCompanyId(pointsAwarding.getCompanyId()).getObject();
         if (pointsConfiguration == null) {
             throw new IllegalArgumentException("Points configuration doesn't exist");
         }
