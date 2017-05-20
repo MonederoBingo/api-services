@@ -8,4 +8,6 @@ public interface PointsConfigurationService {
     ServiceResult<PointsConfiguration> getByCompanyId(long companyId);
 
     ServiceResult<Boolean> update(PointsConfiguration pointsConfiguration);
+
+    void registerPointsConfiguration(long companyId) throws Exception;
 }

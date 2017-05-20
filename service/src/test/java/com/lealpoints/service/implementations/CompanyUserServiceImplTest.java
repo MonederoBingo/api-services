@@ -458,9 +458,9 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
             final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
             ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository,
             NotificationService notificationService) {
-        return new CompanyServiceImpl(companyRepository, companyUserRepository, pointsConfigurationRepository,
+        return new CompanyServiceImpl(companyRepository, companyUserRepository,
                 clientRepository, threadContextService,
-                promotionConfigurationRepository, new ServiceUtil(), notificationService) {
+                promotionConfigurationRepository, new ServiceUtil(), notificationService, null) {
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
