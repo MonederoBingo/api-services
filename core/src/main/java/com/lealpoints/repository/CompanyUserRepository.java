@@ -1,12 +1,23 @@
 package com.lealpoints.repository;
 
+import com.lealpoints.DatabaseServiceResult;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
-import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 @Component
 public class CompanyUserRepository extends BaseRepository {
@@ -25,7 +36,18 @@ public class CompanyUserRepository extends BaseRepository {
         sql.append("'").append(companyUser.getLanguage()).append("', ");
         sql.append("'").append(companyUser.getMustChangePassword()).append("');");
 
-        return getQueryAgent().executeInsert(sql.toString(), "company_user_id");
+        HttpEntity<InsertQuery> entity = new HttpEntity<>(
+                new InsertQuery(sql.toString(), "company_user_id"),
+                getHttpHeaders());
+        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+                "http://test.localhost:30001/insert",
+                entity,
+                DatabaseServiceResult.class);
+        if(responseEntity.getBody().getObject() == null)
+        {
+            return 0L;
+        }
+        return Long.parseLong(responseEntity.getBody().getObject().toString());
     }
 
     public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {
@@ -75,7 +97,7 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public CompanyUser getByEmail(final String email) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
+        getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
             @Override
             public String sql() {
                 StringBuilder sql = new StringBuilder();
@@ -94,6 +116,72 @@ public class CompanyUserRepository extends BaseRepository {
                 return buildCompanyUser(resultSet);
             }
         });
+
+        HttpEntity<SelectQuery> entity = new HttpEntity<>(
+                new SelectQuery("select company_user.* FROM company_user WHERE company_user.email = '" + email + "' ;"),
+                getHttpHeaders());
+        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+                "http://test.localhost:30001/select",
+                entity,
+                DatabaseServiceResult.class);
+        if(responseEntity.getBody().getObject() == null)
+        {
+            return null;
+        }
+        return buildCompanyUser(new JSONObject(responseEntity.getBody()).getString("object"));
+    }
+
+    private HttpHeaders getHttpHeaders()
+    {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return headers;
+    }
+
+    private RestTemplate getRestTemplate()
+    {
+        RestTemplate restTemplate = new RestTemplate();
+        List<HttpMessageConverter<?>> list = new ArrayList<>();
+        list.add(new MappingJackson2HttpMessageConverter());
+        restTemplate.setMessageConverters(list);
+        return restTemplate;
+    }
+
+    private class SelectQuery
+    {
+        private final String query;
+
+        private SelectQuery(String query)
+        {
+            this.query = query;
+        }
+
+        public String getQuery()
+        {
+            return query;
+        }
+    }
+
+    private class InsertQuery
+    {
+        private final String query;
+        private final String idColumnName;
+
+        private InsertQuery(String query, String idColumnName)
+        {
+            this.query = query;
+            this.idColumnName = idColumnName;
+        }
+
+        public String getQuery()
+        {
+            return query;
+        }
+
+        public String getIdColumnName()
+        {
+            return idColumnName;
+        }
     }
 
     public int updateActivateByActivationKey(final String activationKey) throws Exception {
@@ -148,6 +236,22 @@ public class CompanyUserRepository extends BaseRepository {
         companyUser.setLanguage(resultSet.getString("language"));
         companyUser.setMustChangePassword(resultSet.getBoolean("must_change_password"));
         companyUser.setApiKey(resultSet.getString("api_key"));
+        return companyUser;
+    }
+
+    private CompanyUser buildCompanyUser(String stringObject) throws SQLException {
+        JSONObject object = new JSONObject(stringObject);
+        CompanyUser companyUser = new CompanyUser();
+        companyUser.setCompanyUserId(object.getLong("company_user_id"));
+        companyUser.setCompanyId(object.getLong("company_id"));
+        companyUser.setName(object.getString("name"));
+        companyUser.setEmail(object.getString("email"));
+        companyUser.setPassword(object.getString("password"));
+        companyUser.setActive(object.getBoolean("active"));
+        companyUser.setActivationKey(object.getString("activation_key"));
+        companyUser.setLanguage(object.getString("language"));
+        companyUser.setMustChangePassword(object.getBoolean("must_change_password"));
+        companyUser.setApiKey(object.getString("api_key"));
         return companyUser;
     }
 }

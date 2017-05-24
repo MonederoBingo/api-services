@@ -6,7 +6,7 @@ public class CompanyLoginResult {
     private String companyName;
     private String email;
     private String language;
-    private boolean isActive;
+    private boolean active;
     private boolean mustChangePassword;
     private String apiKey;
 
@@ -43,11 +43,11 @@ public class CompanyLoginResult {
     }
 
     public boolean isActive() {
-        return isActive;
+        return active;
     }
 
     public void setActive(boolean isActive) {
-        this.isActive = isActive;
+        this.active = isActive;
     }
 
     public boolean isMustChangePassword() {

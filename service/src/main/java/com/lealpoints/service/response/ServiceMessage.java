@@ -37,7 +37,12 @@ public class ServiceMessage {
         return message;
     }
 
-    public String getTranslation(Language language) {
+    String getTranslation(Language language) {
         return translations.get(language.getLangId());
+    }
+
+    public Map<String, String> getTranslations()
+    {
+        return translations;
     }
 }

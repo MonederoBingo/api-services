@@ -4,7 +4,7 @@ import com.lealpoints.i18n.Language;
 
 public class ServiceResult<T> {
     private final boolean success;
-    private final ServiceMessage message;
+    private final ServiceMessage serviceMessage;
     private final T object;
     private String extraInfo;
 
@@ -14,7 +14,7 @@ public class ServiceResult<T> {
 
     public ServiceResult(boolean success, ServiceMessage serviceMessage, T object, String extraInfo) {
         this.success = success;
-        this.message = serviceMessage;
+        this.serviceMessage = serviceMessage;
         this.object = object;
         this.extraInfo = extraInfo;
     }
@@ -29,11 +29,16 @@ public class ServiceResult<T> {
     }
 
     public String getMessage() {
-        return message.getMessage();
+        return serviceMessage.getMessage();
+    }
+
+    public ServiceMessage getServiceMessage()
+    {
+        return serviceMessage;
     }
 
     public String getTranslation(Language language) {
-        return message.getTranslation(language);
+        return serviceMessage.getTranslation(language);
     }
 
     public T getObject() {
