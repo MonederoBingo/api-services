@@ -39,30 +39,6 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest
     }
 
     @Test
-    public void testGetByEmailAndPassword() throws Exception
-    {
-        final String email = "a@a.com";
-        final String password = "password";
-        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE);
-        CompanyUser companyUser = _companyUserRepository.getByEmailAndPassword(email, password);
-        assertNotNull(companyUser);
-        assertEquals("a@a.com", companyUser.getEmail());
-        assertEquals("es", companyUser.getLanguage());
-        assertFalse(companyUser.getMustChangePassword());
-    }
-
-    @Test
-    public void testUpdateActivateByActivationKey() throws Exception
-    {
-        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
-        CompanyUser companyUser = getCompanyUserById(1);
-        assertFalse(companyUser.isActive());
-        _companyUserRepository.updateActivateByActivationKey("1234");
-        companyUser = getCompanyUserById(1);
-        assertTrue(companyUser.isActive());
-    }
-
-    @Test
     public void testClearActivationKey() throws Exception
     {
         executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
@@ -96,16 +72,6 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest
     }
 
     @Test
-    public void testApiKeyByEmail() throws Exception
-    {
-        executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE);
-        CompanyUser beforeUpdateCompanyUser = getCompanyUserById(1);
-        _companyUserRepository.updateApiKeyByEmail("a@a.com", "QWER");
-        CompanyUser afterUpdateCompanyUser = getCompanyUserById(1);
-        assertNotEquals(beforeUpdateCompanyUser.getApiKey(), afterUpdateCompanyUser.getApiKey());
-    }
-
-    @Test
     public void testGetByCompanyUserIdApiKey() throws Exception
     {
         executeFixture(INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE);
@@ -118,19 +84,6 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest
     {
         CompanyUser companyUser = _companyUserRepository.getByCompanyUserIdApiKey(1, "ASDQWE");
         assertNull(companyUser);
-    }
-
-    @Test
-    public void testGetByCompanyId() throws Exception
-    {
-        executeFixture(INSERT_COMPANY_AND_TWO_COMPANY_USERS);
-        List<CompanyUser> companyUserList = _companyUserRepository.getByCompanyId(1);
-        assertNotNull(companyUserList);
-        assertEquals(2, companyUserList.size());
-        assertEquals("name", companyUserList.get(0).getName());
-        assertEquals("a@a.com", companyUserList.get(0).getEmail());
-        assertEquals("second name", companyUserList.get(1).getName());
-        assertEquals("f@a.com", companyUserList.get(1).getEmail());
     }
 
     private CompanyUser getCompanyUserById(long companyUserId) throws Exception

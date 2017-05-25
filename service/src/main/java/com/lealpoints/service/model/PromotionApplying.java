@@ -21,11 +21,11 @@ public class PromotionApplying {
         this.companyId = companyId;
     }
 
-    public String getPhone() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(String phone) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 }

@@ -41,7 +41,7 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
     public ServiceResult<Long> applyPromotion(PromotionApplying promotionApplying) {
         try {
             final QueryAgent queryAgent = getQueryAgent();
-            final Client client = _clientRepository.getByPhone(promotionApplying.getPhone());
+            final Client client = _clientRepository.getByPhone(promotionApplying.getPhoneNumber());
             if (client == null) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }

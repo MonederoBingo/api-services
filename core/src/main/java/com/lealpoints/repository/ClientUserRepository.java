@@ -61,7 +61,7 @@ public class ClientUserRepository extends BaseRepository {
                 sql.append("SELECT client_user.* FROM ").append("client_user");
                 sql.append(" INNER JOIN client USING (client_id)");
                 sql.append(" WHERE client.phone = ? ");
-                sql.append(" AND client_user.sms_key = ").append(encryptForSelect("sms_key", "?"));
+                sql.append(" AND client_user.sms_key = ").append(encryptForSelect("?", "sms_key"));
                 return sql.toString();
             }
 
@@ -84,7 +84,7 @@ public class ClientUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM ").append("client_user");
                 sql.append(" WHERE client_user.email = ?");
-                sql.append(" AND client_user.password = ").append(encryptForSelect("password", "?"));
+                sql.append(" AND client_user.password = ").append(encryptForSelect("?", "password"));
                 return sql.toString();
             }
 
@@ -112,7 +112,7 @@ public class ClientUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM client_user");
                 sql.append(" WHERE client_user.client_user_id = ").append("?").append("");
-                sql.append(" AND client_user.api_key = ").append(encryptForSelect("api_key", "?")).append(";");
+                sql.append(" AND client_user.api_key = ").append(encryptForSelect("?", "api_key")).append(";");
                 return sql.toString();
             }
 

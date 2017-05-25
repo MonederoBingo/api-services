@@ -1,6 +1,9 @@
 package com.lealpoints.repository;
 
 import com.lealpoints.DatabaseServiceResult;
+import com.lealpoints.InsertQuery;
+import com.lealpoints.SelectQuery;
+import com.lealpoints.UpdateQuery;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
 
@@ -9,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,8 +23,12 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import static java.lang.Integer.parseInt;
+
 @Component
 public class CompanyUserRepository extends BaseRepository {
+
+    private final String DATABASE_SERVICE_URL = "http://test.localhost:30001/";
 
     public long insert(CompanyUser companyUser) throws Exception {
         StringBuilder sql = new StringBuilder();
@@ -40,7 +48,7 @@ public class CompanyUserRepository extends BaseRepository {
                 new InsertQuery(sql.toString(), "company_user_id"),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
-                "http://test.localhost:30001/insert",
+                DATABASE_SERVICE_URL + "/insert",
                 entity,
                 DatabaseServiceResult.class);
         if(responseEntity.getBody().getObject() == null)
@@ -51,77 +59,63 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {
-        return getQueryAgent().selectList(new DbBuilder<CompanyUser>() {
-            @Override
-            public String sql() {return "SELECT * FROM company_user WHERE company_id = ? ;";}
+        String sql = "SELECT * FROM company_user WHERE company_id = " + companyId + " ;";
 
-            @Override
-            public Object[] values() {
-                return new Object[]{companyId};
-            }
+        HttpEntity<SelectQuery> entity = new HttpEntity<>(
+                new SelectQuery(sql),
+                getHttpHeaders());
+        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+                DATABASE_SERVICE_URL + "/selectList",
+                entity,
+                DatabaseServiceResult.class);
+        if(responseEntity.getBody().getObject() == null)
+        {
+            return null;
+        }
 
-            @Override
-            public CompanyUser build(ResultSet resultSet) throws SQLException {
-                CompanyUser companyUser = new CompanyUser();
-                companyUser.setCompanyId(resultSet.getLong("company_id"));
-                companyUser.setCompanyUserId(resultSet.getLong("company_user_id"));
-                companyUser.setActive(resultSet.getBoolean("active"));
-                companyUser.setEmail(resultSet.getString("email"));
-                companyUser.setName(resultSet.getString("name"));
-                return companyUser;
-            }
-        });
+        List<String> jsonArray = (List<String>) responseEntity.getBody().getObject();
+        List<CompanyUser> companyUserList = new ArrayList<>();
+
+        for(int i = 0; i < jsonArray.size(); i++)
+        {
+            JSONObject jsonObject = new JSONObject(jsonArray.get(1));
+            CompanyUser companyUser = new CompanyUser();
+            companyUser.setCompanyId(jsonObject.getLong("company_id"));
+            companyUser.setCompanyUserId(jsonObject.getLong("company_user_id"));
+            companyUser.setActive(jsonObject.getBoolean("active"));
+            companyUser.setEmail(jsonObject.getString("email"));
+            companyUser.setName(jsonObject.getString("name"));
+            companyUserList.add(companyUser);
+        }
+
+        return companyUserList;
     }
 
     public CompanyUser getByEmailAndPassword(final String email, final String password) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT company_user.* FROM ").append("company_user");
-                sql.append(" WHERE company_user.email = ?");
-                sql.append(" AND company_user.password = ").append(encryptForSelect("password", "?"));
-                return sql.toString();
-            }
+        String sql = "SELECT company_user.* FROM " + "company_user" +
+                " WHERE company_user.email = '"+ email + "'" +
+                " AND company_user.password = " + encryptForSelect("'" + password + "'", "password");
 
-            @Override
-            public Object[] values() {
-                return new Object[]{email, password};
-            }
-
-            @Override
-            public CompanyUser build(ResultSet resultSet) throws SQLException {
-                return buildCompanyUser(resultSet);
-            }
-        });
+        HttpEntity<SelectQuery> entity = new HttpEntity<>(
+                new SelectQuery(sql),
+                getHttpHeaders());
+        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+                DATABASE_SERVICE_URL + "/select",
+                entity,
+                DatabaseServiceResult.class);
+        if(responseEntity.getBody().getObject() == null)
+        {
+            return null;
+        }
+        return buildCompanyUser(new JSONObject(responseEntity.getBody()).getString("object"));
     }
 
     public CompanyUser getByEmail(final String email) throws Exception {
-        getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.email = ? ;");
-                return sql.toString();
-            }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{email};
-            }
-
-            @Override
-            public CompanyUser build(ResultSet resultSet) throws SQLException {
-                return buildCompanyUser(resultSet);
-            }
-        });
-
         HttpEntity<SelectQuery> entity = new HttpEntity<>(
                 new SelectQuery("select company_user.* FROM company_user WHERE company_user.email = '" + email + "' ;"),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
-                "http://test.localhost:30001/select",
+                DATABASE_SERVICE_URL + "/select",
                 entity,
                 DatabaseServiceResult.class);
         if(responseEntity.getBody().getObject() == null)
@@ -147,45 +141,14 @@ public class CompanyUserRepository extends BaseRepository {
         return restTemplate;
     }
 
-    private class SelectQuery
-    {
-        private final String query;
-
-        private SelectQuery(String query)
-        {
-            this.query = query;
-        }
-
-        public String getQuery()
-        {
-            return query;
-        }
-    }
-
-    private class InsertQuery
-    {
-        private final String query;
-        private final String idColumnName;
-
-        private InsertQuery(String query, String idColumnName)
-        {
-            this.query = query;
-            this.idColumnName = idColumnName;
-        }
-
-        public String getQuery()
-        {
-            return query;
-        }
-
-        public String getIdColumnName()
-        {
-            return idColumnName;
-        }
-    }
-
     public int updateActivateByActivationKey(final String activationKey) throws Exception {
-        return getQueryAgent().executeUpdate("UPDATE company_user SET active = true WHERE activation_key = '" + activationKey + "';");
+        RestTemplate restTemplate = getRestTemplate();
+        UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET active = true WHERE activation_key = '" + activationKey + "';");
+        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+                DATABASE_SERVICE_URL + "/update",
+                updateQuery,
+                DatabaseServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject().toString());
     }
 
     public int updatePasswordByEmail(final String email, final String password, final boolean mustChangePassword) throws Exception {
@@ -195,7 +158,13 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public int updateApiKeyByEmail(final String email, final String apiKey) throws Exception {
-        return getQueryAgent().executeUpdate("UPDATE company_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE email = '" + email + "';");
+        RestTemplate restTemplate = getRestTemplate();
+        UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE email = '" + email + "';");
+        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+                DATABASE_SERVICE_URL + "/update",
+                updateQuery,
+                DatabaseServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject().toString());
     }
 
     public int clearActivationKey(final String activationKey) throws Exception {
@@ -208,7 +177,7 @@ public class CompanyUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.api_key = ").append(encryptForSelect("api_key", "?")).append(";");
+                sql.append(" WHERE company_user.api_key = ").append(encryptForSelect("?", "api_key")).append(";");
                 return sql.toString();
             }
 
