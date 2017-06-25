@@ -20,7 +20,6 @@ public class FunctionalTestTransactionServiceImpl extends BaseServiceImpl implem
     public void beginTransaction()
     {
         getQueryAgent().beginTransactionForFunctionalTest();
-        beginForService("20000");
         beginForService("30001");
     }
 
@@ -28,7 +27,6 @@ public class FunctionalTestTransactionServiceImpl extends BaseServiceImpl implem
     public void rollbackTransaction()
     {
         getQueryAgent().rollbackTransactionForFunctionalTest();
-        rollbackForService("20000");
         rollbackForService("30001");
     }
 
