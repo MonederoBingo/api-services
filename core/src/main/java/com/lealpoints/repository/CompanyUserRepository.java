@@ -12,8 +12,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -28,7 +32,13 @@ import static java.lang.Integer.parseInt;
 @Component
 public class CompanyUserRepository extends BaseRepository {
 
-    private final String DATABASE_SERVICE_URL = "http://test.localhost:30001/";
+    private final EurekaClient eurekaClient;
+
+    @Autowired
+    public CompanyUserRepository(@Qualifier("eurekaClient") EurekaClient eurekaClient)
+    {
+        this.eurekaClient = eurekaClient;
+    }
 
     public long insert(CompanyUser companyUser) throws Exception {
         StringBuilder sql = new StringBuilder();
@@ -48,7 +58,7 @@ public class CompanyUserRepository extends BaseRepository {
                 new InsertQuery(sql.toString(), "company_user_id"),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
-                DATABASE_SERVICE_URL + "/insert",
+                getDatabaseURL() + "/insert",
                 entity,
                 DatabaseServiceResult.class);
         if(responseEntity.getBody().getObject() == null)
@@ -58,6 +68,12 @@ public class CompanyUserRepository extends BaseRepository {
         return Long.parseLong(responseEntity.getBody().getObject().toString());
     }
 
+    private String getDatabaseURL()
+    {
+        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("database", false);
+        return instanceInfo.getHomePageUrl();
+    }
+
     public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {
         String sql = "SELECT * FROM company_user WHERE company_id = " + companyId + " ;";
 
@@ -65,7 +81,7 @@ public class CompanyUserRepository extends BaseRepository {
                 new SelectQuery(sql),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
-                DATABASE_SERVICE_URL + "/selectList",
+                getDatabaseURL() + "/selectList",
                 entity,
                 DatabaseServiceResult.class);
         if(responseEntity.getBody().getObject() == null)
@@ -100,7 +116,7 @@ public class CompanyUserRepository extends BaseRepository {
                 new SelectQuery(sql),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
-                DATABASE_SERVICE_URL + "/select",
+                getDatabaseURL() + "/select",
                 entity,
                 DatabaseServiceResult.class);
         if(responseEntity.getBody().getObject() == null)
@@ -115,7 +131,7 @@ public class CompanyUserRepository extends BaseRepository {
                 new SelectQuery("select company_user.* FROM company_user WHERE company_user.email = '" + email + "' ;"),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
-                DATABASE_SERVICE_URL + "/select",
+                getDatabaseURL() + "/select",
                 entity,
                 DatabaseServiceResult.class);
         if(responseEntity.getBody().getObject() == null)
@@ -145,7 +161,7 @@ public class CompanyUserRepository extends BaseRepository {
         RestTemplate restTemplate = getRestTemplate();
         UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET active = true WHERE activation_key = '" + activationKey + "';");
         ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
-                DATABASE_SERVICE_URL + "/update",
+                getDatabaseURL() + "/update",
                 updateQuery,
                 DatabaseServiceResult.class);
         return parseInt(responseEntity.getBody().getObject().toString());
@@ -161,7 +177,7 @@ public class CompanyUserRepository extends BaseRepository {
         RestTemplate restTemplate = getRestTemplate();
         UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE email = '" + email + "';");
         ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
-                DATABASE_SERVICE_URL + "/update",
+                getDatabaseURL() + "/update",
                 updateQuery,
                 DatabaseServiceResult.class);
         return parseInt(responseEntity.getBody().getObject().toString());

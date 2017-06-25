@@ -2,7 +2,6 @@ package com.lealpoints.repository;
 
 import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_FALSE;
 import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_COMPANY_USER_WHERE_ACTIVE_IS_TRUE;
-import static com.lealpoints.repository.fixtures.CompanyUserRepositoryFixture.INSERT_COMPANY_AND_TWO_COMPANY_USERS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -15,14 +14,12 @@ import com.lealpoints.model.CompanyUser;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class CompanyUserRepositoryTest extends BaseRepositoryTest
 {
-
     private CompanyUserRepository _companyUserRepository;
 
     @Before
@@ -111,7 +108,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest
 
     private CompanyUserRepository createCompanyUserRepository(final QueryAgent queryAgent)
     {
-        return new CompanyUserRepository()
+        return new CompanyUserRepository(null)
         {
             @Override
             protected QueryAgent getQueryAgent() throws Exception
