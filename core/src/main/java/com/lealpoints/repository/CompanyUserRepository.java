@@ -61,7 +61,7 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/insert",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject() == null)
+        if(responseEntity.getBody().getObject().equals("{}"))
         {
             return 0L;
         }
@@ -84,17 +84,17 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/selectList",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject() == null)
+        if(responseEntity.getBody().getObject().equals("{}"))
         {
             return null;
         }
 
-        List<String> jsonArray = (List<String>) responseEntity.getBody().getObject();
+        JSONArray jsonArray = new JSONArray(responseEntity.getBody().getObject().toString());
         List<CompanyUser> companyUserList = new ArrayList<>();
 
-        for(int i = 0; i < jsonArray.size(); i++)
+        for(int i = 0; i < jsonArray.length(); i++)
         {
-            JSONObject jsonObject = new JSONObject(jsonArray.get(1));
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
             CompanyUser companyUser = new CompanyUser();
             companyUser.setCompanyId(jsonObject.getLong("company_id"));
             companyUser.setCompanyUserId(jsonObject.getLong("company_user_id"));
@@ -119,7 +119,7 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject() == null)
+        if(responseEntity.getBody().getObject().equals("{}"))
         {
             return null;
         }
@@ -134,7 +134,7 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject() == null)
+        if(responseEntity.getBody().getObject().equals("{}"))
         {
             return null;
         }
