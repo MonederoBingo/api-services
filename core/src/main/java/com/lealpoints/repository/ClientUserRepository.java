@@ -17,8 +17,8 @@ public class ClientUserRepository extends BaseRepository {
         sql.append(clientUser.getClientId()).append(", ");
         sql.append("'").append(clientUser.getName()).append("', ");
         sql.append(clientUser.getEmail() == null ? null : "'" + clientUser.getEmail() + "'").append(", ");
-        sql.append(encryptForUpdate(clientUser.getPassword())).append(", ");
-        sql.append(encryptForUpdate(clientUser.getSmsKey())).append(");");
+        sql.append("'").append(clientUser.getPassword()).append("', ");
+        sql.append("'").append(clientUser.getSmsKey()).append("');");
 
         return getQueryAgent().executeInsert(sql.toString(), "client_user_id");
     }
@@ -26,7 +26,7 @@ public class ClientUserRepository extends BaseRepository {
     public int updateSmsKey(String smsKey, String phone) throws Exception {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE client_user");
-        sql.append(" SET sms_key = ").append(encryptForUpdate(smsKey));
+        sql.append(" SET sms_key = '").append(smsKey).append("'");
         sql.append(" WHERE client_id = (SELECT client_id FROM client WHERE phone = '").append(phone).append("');");
         return getQueryAgent().executeUpdate(sql.toString());
     }
@@ -61,7 +61,7 @@ public class ClientUserRepository extends BaseRepository {
                 sql.append("SELECT client_user.* FROM ").append("client_user");
                 sql.append(" INNER JOIN client USING (client_id)");
                 sql.append(" WHERE client.phone = ? ");
-                sql.append(" AND client_user.sms_key = ").append(encryptForSelect("?", "sms_key"));
+                sql.append(" AND client_user.sms_key = ?;");
                 return sql.toString();
             }
 
@@ -84,7 +84,7 @@ public class ClientUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM ").append("client_user");
                 sql.append(" WHERE client_user.email = ?");
-                sql.append(" AND client_user.password = ").append(encryptForSelect("?", "password"));
+                sql.append(" AND client_user.password = ?");
                 return sql.toString();
             }
 
@@ -102,7 +102,7 @@ public class ClientUserRepository extends BaseRepository {
 
     public int updateApiKeyById(long clientUserId, String apiKey) throws Exception {
         return getQueryAgent()
-            .executeUpdate("UPDATE client_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE client_user_id = '" + clientUserId + "';");
+            .executeUpdate("UPDATE client_user SET api_key = '" + apiKey + "' WHERE client_user_id = '" + clientUserId + "';");
     }
 
     public ClientUser getByClientUserIdApiKey(final Integer userId, final String apiKey) throws Exception {
@@ -112,7 +112,7 @@ public class ClientUserRepository extends BaseRepository {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT client_user.* FROM client_user");
                 sql.append(" WHERE client_user.client_user_id = ").append("?").append("");
-                sql.append(" AND client_user.api_key = ").append(encryptForSelect("?", "api_key")).append(";");
+                sql.append(" AND client_user.api_key = ?;");
                 return sql.toString();
             }
 

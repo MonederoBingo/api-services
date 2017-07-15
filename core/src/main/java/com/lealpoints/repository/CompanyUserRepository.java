@@ -48,7 +48,7 @@ public class CompanyUserRepository extends BaseRepository {
         sql.append(companyUser.getCompanyId()).append(", ");
         sql.append("'").append(companyUser.getName()).append("', ");
         sql.append("'").append(companyUser.getEmail()).append("', ");
-        sql.append(encryptForUpdate(companyUser.getPassword())).append(", ");
+        sql.append("'").append(companyUser.getPassword()).append("', ");
         sql.append("'").append(companyUser.isActive()).append("', ");
         sql.append("'").append(companyUser.getActivationKey()).append("', ");
         sql.append("'").append(companyUser.getLanguage()).append("', ");
@@ -110,7 +110,7 @@ public class CompanyUserRepository extends BaseRepository {
     public CompanyUser getByEmailAndPassword(final String email, final String password) throws Exception {
         String sql = "SELECT company_user.* FROM " + "company_user" +
                 " WHERE company_user.email = '"+ email + "'" +
-                " AND company_user.password = " + encryptForSelect("'" + password + "'", "password");
+                " AND company_user.password = '" + password + "'";
 
         HttpEntity<SelectQuery> entity = new HttpEntity<>(
                 new SelectQuery(sql),
@@ -169,13 +169,13 @@ public class CompanyUserRepository extends BaseRepository {
 
     public int updatePasswordByEmail(final String email, final String password, final boolean mustChangePassword) throws Exception {
         return getQueryAgent().executeUpdate(
-            "UPDATE company_user SET password = " + encryptForUpdate(password) + ", must_change_password = " + mustChangePassword +
+            "UPDATE company_user SET password = '" + password + "', must_change_password = " + mustChangePassword +
                 " WHERE email = '" + email + "';");
     }
 
     public int updateApiKeyByEmail(final String email, final String apiKey) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET api_key =  " + encryptForUpdate(apiKey) + " WHERE email = '" + email + "';");
+        UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET api_key = '" + apiKey + "' WHERE email = '" + email + "';");
         ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,
@@ -193,7 +193,7 @@ public class CompanyUserRepository extends BaseRepository {
             public String sql() {
                 StringBuilder sql = new StringBuilder();
                 sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.api_key = ").append(encryptForSelect("?", "api_key")).append(";");
+                sql.append(" WHERE company_user.api_key = ?").append(";");
                 return sql.toString();
             }
 

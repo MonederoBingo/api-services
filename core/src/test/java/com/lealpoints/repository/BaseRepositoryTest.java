@@ -56,7 +56,4 @@ public class BaseRepositoryTest {
         st.close();
     }
 
-    protected String encryptForSelect(String column, String wordToEncrypt) {
-        return "crypt('" + wordToEncrypt + "', " + column + ")";
-    }
 }

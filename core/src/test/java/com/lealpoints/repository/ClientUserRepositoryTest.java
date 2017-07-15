@@ -136,7 +136,7 @@ public class ClientUserRepositoryTest extends BaseRepositoryTest {
         try {
             st = getQueryAgent().getConnection().createStatement();
             ResultSet resultSet = st.executeQuery("SELECT * FROM client_user INNER JOIN client USING (client_id) " +
-                "WHERE client.phone = '" + phone + "' AND client_user.sms_key = " + encryptForSelect("sms_key", smsKey) + ";");
+                "WHERE client.phone = '" + phone + "' AND client_user.sms_key = '" + smsKey + "';");
             if (resultSet.next()) {
                 clientUser.setClientUserId(resultSet.getLong("client_user_id"));
                 clientUser.setClientId(resultSet.getLong("client_id"));
