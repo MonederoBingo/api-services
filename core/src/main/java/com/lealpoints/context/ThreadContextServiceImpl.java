@@ -37,6 +37,12 @@ public class ThreadContextServiceImpl implements ThreadContextService {
     }
 
     @Override
+    public Environment getEnvironment()
+    {
+        return getThreadContext().getEnvironment();
+    }
+
+    @Override
     public QueryAgent getQueryAgent() {
         return getThreadContext().getClientQueryAgent();
     }

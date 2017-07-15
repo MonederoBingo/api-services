@@ -1,5 +1,8 @@
 package com.lealpoints.environments;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class EnvironmentFactoryImpl implements EnvironmentFactory {
 
     @Override

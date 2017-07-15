@@ -9,6 +9,8 @@ public interface ThreadContextService {
 
     ThreadContext getThreadContext();
 
+    Environment getEnvironment();
+
     QueryAgent getQueryAgent();
 
     void setThreadContextOnThread(ThreadContext threadContext);

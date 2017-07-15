@@ -29,6 +29,16 @@ public class UnitTestEnvironment extends Environment {
         return PropertyManager.getProperty("unit_test.images_dir");
     }
 
+    @Override public String getSchema()
+    {
+        return "";
+    }
+
+    @Override public String getURIPrefix()
+    {
+        return "";
+    }
+
     @Override
     public String getClientUrl() {
         return PropertyManager.getProperty("unit_test.client_url");

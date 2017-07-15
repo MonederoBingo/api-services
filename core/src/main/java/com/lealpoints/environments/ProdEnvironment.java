@@ -1,53 +1,92 @@
 package com.lealpoints.environments;
 
-import com.lealpoints.common.PropertyManager;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-public class ProdEnvironment extends Environment {
+@Component
+public class ProdEnvironment extends Environment
+{
+
+    @Value("${db_driver}")
+    private String dbDriver;
+
+    @Value("${db_driver_class}")
+    private String dbDriverClass;
+
+    @Value("${JDBC_DATABASE_URL}")
+    private String dbUrl;
+
+    @Value("${JDBC_DATABASE_USERNAME}")
+    private String dbUser;
+
+    @Value("${JDBC_DATABASE_PASSWORD}")
+    private String dbPassword;
+
+    @Value("${prod.client_url}")
+    private String clientUrl;
+
+    @Value("${db_schema}")
+    private String schema;
 
     @Override
-    public String getDatabasePath() {
-        return PropertyManager.getProperty("db_driver") + PropertyManager.getProperty("prod.db_url");
+    public String getDatabasePath()
+    {
+        return dbUrl;
     }
 
-    @Override
-    public String getDatabaseDriverClass() {
-        return PropertyManager.getProperty("db_driver_class");
+    public String getDatabaseDriverClass()
+    {
+        return dbDriverClass;
     }
 
-    @Override
-    public String getDatabaseUsername() {
-        return PropertyManager.getProperty("prod.db_user");
+    public String getDatabaseUsername()
+    {
+        return dbUser;
     }
 
-    @Override
-    public String getDatabasePassword() {
-        return PropertyManager.getProperty("prod.db_password");
+    public String getDatabasePassword()
+    {
+        return dbPassword;
     }
 
-    @Override
-    public String getImageDir() {
+    public String getImageDir()
+    {
         return System.getenv("OPENSHIFT_DATA_DIR") + "images/prod/";
     }
 
-    @Override
-    public String getClientUrl() {
-        return PropertyManager.getProperty("prod.client_url");
+    @Override public String getSchema()
+    {
+        return schema;
+    }
+
+    @Override public String getURIPrefix()
+    {
+        return "prod.";
+    }
+
+    public String getClientUrl()
+    {
+        return clientUrl;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
             return false;
         }
-        if (!(obj instanceof ProdEnvironment)) {
+        if (!(obj instanceof DevEnvironment))
+        {
             return false;
         }
-        ProdEnvironment that = (ProdEnvironment) obj;
+        DevEnvironment that = (DevEnvironment) obj;
         return getDatabasePath().equals(that.getDatabasePath());
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return getDatabasePath().hashCode();
     }
 }

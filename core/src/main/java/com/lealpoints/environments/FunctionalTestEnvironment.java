@@ -35,6 +35,17 @@ public class FunctionalTestEnvironment extends Environment {
     }
 
     @Override
+    public String getSchema()
+    {
+        return "monedero_test";
+    }
+
+    @Override public String getURIPrefix()
+    {
+        return "test.";
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;

@@ -4,6 +4,7 @@ import com.lealpoints.DatabaseServiceResult;
 import com.lealpoints.InsertQuery;
 import com.lealpoints.SelectQuery;
 import com.lealpoints.UpdateQuery;
+import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
 
@@ -33,11 +34,13 @@ import static java.lang.Integer.parseInt;
 public class CompanyUserRepository extends BaseRepository {
 
     private final EurekaClient eurekaClient;
+    private final ThreadContextService threadContextService;
 
     @Autowired
-    public CompanyUserRepository(@Qualifier("eurekaClient") EurekaClient eurekaClient)
+    public CompanyUserRepository(@Qualifier("eurekaClient") EurekaClient eurekaClient, ThreadContextService threadContextService)
     {
         this.eurekaClient = eurekaClient;
+        this.threadContextService = threadContextService;
     }
 
     public long insert(CompanyUser companyUser) throws Exception {
@@ -71,7 +74,12 @@ public class CompanyUserRepository extends BaseRepository {
     private String getDatabaseURL()
     {
         InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("database", false);
-        return instanceInfo.getHomePageUrl();
+        String homePageUrl = instanceInfo.getHomePageUrl();
+        boolean hasHttps = homePageUrl.contains("https://");
+        homePageUrl = homePageUrl.replace("http://", "");
+        homePageUrl = homePageUrl.replace("https://", "");
+        homePageUrl = threadContextService.getEnvironment().getURIPrefix() + homePageUrl;
+        return hasHttps ? "https://" + homePageUrl : "http://" + homePageUrl;
     }
 
     public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {

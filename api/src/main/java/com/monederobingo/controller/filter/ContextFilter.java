@@ -3,22 +3,34 @@ package com.monederobingo.controller.filter;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.environments.Environment;
 import com.lealpoints.environments.EnvironmentFactory;
-import com.lealpoints.environments.EnvironmentFactoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ContextFilter implements Filter {
 
+    private final ThreadContextService threadContextService;
+    private final EnvironmentFactory environmentFactory;
+
     @Autowired
-    private ThreadContextService _threadContextService;
+    public ContextFilter(ThreadContextService threadContextService, EnvironmentFactory environmentFactory)
+    {
+        this.threadContextService = threadContextService;
+        this.environmentFactory = environmentFactory;
+    }
 
     public void init(FilterConfig filterConfig) {
     }
@@ -34,7 +46,7 @@ public class ContextFilter implements Filter {
     }
 
     private void initializeContext(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        _threadContextService.initializeContext(getEnvironment(httpServletRequest), httpServletRequest.getHeader("language"));
+        threadContextService.initializeContext(getEnvironment(httpServletRequest), httpServletRequest.getHeader("language"));
         setHeaders(httpServletResponse, httpServletRequest);
     }
 
@@ -56,17 +68,20 @@ public class ContextFilter implements Filter {
         }
     }
 
-    private Environment getEnvironment(HttpServletRequest request) {
-        EnvironmentFactory environmentFactory = new EnvironmentFactoryImpl();
-        switch (request.getServerName()) {
-            case "services.monederobingo.com":
-                return environmentFactory.getProdEnvironment();
-            case "test.services.monederobingo.com":
-                return environmentFactory.getUATEnvironment();
-            case "test.localhost":
-                return environmentFactory.getFunctionalTestEnvironment();
-            default:
-                return environmentFactory.getDevEnvironment();
+    private Environment getEnvironment(HttpServletRequest request)
+    {
+        if (request.getServerName().startsWith("prod."))
+        {
+            return environmentFactory.getProdEnvironment();
         }
+        if (request.getServerName().startsWith("uat."))
+        {
+            return environmentFactory.getUATEnvironment();
+        }
+        if (request.getServerName().startsWith("test.localhost"))
+        {
+            return environmentFactory.getFunctionalTestEnvironment();
+        }
+        return environmentFactory.getDevEnvironment();
     }
 }

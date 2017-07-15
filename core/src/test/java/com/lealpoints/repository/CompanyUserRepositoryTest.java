@@ -108,7 +108,7 @@ public class CompanyUserRepositoryTest extends BaseRepositoryTest
 
     private CompanyUserRepository createCompanyUserRepository(final QueryAgent queryAgent)
     {
-        return new CompanyUserRepository(null)
+        return new CompanyUserRepository(null, null)
         {
             @Override
             protected QueryAgent getQueryAgent() throws Exception
