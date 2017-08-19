@@ -1,0 +1,6 @@
+#!/bin/bash
+cd src/MonederoBingo/api-services
+title='Api Services'
+echo -n -e "\033]0;$title\007"
+mvn clean install -DskipTests
+java -jar api/target/api.war
