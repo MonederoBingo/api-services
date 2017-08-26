@@ -1,18 +1,10 @@
 package com.lealpoints.repository;
 
 import com.lealpoints.DatabaseServiceResult;
-import com.lealpoints.InsertQuery;
-import com.lealpoints.SelectQuery;
 import com.lealpoints.UpdateQuery;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import org.json.JSONArray;
@@ -28,7 +20,13 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import xyz.greatapp.libs.service.requests.database.ColumnValue;
+import xyz.greatapp.libs.service.requests.database.InsertQueryRQ;
 import xyz.greatapp.libs.service.requests.database.SelectQueryRQ;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
@@ -39,42 +37,36 @@ public class CompanyUserRepository extends BaseRepository {
     private final ThreadContextService threadContextService;
 
     @Autowired
-    public CompanyUserRepository(@Qualifier("eurekaClient") EurekaClient eurekaClient, ThreadContextService threadContextService)
-    {
+    public CompanyUserRepository(@Qualifier("eurekaClient") EurekaClient eurekaClient, ThreadContextService threadContextService) {
         this.eurekaClient = eurekaClient;
         this.threadContextService = threadContextService;
     }
 
     public long insert(CompanyUser companyUser) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO company_user(company_id, name, email, " +
-                "password, active, activation_key, language, must_change_password)");
-        sql.append(" VALUES (");
-        sql.append(companyUser.getCompanyId()).append(", ");
-        sql.append("'").append(companyUser.getName()).append("', ");
-        sql.append("'").append(companyUser.getEmail()).append("', ");
-        sql.append("'").append(companyUser.getPassword()).append("', ");
-        sql.append("'").append(companyUser.isActive()).append("', ");
-        sql.append("'").append(companyUser.getActivationKey()).append("', ");
-        sql.append("'").append(companyUser.getLanguage()).append("', ");
-        sql.append("'").append(companyUser.getMustChangePassword()).append("');");
-
-        HttpEntity<InsertQuery> entity = new HttpEntity<>(
-                new InsertQuery(sql.toString(), "company_user_id"),
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("company_id", companyUser.getCompanyId()),
+                new ColumnValue("name", companyUser.getName()),
+                new ColumnValue("email", companyUser.getEmail()),
+                new ColumnValue("password", companyUser.getPassword()),
+                new ColumnValue("active", companyUser.isActive()),
+                new ColumnValue("activation_key", companyUser.getActivationKey()),
+                new ColumnValue("language", companyUser.getLanguage()),
+                new ColumnValue("must_change_password", companyUser.getMustChangePassword())
+        };
+        HttpEntity<InsertQueryRQ> entity = new HttpEntity<>(
+                new InsertQueryRQ("company_user", values, "company_user_id"),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/insert",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject().equals("{}"))
-        {
+        if (responseEntity.getBody().getObject().equals("{}")) {
             return 0L;
         }
         return Long.parseLong(responseEntity.getBody().getObject().toString());
     }
 
-    private String getDatabaseURL()
-    {
+    private String getDatabaseURL() {
         InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("database", false);
         String homePageUrl = instanceInfo.getHomePageUrl();
         boolean hasHttps = homePageUrl.contains("https://");
@@ -85,25 +77,26 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {
-        String sql = "SELECT * FROM company_user WHERE company_id = " + companyId + " ;";
 
-        HttpEntity<SelectQuery> entity = new HttpEntity<>(
-                new SelectQuery(sql),
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("company_id", companyId)
+        };
+
+        HttpEntity<SelectQueryRQ> entity = new HttpEntity<>(
+                new SelectQueryRQ("company_user", filters),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/selectList",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject().equals("{}"))
-        {
+        if (responseEntity.getBody().getObject().equals("{}")) {
             return null;
         }
 
         JSONArray jsonArray = new JSONArray(responseEntity.getBody().getObject().toString());
         List<CompanyUser> companyUserList = new ArrayList<>();
 
-        for(int i = 0; i < jsonArray.length(); i++)
-        {
+        for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             CompanyUser companyUser = new CompanyUser();
             companyUser.setCompanyId(jsonObject.getLong("company_id"));
@@ -130,8 +123,7 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject().equals("{}"))
-        {
+        if (responseEntity.getBody().getObject().equals("{}")) {
             return null;
         }
         return buildCompanyUser(new JSONObject(responseEntity.getBody()).getString("object"));
@@ -151,22 +143,19 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 DatabaseServiceResult.class);
-        if(responseEntity.getBody().getObject().equals("{}"))
-        {
+        if (responseEntity.getBody().getObject().equals("{}")) {
             return null;
         }
         return buildCompanyUser(new JSONObject(responseEntity.getBody()).getString("object"));
     }
 
-    private HttpHeaders getHttpHeaders()
-    {
+    private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         return headers;
     }
 
-    private RestTemplate getRestTemplate()
-    {
+    private RestTemplate getRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         List<HttpMessageConverter<?>> list = new ArrayList<>();
         list.add(new MappingJackson2HttpMessageConverter());
@@ -186,8 +175,8 @@ public class CompanyUserRepository extends BaseRepository {
 
     public int updatePasswordByEmail(final String email, final String password, final boolean mustChangePassword) throws Exception {
         return getQueryAgent().executeUpdate(
-            "UPDATE company_user SET password = '" + password + "', must_change_password = " + mustChangePassword +
-                " WHERE email = '" + email + "';");
+                "UPDATE company_user SET password = '" + password + "', must_change_password = " + mustChangePassword +
+                        " WHERE email = '" + email + "';");
     }
 
     public int updateApiKeyByEmail(final String email, final String apiKey) throws Exception {
