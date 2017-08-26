@@ -27,6 +27,8 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import xyz.greatapp.libs.service.requests.database.ColumnValue;
+import xyz.greatapp.libs.service.requests.database.SelectQueryRQ;
 
 import static java.lang.Integer.parseInt;
 
@@ -116,12 +118,13 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public CompanyUser getByEmailAndPassword(final String email, final String password) throws Exception {
-        String sql = "SELECT company_user.* FROM " + "company_user" +
-                " WHERE company_user.email = '"+ email + "'" +
-                " AND company_user.password = '" + password + "'";
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("email", email),
+                new ColumnValue("password", password)
+        };
 
-        HttpEntity<SelectQuery> entity = new HttpEntity<>(
-                new SelectQuery(sql),
+        HttpEntity<SelectQueryRQ> entity = new HttpEntity<>(
+                new SelectQueryRQ("company_user", filters),
                 getHttpHeaders());
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/select",
@@ -135,9 +138,15 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public CompanyUser getByEmail(final String email) throws Exception {
-        HttpEntity<SelectQuery> entity = new HttpEntity<>(
-                new SelectQuery("select company_user.* FROM company_user WHERE company_user.email = '" + email + "' ;"),
+
+        SelectQueryRQ selectQueryRQ = new SelectQueryRQ("company_user", new ColumnValue[]{
+                new ColumnValue("email", email)
+        });
+        HttpEntity<SelectQueryRQ> entity = new HttpEntity<>(
+                selectQueryRQ,
                 getHttpHeaders());
+
+
         ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/select",
                 entity,
