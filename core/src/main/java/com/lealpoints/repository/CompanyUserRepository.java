@@ -1,7 +1,6 @@
 package com.lealpoints.repository;
 
 import com.lealpoints.DatabaseServiceResult;
-import com.lealpoints.UpdateQuery;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
@@ -19,9 +18,10 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import xyz.greatapp.libs.service.requests.database.ColumnValue;
-import xyz.greatapp.libs.service.requests.database.InsertQueryRQ;
-import xyz.greatapp.libs.service.requests.database.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
+import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.UpdateQueryRQ;
+import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -165,7 +165,14 @@ public class CompanyUserRepository extends BaseRepository {
 
     public int updateActivateByActivationKey(final String activationKey) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET active = true WHERE activation_key = '" + activationKey + "';");
+        ColumnValue[] sets = new ColumnValue[] {
+                new ColumnValue("active", true)
+        };
+        ColumnValue[] filters = new ColumnValue[] {
+                new ColumnValue("activation_key", activationKey)
+        };
+        UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
+
         ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,
@@ -181,7 +188,15 @@ public class CompanyUserRepository extends BaseRepository {
 
     public int updateApiKeyByEmail(final String email, final String apiKey) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        UpdateQuery updateQuery = new UpdateQuery("UPDATE company_user SET api_key = '" + apiKey + "' WHERE email = '" + email + "';");
+        ColumnValue[] sets = new ColumnValue[] {
+                new ColumnValue("api_key", apiKey)
+        };
+        ColumnValue[] filters = new ColumnValue[] {
+                new ColumnValue("email", email)
+        };
+        UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
+
+
         ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,

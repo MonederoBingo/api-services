@@ -7,6 +7,8 @@ import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -41,23 +43,31 @@ public class ClientControllerTest {
         List<CompanyClientMapping> expectedClients = new ArrayList<>();
         expectedClients.add(createCompanyClientMapping(100, "123"));
         expectedClients.add(createCompanyClientMapping(200, "456"));
-        final ServiceResult<List<CompanyClientMapping>> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"), expectedClients);
+        JSONArray jsonArray = new JSONArray(expectedClients);
+        final xyz.greatapp.libs.service.ServiceResult expectedServiceResult =
+                new xyz.greatapp.libs.service.ServiceResult(true, "1", jsonArray.toString());
         final ClientServiceImpl clientService = createClientServiceForGet(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
-        ResponseEntity<ServiceResult<List<CompanyClientMapping>>> responseEntity = clientController.getByCompanyId(1);
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> responseEntity = clientController.getByCompanyId(1);
         assertNotNull(responseEntity);
-        ServiceResult actualServiceResults = responseEntity.getBody();
+        xyz.greatapp.libs.service.ServiceResult actualServiceResults = responseEntity.getBody();
         assertNotNull(actualServiceResults);
         assertEquals(expectedServiceResult.isSuccess(), actualServiceResults.isSuccess());
         assertEquals(expectedServiceResult.getMessage(), actualServiceResults.getMessage());
         assertNotNull(expectedServiceResult.getObject());
-        List<CompanyClientMapping> companyClientMappings = expectedServiceResult.getObject();
-        assertEquals(2, companyClientMappings.size());
-        assertEquals(100, companyClientMappings.get(0).getPoints(), 0.00);
-        assertEquals("123", companyClientMappings.get(0).getClient().getPhone());
-        assertEquals(200, companyClientMappings.get(1).getPoints(), 0.00);
-        assertEquals("456", companyClientMappings.get(1).getClient().getPhone());
+        JSONArray companyClientMappings = new JSONArray(expectedServiceResult.getObject());
+        assertEquals(2, companyClientMappings.length());
+
+        JSONObject companyClientMapping = new JSONObject(companyClientMappings.get(0).toString());
+        assertEquals(100, companyClientMapping.getDouble("points"), 0.00);
+        JSONObject client = companyClientMapping.getJSONObject("client");
+        assertEquals("123", client.get("phone"));
+
+        companyClientMapping = new JSONObject(companyClientMappings.get(1).toString());
+        assertEquals(200, companyClientMapping.getDouble("points"), 0.00);
+        client = companyClientMapping.getJSONObject("client");
+        assertEquals("456", client.get("phone"));
     }
 
     @Test
@@ -94,12 +104,12 @@ public class ClientControllerTest {
 
     private ClientServiceImpl createClientServiceForRegister(ServiceResult<Long> serviceResult) throws Exception {
         final ClientServiceImpl clientService = EasyMock.createMock(ClientServiceImpl.class);
-        expect(clientService.register((ClientRegistration) anyObject())).andReturn(serviceResult).times(1);
+        expect(clientService.register(anyObject())).andReturn(serviceResult).times(1);
         replay(clientService);
         return clientService;
     }
 
-    private ClientServiceImpl createClientServiceForGet(ServiceResult<List<CompanyClientMapping>> serviceResult) throws Exception {
+    private ClientServiceImpl createClientServiceForGet(xyz.greatapp.libs.service.ServiceResult serviceResult) throws Exception {
         final ClientServiceImpl clientService = EasyMock.createMock(ClientServiceImpl.class);
         expect(clientService.getByCompanyId(anyLong())).andReturn(serviceResult);
         replay(clientService);

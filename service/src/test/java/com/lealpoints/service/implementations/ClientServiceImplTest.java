@@ -11,6 +11,8 @@ import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -101,21 +103,29 @@ public class ClientServiceImplTest extends BaseServiceTest {
         final List<CompanyClientMapping> expectedClients = new ArrayList<>();
         expectedClients.add(createClient(100, "6391112233"));
         expectedClients.add(createClient(200, "6141112233"));
-        final ClientRepository clientRepository = createClientRepositoryForGet(expectedClients);
+        CompanyClientMapping[] companyClientMappings = new CompanyClientMapping[expectedClients.size()];
+        expectedClients.toArray(companyClientMappings);
+
+        final ClientRepository clientRepository = createClientRepositoryForGet(new JSONArray(companyClientMappings).toString());
         final ClientServiceImpl clientService = new ClientServiceImpl(clientRepository, null, null, null);
 
-        ServiceResult<List<CompanyClientMapping>> serviceResult = clientService.getByCompanyId(1);
+        xyz.greatapp.libs.service.ServiceResult serviceResult = clientService.getByCompanyId(1);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
-        List<CompanyClientMapping> actualClients = serviceResult.getObject();
-        assertEquals(2, actualClients.size());
-        assertEquals(100, actualClients.get(0).getPoints(), 0.00);
-        assertEquals("6391112233", actualClients.get(0).getClient().getPhone());
-        assertEquals(200, actualClients.get(1).getPoints(), 0.00);
-        assertEquals("6141112233", actualClients.get(1).getClient().getPhone());
+        JSONArray actualClients = new JSONArray(serviceResult.getObject());
+        assertEquals(2, actualClients.length());
+
+        assertEquals(100, actualClients.getJSONObject(0).getDouble("points"), 0.00);
+        JSONObject client = actualClients.getJSONObject(0).getJSONObject("client");
+        assertEquals("6391112233", client.get("phone"));
+
+        assertEquals(200, actualClients.getJSONObject(1).getDouble("points"), 0.00);
+        client = actualClients.getJSONObject(1).getJSONObject("client");
+        assertEquals("6141112233", client.get("phone"));
+
         verify(clientRepository);
     }
 
@@ -179,9 +189,11 @@ public class ClientServiceImplTest extends BaseServiceTest {
         return clientRepository;
     }
 
-    private ClientRepository createClientRepositoryForGet(List<CompanyClientMapping> companyClientMappingList) throws Exception {
+    private ClientRepository createClientRepositoryForGet(String object) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByCompanyId(anyLong())).andReturn(companyClientMappingList).anyTimes();
+        xyz.greatapp.libs.service.ServiceResult serviceResult =
+                new xyz.greatapp.libs.service.ServiceResult(true, "", object);
+        expect(clientRepository.getByCompanyId(anyLong())).andReturn(serviceResult).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }

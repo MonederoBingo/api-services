@@ -10,7 +10,7 @@ public interface ClientService extends BaseService {
 
     ServiceResult<Long> register(ClientRegistration clientRegistration);
 
-    ServiceResult<List<CompanyClientMapping>> getByCompanyId(long companyId);
+    xyz.greatapp.libs.service.ServiceResult getByCompanyId(long companyId);
 
     ServiceResult<CompanyClientMapping> getByCompanyIdPhone(long companyId, String phone);
 }

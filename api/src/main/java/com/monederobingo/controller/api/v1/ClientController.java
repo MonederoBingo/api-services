@@ -40,8 +40,8 @@ public class ClientController extends BaseController {
 
     @RequestMapping(value = "/{companyId}", method = GET)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<CompanyClientMapping>>> getByCompanyId(@PathVariable("companyId") long companyId) {
-        ServiceResult<List<CompanyClientMapping>> serviceResult = _clientService.getByCompanyId(companyId);
+    public ResponseEntity<xyz.greatapp.libs.service.ServiceResult> getByCompanyId(@PathVariable("companyId") long companyId) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _clientService.getByCompanyId(companyId);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 

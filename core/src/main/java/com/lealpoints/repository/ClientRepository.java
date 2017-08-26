@@ -4,42 +4,59 @@ package com.lealpoints.repository;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.ServiceResult;
+import xyz.greatapp.libs.service.context.ThreadContextService;
+import xyz.greatapp.libs.service.database.common.ApiClientUtils;
+import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
+import xyz.greatapp.libs.service.database.requests.fields.Join;
+import xyz.greatapp.libs.service.location.ServiceLocator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+
+import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
 public class ClientRepository extends BaseRepository {
 
-    public List<CompanyClientMapping> getByCompanyId(final long companyId) throws Exception {
-        return getQueryAgent().selectList(new DbBuilder<CompanyClientMapping>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT * FROM client");
-                sql.append(" INNER JOIN company_client_mapping USING (client_id)");
-                sql.append(" WHERE company_client_mapping.company_id = ").append("?").append(" ;");
-                return sql.toString();
-            }
+    private static final Common c = new Common();
+    @Autowired
+    private ServiceLocator serviceLocator;
+    @Autowired
+    private ThreadContextService threadContextService;
 
-            @Override
-            public Object[] values() {
-                return new Object[]{companyId};
-            }
+    private ApiClientUtils apiClientUtils = new ApiClientUtils();
 
-            @Override
-            public CompanyClientMapping build(ResultSet resultSet) throws SQLException {
-                CompanyClientMapping companyClientMapping = new CompanyClientMapping();
-                companyClientMapping.setCompanyClientMappingId(resultSet.getLong("company_client_mapping_id"));
-                companyClientMapping.setCompanyId(resultSet.getLong("company_id"));
-                companyClientMapping.setPoints(resultSet.getFloat("points"));
-                Client client = buildClient(resultSet);
-                companyClientMapping.setClient(client);
-                return companyClientMapping;
-            }
-        });
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyId(final long companyId) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("company_id", companyId)
+        };
+        Join[] joins = new Join[]{
+                new Join("client", "client_id", "client_id")
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("company_client_mapping", filters, joins));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/selectList";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+
+        ServiceResult body = responseEntity.getBody();
+        ServiceResult result;
+        if (body.isSuccess()) {
+            result = new ServiceResult(
+                    body.isSuccess(),
+                    body.getMessage(),
+                    body.getObject());
+        } else {
+            result = new ServiceResult(false, "Error returning client");
+        }
+        return result;
     }
 
     public CompanyClientMapping getByCompanyIdPhone(final long companyId, final String phone) throws Exception {
@@ -116,7 +133,7 @@ public class ClientRepository extends BaseRepository {
 
     public int updateCanReceivePromoSms(long clientId, boolean canReceivePromo) throws Exception {
         return getQueryAgent().executeUpdate(
-            "UPDATE client SET can_receive_promo_sms = " + canReceivePromo + " WHERE client_id = " + clientId + ";");
+                "UPDATE client SET can_receive_promo_sms = " + canReceivePromo + " WHERE client_id = " + clientId + ";");
     }
 
     private Client buildClient(ResultSet resultSet) throws SQLException {
