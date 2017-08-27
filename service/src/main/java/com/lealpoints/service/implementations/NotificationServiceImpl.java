@@ -44,7 +44,7 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
         try {
             final Company company = companyRepository.getByCompanyId(companyId);
             final xyz.greatapp.libs.service.ServiceResult client = clientRepository.getByPhone(phone);
-            if (client == null) {
+            if ("{}".equals(client.getObject())) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
             long clientId = new JSONObject(client.getObject()).getLong("client_id");
