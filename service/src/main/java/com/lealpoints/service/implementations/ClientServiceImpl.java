@@ -66,17 +66,16 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
             return _clientRepository.getByCompanyId(companyId);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new xyz.greatapp.libs.service.ServiceResult(false, "", null);
+            return new xyz.greatapp.libs.service.ServiceResult(false, "Error.", null);
         }
     }
 
-    public ServiceResult<CompanyClientMapping> getByCompanyIdPhone(long companyId, String phone) {
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyIdPhone(long companyId, String phone) {
         try {
-            CompanyClientMapping clientPoints = _clientRepository.getByCompanyIdPhone(companyId, phone);
-            return new ServiceResult<>(true, ServiceMessage.EMPTY, clientPoints);
+            return _clientRepository.getByCompanyIdPhone(companyId, phone);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
+            return new xyz.greatapp.libs.service.ServiceResult(false, "Error.", null);
         }
     }
 

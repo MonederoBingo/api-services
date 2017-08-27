@@ -136,18 +136,19 @@ public class ClientServiceImplTest extends BaseServiceTest {
         Client client = new Client();
         client.setPhone("1234567890");
         companyClientMapping.setClient(client);
-        final ClientRepository clientRepository = createClientRepositoryForGetByCompanyIDPhone(companyClientMapping);
+        final ClientRepository clientRepository = createClientRepositoryForGetByCompanyIDPhone(new JSONObject(companyClientMapping).toString());
         final ClientServiceImpl clientService = new ClientServiceImpl(clientRepository, null, null, null);
 
-        ServiceResult<CompanyClientMapping> serviceResult = clientService.getByCompanyIdPhone(1, "1234567890");
+        xyz.greatapp.libs.service.ServiceResult serviceResult = clientService.getByCompanyIdPhone(1, "1234567890");
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
-        final CompanyClientMapping actualCompanyClientMapping = serviceResult.getObject();
-        assertEquals(1200, actualCompanyClientMapping.getPoints(), 0.00);
-        assertEquals("1234567890", actualCompanyClientMapping.getClient().getPhone());
+        final JSONObject actualCompanyClientMapping = new JSONObject(serviceResult.getObject());
+        assertEquals(1200, actualCompanyClientMapping.getDouble("points"), 0.00);
+
+        assertEquals("1234567890", new JSONObject(actualCompanyClientMapping.get("client").toString()).get("phone"));
         verify(clientRepository);
     }
 
@@ -198,9 +199,10 @@ public class ClientServiceImplTest extends BaseServiceTest {
         return clientRepository;
     }
 
-    private ClientRepository createClientRepositoryForGetByCompanyIDPhone(CompanyClientMapping companyClientMapping) throws Exception {
+    private ClientRepository createClientRepositoryForGetByCompanyIDPhone(String companyClientMapping) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByCompanyIdPhone(anyLong(), anyString())).andReturn(companyClientMapping).anyTimes();
+        expect(clientRepository.getByCompanyIdPhone(anyLong(), anyString())).
+                andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", companyClientMapping)).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }

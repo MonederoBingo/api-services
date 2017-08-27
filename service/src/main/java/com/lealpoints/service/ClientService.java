@@ -1,10 +1,7 @@
 package com.lealpoints.service;
 
-import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.response.ServiceResult;
-
-import java.util.List;
 
 public interface ClientService extends BaseService {
 
@@ -12,5 +9,5 @@ public interface ClientService extends BaseService {
 
     xyz.greatapp.libs.service.ServiceResult getByCompanyId(long companyId);
 
-    ServiceResult<CompanyClientMapping> getByCompanyIdPhone(long companyId, String phone);
+    xyz.greatapp.libs.service.ServiceResult getByCompanyIdPhone(long companyId, String phone);
 }

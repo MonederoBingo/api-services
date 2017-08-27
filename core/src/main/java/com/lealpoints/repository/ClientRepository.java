@@ -4,6 +4,7 @@ package com.lealpoints.repository;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -59,31 +60,15 @@ public class ClientRepository extends BaseRepository {
         return result;
     }
 
-    public CompanyClientMapping getByCompanyIdPhone(final long companyId, final String phone) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<CompanyClientMapping>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT * FROM client");
-                sql.append(" INNER JOIN company_client_mapping USING (client_id)");
-                sql.append(" WHERE company_client_mapping.company_id = ?");
-                sql.append(" AND client.phone = ? ;");
-                return sql.toString();
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyIdPhone(final long companyId, final String phone) throws Exception {
+        ServiceResult result = getByCompanyId(companyId);
+        JSONArray clients = new JSONArray(result.getObject());
+        for (int i = 0; i < clients.length(); i++) {
+            if(phone.equals(clients.getJSONObject(i).get("phone"))) {
+                return new ServiceResult(true, "", clients.getJSONObject(i).toString());
             }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{companyId, phone};
-            }
-
-            @Override
-            public CompanyClientMapping build(ResultSet resultSet) throws SQLException {
-                CompanyClientMapping companyClientMapping = new CompanyClientMapping();
-                companyClientMapping.setClient(buildClient(resultSet));
-                companyClientMapping.setPoints(resultSet.getFloat("points"));
-                return companyClientMapping;
-            }
-        });
+        }
+        return new ServiceResult(false, "Client not found.");
     }
 
     public Client getByPhone(final String phone) throws Exception {

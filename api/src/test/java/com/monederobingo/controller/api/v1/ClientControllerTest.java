@@ -77,20 +77,21 @@ public class ClientControllerTest {
         Client client = new Client();
         client.setPhone("1234567890");
         companyClientMapping.setClient(client);
-        final ServiceResult<CompanyClientMapping> expectedServiceResult = new ServiceResult<>(true, new ServiceMessage("1"), companyClientMapping);
+        final xyz.greatapp.libs.service.ServiceResult expectedServiceResult =
+                new xyz.greatapp.libs.service.ServiceResult(true, "1", new JSONObject(companyClientMapping).toString());
         final ClientServiceImpl clientService = createClientServiceForGetByCompanyIdPhone(expectedServiceResult);
         final ClientController clientController = new ClientController(clientService);
 
-        ResponseEntity<ServiceResult<CompanyClientMapping>> responseEntity = clientController.getByCompanyIdPhone(1, "1234567890");
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> responseEntity = clientController.getByCompanyIdPhone(1, "1234567890");
         assertNotNull(responseEntity);
-        ServiceResult actualServiceResults = responseEntity.getBody();
+        xyz.greatapp.libs.service.ServiceResult actualServiceResults = responseEntity.getBody();
         assertNotNull(actualServiceResults);
         assertEquals(expectedServiceResult.isSuccess(), actualServiceResults.isSuccess());
         assertEquals(expectedServiceResult.getMessage(), actualServiceResults.getMessage());
         assertNotNull(expectedServiceResult.getObject());
-        CompanyClientMapping actualCompanyClientMapping = expectedServiceResult.getObject();
-        assertEquals(1200, actualCompanyClientMapping.getPoints(), 0.00);
-        assertEquals("1234567890", actualCompanyClientMapping.getClient().getPhone());
+        JSONObject actualCompanyClientMapping = new JSONObject(actualServiceResults.getObject());
+        assertEquals(1200, actualCompanyClientMapping.getDouble("points"), 0.00);
+        assertEquals("1234567890", new JSONObject(actualCompanyClientMapping.get("client").toString()).get("phone"));
     }
 
     private CompanyClientMapping createCompanyClientMapping(float points, String phone) {
@@ -116,7 +117,7 @@ public class ClientControllerTest {
         return clientService;
     }
 
-    private ClientServiceImpl createClientServiceForGetByCompanyIdPhone(ServiceResult<CompanyClientMapping> serviceResult) throws Exception {
+    private ClientServiceImpl createClientServiceForGetByCompanyIdPhone(xyz.greatapp.libs.service.ServiceResult serviceResult) throws Exception {
         final ClientServiceImpl clientService = EasyMock.createMock(ClientServiceImpl.class);
         expect(clientService.getByCompanyIdPhone(anyLong(), anyString())).andReturn(serviceResult);
         replay(clientService);
