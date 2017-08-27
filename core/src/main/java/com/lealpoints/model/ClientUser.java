@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 @Table
 public class ClientUser {
     private long clientUserId;
@@ -64,5 +66,17 @@ public class ClientUser {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("client_user_id", clientUserId);
+        jsonObject.put("client_id", clientId);
+        jsonObject.put("name", name);
+        jsonObject.put("email", email);
+        jsonObject.put("password", password);
+        jsonObject.put("sms_key", smsKey);
+        jsonObject.put("api_key", apiKey);
+        return jsonObject;
     }
 }

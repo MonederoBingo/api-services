@@ -204,6 +204,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testUserLoginWithEmailWhenNotUpdatingApiKey() throws Exception {
+        //given
         ClientUser clientUser = new ClientUser();
         clientUser.setClientUserId(1);
         clientUser.setClientId(1);
@@ -231,7 +232,11 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
         clientUserLogin.setSmsKey("");
         clientUserLogin.setEmail("a@a.com");
         clientUserLogin.setPassword("password");
+
+        //when
         ServiceResult serviceResult = clientUserService.login(clientUserLogin);
+
+        //then
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
@@ -292,7 +297,8 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     private ClientUserRepository createClientUserRepositoryForPhone(ClientUser clientUser) throws Exception {
         final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(
+                new xyz.greatapp.libs.service.ServiceResult(true, "", clientUser.toJSONObject().toString()));
         expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(1);
         replay(clientUserRepository);
         return clientUserRepository;
@@ -300,7 +306,8 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     private ClientUserRepository createClientUserRepositoryForPhoneWhenNotUpdatingApiKey(ClientUser clientUser) throws Exception {
         final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(
+                new xyz.greatapp.libs.service.ServiceResult(true, "", clientUser.toJSONObject().toString()));
         expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(0);
         replay(clientUserRepository);
         return clientUserRepository;
@@ -308,8 +315,9 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     private ClientUserRepository createClientUserRepositoryForEmail(ClientUser clientUser) throws Exception {
         final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(null);
-        expect(clientUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(false, "", "{}"));
+        expect(clientUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(
+                new xyz.greatapp.libs.service.ServiceResult(true, "", clientUser.toJSONObject().toString()));
         expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(1);
         replay(clientUserRepository);
         return clientUserRepository;
@@ -317,8 +325,10 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     private ClientUserRepository createClientUserRepositoryForEmailWhenNotUpdatingApiKey(ClientUser clientUser) throws Exception {
         final ClientUserRepository clientUserRepository = EasyMock.createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(null);
-        expect(clientUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(clientUser);
+        expect(clientUserRepository.getByPhoneAndKey(anyString(), anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(false, "", "{}"));
+        expect(clientUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(
+                new xyz.greatapp.libs.service.ServiceResult(true, "", clientUser.toJSONObject().toString())
+        );
         expect(clientUserRepository.updateApiKeyById(anyLong(), anyString())).andReturn(0);
         replay(clientUserRepository);
         return clientUserRepository;
@@ -340,14 +350,15 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
     private ClientUserRepository createClientUserRepository() throws Exception {
         ClientUserRepository clientUserRepository = createMock(ClientUserRepository.class);
         expect(clientUserRepository.insert((ClientUser) anyObject())).andReturn(1L);
-        expect(clientUserRepository.getByClientId(anyLong())).andReturn(null);
+        expect(clientUserRepository.getByClientId(anyLong())).andReturn(new xyz.greatapp.libs.service.ServiceResult(false, "", "{}"));
         replay(clientUserRepository);
         return clientUserRepository;
     }
 
     private ClientUserRepository createClientUserRepositoryWhenClientExists(ClientUser clientUser) throws Exception {
         ClientUserRepository clientUserRepository = createMock(ClientUserRepository.class);
-        expect(clientUserRepository.getByClientId(anyLong())).andReturn(clientUser);
+        expect(clientUserRepository.getByClientId(anyLong())).andReturn(
+                new xyz.greatapp.libs.service.ServiceResult(true, "", clientUser.toJSONObject().toString()));
         expect(clientUserRepository.updateSmsKey(anyString(), anyString())).andReturn(1);
         replay(clientUserRepository);
         return clientUserRepository;

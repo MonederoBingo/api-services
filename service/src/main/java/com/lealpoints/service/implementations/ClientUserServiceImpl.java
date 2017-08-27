@@ -2,7 +2,6 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Client;
 import com.lealpoints.model.ClientUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.ClientRepository;
@@ -64,21 +63,23 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
             if (clientUserLogin == null || (StringUtils.isEmpty(clientUserLogin.getEmail()) && StringUtils.isEmpty(clientUserLogin.getPhoneNumber()))) {
                 return null;
             }
-            ClientUser clientUser = authenticateUsingPhone(clientUserLogin);
-            if (clientUser == null) {
+            xyz.greatapp.libs.service.ServiceResult clientUser = authenticateUsingPhone(clientUserLogin);
+            if (clientUser.getObject().equals("{}")) {
                 clientUser = authenticateUsingEmail(clientUserLogin);
             }
-            if (clientUser == null) {
+            if (clientUser.getObject().equals("{}")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.LOGIN_FAILED));
             } else {
                 String apiKey = RandomStringUtils.random(20, true, true) + "cli";
-                final int updatedRows = _clientUserRepository.updateApiKeyById(clientUser.getClientUserId(), apiKey);
+                long clientUserId = new JSONObject(clientUser.getObject()).getLong("client_user_id");
+                final int updatedRows = _clientUserRepository.updateApiKeyById(
+                        clientUserId, apiKey);
                 if (updatedRows != 1) {
                     logger.error("The client user api key could not be updated. updatedRows: " + updatedRows);
                     return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR));
                 }
                 ClientLoginResult clientLoginResult = new ClientLoginResult();
-                clientLoginResult.setClientUserId(clientUser.getClientUserId());
+                clientLoginResult.setClientUserId(clientUserId);
                 clientLoginResult.setApiKey(apiKey);
                 return new ServiceResult<>(true, ServiceMessage.EMPTY, clientLoginResult);
             }
@@ -101,10 +102,10 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
     private String registerClientAndClientUser(ClientUserRegistration clientUserRegistration) throws Exception {
         xyz.greatapp.libs.service.ServiceResult client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhoneNumber(), true);
         long clientId = new JSONObject(client.getObject()).getLong("client_id");
-        ClientUser clientUser = _clientUserRepository.getByClientId(clientId);
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _clientUserRepository.getByClientId(clientId);
         final String smsKey = generateAndSendRegistrationSMS(clientUserRegistration.getPhoneNumber());
-        if (clientUser == null) {
-            clientUser = new ClientUser();
+        if ("{}".equals(serviceResult.getObject())) {
+            ClientUser clientUser = new ClientUser();
             clientUser.setClientId(clientId);
             clientUser.setSmsKey(smsKey);
             _clientUserRepository.insert(clientUser);
@@ -114,11 +115,11 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
         return smsKey;
     }
 
-    private ClientUser authenticateUsingPhone(ClientUserLogin clientUserLogin) throws Exception {
+    private xyz.greatapp.libs.service.ServiceResult authenticateUsingPhone(ClientUserLogin clientUserLogin) throws Exception {
         return _clientUserRepository.getByPhoneAndKey(clientUserLogin.getPhoneNumber(), clientUserLogin.getSmsKey());
     }
 
-    private ClientUser authenticateUsingEmail(ClientUserLogin clientUserLogin) throws Exception {
+    private xyz.greatapp.libs.service.ServiceResult authenticateUsingEmail(ClientUserLogin clientUserLogin) throws Exception {
         return _clientUserRepository.getByEmailAndPassword(clientUserLogin.getEmail(), clientUserLogin.getPassword());
     }
 
@@ -136,7 +137,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
         return key;
     }
 
-    void sendKeyToEmail(String key, String phone) throws MessagingException {
+    private void sendKeyToEmail(String key, String phone) throws MessagingException {
         NotificationEmail notificationEmail = new NotificationEmail();
         notificationEmail.setSubject(getServiceMessage(Message.ACTIVATION_EMAIL_SUBJECT).getMessage());
         notificationEmail.setBody("Phone: " + phone + ", Key:" + key);
