@@ -12,6 +12,7 @@ import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -21,6 +22,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
 
     @Test
     public void testSendMobileAppAdMessage() throws Exception {
+        //given
         SMSServiceImpl smsService = createStrictMock(SMSServiceImpl.class);
         smsService.sendSMSMessage(anyString(), anyString());
         expectLastCall();
@@ -32,7 +34,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
 
         ClientRepository clientRepository = createStrictMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
+        expect(clientRepository.getByPhone(anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
 
         replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
@@ -45,7 +47,10 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
             }
         };
 
+        //when
         final ServiceResult serviceResult = notificationService.sendMobileAppAdMessage(0, "6623471507");
+
+        //then
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
 
@@ -75,6 +80,7 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
 
     @Test
     public void testSendMobileAppAdMessageWhenConfIsEnabled() throws Exception {
+        //given
         SMSServiceImpl smsService = createStrictMock(SMSServiceImpl.class);
         smsService.sendSMSMessage(anyString(), anyString());
         expectLastCall();
@@ -86,7 +92,8 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
 
         ClientRepository clientRepository = createStrictMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
+        expect(clientRepository.getByPhone(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         expect(clientRepository.updateCanReceivePromoSms(anyLong(), anyBoolean())).andReturn(1);
 
         replay(smsService, companyRepository, clientRepository, companyClientMappingRepository);
@@ -103,7 +110,11 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
                 return false;
             }
         };
+
+        //when
         final ServiceResult serviceResult = notificationService.sendMobileAppAdMessage(0, "6623471507");
+
+        //then
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
         verify(smsService, clientRepository);

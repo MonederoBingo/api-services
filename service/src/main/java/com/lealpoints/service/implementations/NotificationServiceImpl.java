@@ -15,6 +15,7 @@ import com.lealpoints.util.EmailUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,11 +43,11 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
     public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
         try {
             final Company company = companyRepository.getByCompanyId(companyId);
-            final Client client = clientRepository.getByPhone(phone);
+            final xyz.greatapp.libs.service.ServiceResult client = clientRepository.getByPhone(phone);
             if (client == null) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
-            long clientId = client.getClientId();
+            long clientId = new JSONObject(client.getObject()).getLong("client_id");
             final double points = companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
             if (company != null) {
                 final String smsMessage = getSMSMessage(points);

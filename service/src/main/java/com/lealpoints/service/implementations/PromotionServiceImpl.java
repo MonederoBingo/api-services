@@ -17,6 +17,7 @@ import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.DateUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -41,13 +42,13 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
     public ServiceResult<Long> applyPromotion(PromotionApplying promotionApplying) {
         try {
             final QueryAgent queryAgent = getQueryAgent();
-            final Client client = _clientRepository.getByPhone(promotionApplying.getPhoneNumber());
-            if (client == null) {
+            final xyz.greatapp.libs.service.ServiceResult client = _clientRepository.getByPhone(promotionApplying.getPhoneNumber());
+            if (client.getObject().equals("{}")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
 
             CompanyClientMapping companyClientMapping = _companyClientMappingRepository.getByCompanyIdClientId(
-                    promotionApplying.getCompanyId(), client.getClientId());
+                    promotionApplying.getCompanyId(), new JSONObject(client.getObject()).getLong("client_id"));
             PromotionConfiguration promotionConfiguration = _promotionConfigurationRepository.getById(
                     promotionApplying.getPromotionConfigurationId());
 

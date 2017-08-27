@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 @Table
 public class Client {
     private long clientId;
@@ -28,5 +30,13 @@ public class Client {
 
     public void setCanReceivePromotionSms(boolean canReceivePromotionSms) {
         this.canReceivePromotionSms = canReceivePromotionSms;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("client_id", clientId);
+        jsonObject.put("phone", phone);
+        jsonObject.put("can_receive_promo_sms", canReceivePromotionSms);
+        return jsonObject;
     }
 }

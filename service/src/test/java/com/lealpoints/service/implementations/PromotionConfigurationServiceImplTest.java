@@ -9,6 +9,7 @@ import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -74,6 +75,7 @@ public class PromotionConfigurationServiceImplTest {
 
     @Test
     public void testGetByCompanyIdRequiredPoints() throws Exception {
+        //given
         List<PromotionConfiguration> expectedPromotionConfigurations = new ArrayList<>();
         expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "5% off", 500));
         expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "10% off", 1200));
@@ -83,12 +85,15 @@ public class PromotionConfigurationServiceImplTest {
             createPromotionConfigurationRepositoryForGet(expectedPromotionConfigurations);
         CompanyClientMapping companyClientMapping = new CompanyClientMapping();
         companyClientMapping.setPoints(1200);
-        ClientRepository clientRepository = createClientRepository(new Client());
+        ClientRepository clientRepository = createClientRepository(new Client().toJSONObject().toString());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null);
 
+        //when
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
@@ -111,7 +116,7 @@ public class PromotionConfigurationServiceImplTest {
 
     @Test
     public void testGetByCompanyIdRequiredPointsWhenClientDoesNotExist() throws Exception {
-        ClientRepository clientRepository = createClientRepository(null);
+        ClientRepository clientRepository = createClientRepository("{}");
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(null, null, clientRepository, null) {
                     @Override
@@ -130,7 +135,8 @@ public class PromotionConfigurationServiceImplTest {
 
     @Test
     public void testGetByCompanyIdRequiredPointsWhenMappingDoesNotExist() throws Exception {
-        ClientRepository clientRepository = createClientRepository(new Client());
+        //given
+        ClientRepository clientRepository = createClientRepository(new Client().toJSONObject().toString());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(null);
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(null, companyClientMappingRepository, clientRepository, null) {
@@ -140,11 +146,13 @@ public class PromotionConfigurationServiceImplTest {
                     }
             };
 
+        //when
         ServiceResult<List<PromotionConfiguration>> serviceResult = promotionConfigurationService.getByCompanyIdRequiredPoints(1, "12345");
+
+        //then
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Message.PHONE_NUMBER_DOES_NOT_EXIST.name(), serviceResult.getMessage());
-
         verify(companyClientMappingRepository, clientRepository);
     }
 
@@ -159,7 +167,7 @@ public class PromotionConfigurationServiceImplTest {
             createPromotionConfigurationRepositoryForGet(expectedPromotionConfigurations);
         CompanyClientMapping companyClientMapping = new CompanyClientMapping();
         companyClientMapping.setPoints(300);
-        ClientRepository clientRepository = createClientRepository(new Client());
+        ClientRepository clientRepository = createClientRepository(new Client().toJSONObject().toString());
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository(companyClientMapping);
         PromotionConfigurationServiceImpl promotionConfigurationService =
                 new PromotionConfigurationServiceImpl(promotionConfigurationRepository, companyClientMappingRepository, clientRepository, null) {
@@ -205,9 +213,9 @@ public class PromotionConfigurationServiceImplTest {
         return companyClientMappingRepository;
     }
 
-    private ClientRepository createClientRepository(Client client) throws Exception {
+    private ClientRepository createClientRepository(String client) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(client);
+        expect(clientRepository.getByPhone(anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", client));
         replay(clientRepository);
         return clientRepository;
     }

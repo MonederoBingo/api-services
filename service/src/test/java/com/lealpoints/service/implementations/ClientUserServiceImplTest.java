@@ -56,6 +56,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testRegisterWhenClientExists() throws Exception {
+        //given
         final ClientUser clientUser = new ClientUser();
         clientUser.setClientUserId(2);
         ClientUserRepository clientUserRepository = createClientUserRepositoryWhenClientExists(clientUser);
@@ -73,7 +74,11 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
                 };
         ClientUserRegistration clientUserRegistration = new ClientUserRegistration();
         clientUserRegistration.setPhoneNumber("1234567890");
+
+        //when
         ServiceResult<String> serviceResult = clientUserService.register(new ClientUserRegistration());
+
+        //then
         assertNotNull(serviceResult);
         assertEquals("123456", serviceResult.getObject());
         verify(clientRepository, clientRepository);
@@ -327,7 +332,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
 
     private ClientRepository createClientRepositoryForRegister() throws Exception {
         final ClientRepository clientRepository = EasyMock.createMock(ClientRepository.class);
-        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(new Client());
+        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         replay(clientRepository);
         return clientRepository;
     }

@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -100,8 +101,8 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
     {
         try
         {
-            Client client = _clientRepository.getByPhone(phone);
-            List<PointsInCompany> companies = _companyRepository.getPointsInCompanyByClientId(client.getClientId());
+            xyz.greatapp.libs.service.ServiceResult serviceResult = _clientRepository.getByPhone(phone);
+            List<PointsInCompany> companies = _companyRepository.getPointsInCompanyByClientId(new JSONObject(serviceResult.getObject()).getLong("client_id"));
             return new ServiceResult<>(true, ServiceMessage.EMPTY, companies);
         }
         catch (Exception ex)

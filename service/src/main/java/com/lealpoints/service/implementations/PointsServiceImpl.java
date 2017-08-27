@@ -20,6 +20,7 @@ import com.lealpoints.util.DateUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -74,13 +75,14 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         if (pointsConfiguration == null) {
             throw new IllegalArgumentException("Points configuration doesn't exist");
         }
-        Client client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhoneNumber(), true);
+        xyz.greatapp.libs.service.ServiceResult client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhoneNumber(), true);
         //Inserting company client mapping if it doesn't exist
-        _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), client.getClientId());
+        long clientId = new JSONObject(client.getObject()).getLong("client_id");
+        _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), clientId);
 
         Points points = new Points();
         points.setCompanyId(pointsAwarding.getCompanyId());
-        points.setClientId(client.getClientId());
+        points.setClientId(clientId);
         points.setSaleKey(pointsAwarding.getSaleKey());
         points.setRequiredAmount(pointsConfiguration.getRequiredAmount());
         points.setPointsToEarn(pointsConfiguration.getPointsToEarn());
@@ -93,7 +95,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
 
         // Updating points in company client mapping table
         CompanyClientMapping companyClientMapping =
-            _companyClientMappingRepository.getByCompanyIdClientId(pointsAwarding.getCompanyId(), client.getClientId());
+            _companyClientMappingRepository.getByCompanyIdClientId(pointsAwarding.getCompanyId(), clientId);
         if (companyClientMapping == null) {
             throw new IllegalArgumentException("CompanyClientMapping doesn't exist.");
         }

@@ -1,10 +1,9 @@
 package com.lealpoints.repository;
 
 
-import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Client;
-import com.lealpoints.model.CompanyClientMapping;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -47,17 +46,7 @@ public class ClientRepository extends BaseRepository {
                 entity,
                 ServiceResult.class);
 
-        ServiceResult body = responseEntity.getBody();
-        ServiceResult result;
-        if (body.isSuccess()) {
-            result = new ServiceResult(
-                    body.isSuccess(),
-                    body.getMessage(),
-                    body.getObject());
-        } else {
-            result = new ServiceResult(false, "Error returning client");
-        }
-        return result;
+        return responseEntity.getBody();
     }
 
     public xyz.greatapp.libs.service.ServiceResult getByCompanyIdPhone(final long companyId, final String phone) throws Exception {
@@ -71,29 +60,17 @@ public class ClientRepository extends BaseRepository {
         return new ServiceResult(false, "Client not found.");
     }
 
-    public Client getByPhone(final String phone) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<Client>() {
-            @Override
-            public String sql() throws SQLException {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT * FROM client");
-                sql.append(" WHERE phone = ? ;");
-                return sql.toString();
-            }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{phone};
-            }
-
-            @Override
-            public Client build(ResultSet resultSet) throws SQLException {
-                Client client = new Client();
-                client.setClientId(resultSet.getLong("client_id"));
-                client.setPhone(resultSet.getString("phone"));
-                return client;
-            }
-        });
+    public ServiceResult getByPhone(final String phone) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("phone", phone)
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("client", filters, new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/select";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return responseEntity.getBody();
     }
 
     public long insert(Client client) throws Exception {
@@ -105,15 +82,16 @@ public class ClientRepository extends BaseRepository {
         return getQueryAgent().executeInsert(sql.toString(), "client_id");
     }
 
-    public Client insertIfDoesNotExist(String phone, boolean canReceivePromotionSms) throws Exception {
-        Client client = getByPhone(phone);
-        if (client == null) {
-            client = new Client();
+    public ServiceResult insertIfDoesNotExist(String phone, boolean canReceivePromotionSms) throws Exception {
+        ServiceResult serviceResult = getByPhone(phone);
+        if (serviceResult.getObject().equals("{}")) {
+            Client client = new Client();
             client.setPhone(phone);
             client.setCanReceivePromotionSms(canReceivePromotionSms);
             client.setClientId(insert(client));
+            serviceResult = new ServiceResult(serviceResult.isSuccess(), serviceResult.getMessage(), new JSONObject(client).toString());
         }
-        return client;
+        return serviceResult;
     }
 
     public int updateCanReceivePromoSms(long clientId, boolean canReceivePromo) throws Exception {

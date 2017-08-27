@@ -17,6 +17,7 @@ import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMockSupport;
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -30,6 +31,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testAwardPoints() throws Exception {
+        //given
         expect(pointsConfigurationService.getByCompanyId(anyInt()))
                 .andReturn(new ServiceResult<>(true, new ServiceMessage(""), createPointsConfiguration(10, 100)));
         PointsServiceImpl pointsService =
@@ -48,7 +50,10 @@ public class PointsServiceImplTest extends EasyMockSupport {
         pointsAwarding.setSaleAmount(100);
         pointsAwarding.setSaleKey("A123");
 
+        //when
         ServiceResult<Float> serviceResult = pointsService.awardPoints(pointsAwarding);
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.POINTS_AWARDED.name(), serviceResult.getMessage());
@@ -150,7 +155,8 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     private ClientRepository createClientRepository() throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(new Client());
+        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         return clientRepository;
     }
 

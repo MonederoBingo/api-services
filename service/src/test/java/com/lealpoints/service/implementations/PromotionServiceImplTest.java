@@ -25,7 +25,7 @@ public class PromotionServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testApplyPromotion() throws Exception {
-
+        //given
         PromotionRepository promotionRepository = createPromotionRepository();
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepository();
         ClientRepository clientRepository = createClientRepository();
@@ -33,19 +33,22 @@ public class PromotionServiceImplTest extends BaseServiceTest {
         ThreadContextService threadContextService = createThreadContextService(queryAgent);
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository();
         PromotionServiceImpl promotionService =
-            new PromotionServiceImpl(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
-                    threadContextService) {
-                @Override
-                public ServiceMessage getServiceMessage(Message message, String... params) {
-                    return new ServiceMessage(message.name());
-                }
-            };
+                new PromotionServiceImpl(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
+                        threadContextService) {
+                    @Override
+                    public ServiceMessage getServiceMessage(Message message, String... params) {
+                        return new ServiceMessage(message.name());
+                    }
+                };
         PromotionApplying promotionApplying = new PromotionApplying();
         promotionApplying.setPromotionConfigurationId(1);
         promotionApplying.setCompanyId(1);
         promotionApplying.setPhoneNumber("1234567890");
 
+        //when
         ServiceResult<Long> serviceResult = promotionService.applyPromotion(promotionApplying);
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.PROMOTION_APPLIED.name(), serviceResult.getMessage());
@@ -73,7 +76,8 @@ public class PromotionServiceImplTest extends BaseServiceTest {
 
     private ClientRepository createClientRepository() throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
+        expect(clientRepository.getByPhone(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         replay(clientRepository);
         return clientRepository;
     }

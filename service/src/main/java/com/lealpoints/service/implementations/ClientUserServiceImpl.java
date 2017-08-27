@@ -19,6 +19,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -98,12 +99,13 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
     }
 
     private String registerClientAndClientUser(ClientUserRegistration clientUserRegistration) throws Exception {
-        Client client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhoneNumber(), true);
-        ClientUser clientUser = _clientUserRepository.getByClientId(client.getClientId());
+        xyz.greatapp.libs.service.ServiceResult client = _clientRepository.insertIfDoesNotExist(clientUserRegistration.getPhoneNumber(), true);
+        long clientId = new JSONObject(client.getObject()).getLong("client_id");
+        ClientUser clientUser = _clientUserRepository.getByClientId(clientId);
         final String smsKey = generateAndSendRegistrationSMS(clientUserRegistration.getPhoneNumber());
         if (clientUser == null) {
             clientUser = new ClientUser();
-            clientUser.setClientId(client.getClientId());
+            clientUser.setClientId(clientId);
             clientUser.setSmsKey(smsKey);
             _clientUserRepository.insert(clientUser);
         } else {

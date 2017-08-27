@@ -2,7 +2,6 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.repository.ClientRepository;
@@ -15,6 +14,7 @@ import org.apache.commons.collections15.CollectionUtils;
 import org.apache.commons.collections15.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -59,22 +59,23 @@ public class PromotionConfigurationServiceImpl extends BaseServiceImpl implement
 
     public ServiceResult<List<PromotionConfiguration>> getByCompanyIdRequiredPoints(long companyId, final String phone) {
         try {
-            final Client client = _clientRepository.getByPhone(phone);
-            if (client == null) {
+            final xyz.greatapp.libs.service.ServiceResult client = _clientRepository.getByPhone(phone);
+            if (client.getObject().equals("{}")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
-            final CompanyClientMapping companyClientMapping = _companyClientMappingRepository.getByCompanyIdClientId(companyId, client.getClientId());
+            final CompanyClientMapping companyClientMapping =
+                    _companyClientMappingRepository.getByCompanyIdClientId(companyId, new JSONObject(client.getObject()).getLong("client_id"));
             if (companyClientMapping == null) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
             final List<PromotionConfiguration> promotionConfigurations = _promotionConfigurationRepository.getByCompanyId(companyId);
             final List<PromotionConfiguration> resultPromotionConfigurations =
-                (List<PromotionConfiguration>) CollectionUtils.select(promotionConfigurations, new Predicate<PromotionConfiguration>() {
-                    @Override
-                    public boolean evaluate(PromotionConfiguration promotionConfiguration) {
-                        return promotionConfiguration.getRequiredPoints() <= companyClientMapping.getPoints();
-                    }
-                });
+                    (List<PromotionConfiguration>) CollectionUtils.select(promotionConfigurations, new Predicate<PromotionConfiguration>() {
+                        @Override
+                        public boolean evaluate(PromotionConfiguration promotionConfiguration) {
+                            return promotionConfiguration.getRequiredPoints() <= companyClientMapping.getPoints();
+                        }
+                    });
             ServiceMessage message = ServiceMessage.EMPTY;
             if (resultPromotionConfigurations.isEmpty()) {
                 message = getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_AVAILABLE_PROMOTIONS);

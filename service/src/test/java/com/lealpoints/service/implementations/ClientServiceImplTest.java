@@ -25,9 +25,11 @@ import static org.junit.Assert.*;
 public class ClientServiceImplTest extends BaseServiceTest {
     @Test
     public void testRegister() throws Exception {
+        //given
         Client client = new Client();
         client.setClientId(1);
-        final ClientRepository clientRepository = createClientRepository(client);
+        client.setPhone("");
+        final ClientRepository clientRepository = createClientRepository(client.toJSONObject().toString());
         final QueryAgent queryAgent = createQueryAgent();
         final ThreadContextService threadContextService = createThreadContextService(queryAgent);
         final CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepositoryForInsert();
@@ -45,7 +47,11 @@ public class ClientServiceImplTest extends BaseServiceTest {
         ClientRegistration clientRegistration = new ClientRegistration();
         clientRegistration.setCompanyId(1);
         clientRegistration.setPhone("6141112233");
+
+        //when
         ServiceResult serviceResult = clientService.register(clientRegistration);
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals(1L, serviceResult.getObject());
@@ -75,6 +81,7 @@ public class ClientServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testRegisterWhenThereIsAnExistentMapping() throws Exception {
+        //given
         final ClientRepository clientRepository = createClientRepositoryWhenThereIsAnExistentMapping();
         final CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepositoryWhenThereIsAnExistentMapping();
         final PhoneValidatorServiceImpl phoneValidatorService = createNiceMock(PhoneValidatorServiceImpl.class);
@@ -90,7 +97,11 @@ public class ClientServiceImplTest extends BaseServiceTest {
 
         final ClientRegistration clientRegistration = new ClientRegistration();
         clientRegistration.setPhone("1234567890");
+
+        //when
         ServiceResult serviceResult = clientService.register(clientRegistration);
+
+        //then
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Message.THE_CLIENT_ALREADY_EXISTS.name(), serviceResult.getMessage());
@@ -175,17 +186,21 @@ public class ClientServiceImplTest extends BaseServiceTest {
         return companyClientMappingRepository;
     }
 
-    private ClientRepository createClientRepository(Client client) throws Exception {
+    private ClientRepository createClientRepository(String client) throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean())).andReturn(client).anyTimes();
-        expect(clientRepository.getByPhone(anyString())).andReturn(client).anyTimes();
+        expect(clientRepository.insertIfDoesNotExist(anyString(), anyBoolean()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", client)).anyTimes();
+        expect(clientRepository.getByPhone(anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", client)).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }
 
     private ClientRepository createClientRepositoryWhenThereIsAnExistentMapping() throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client()).anyTimes();
+        Client client = new Client();
+        client.setPhone("");
+        expect(clientRepository.getByPhone(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", client.toJSONObject().toString())).anyTimes();
         replay(clientRepository);
         return clientRepository;
     }

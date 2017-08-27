@@ -9,14 +9,12 @@ import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.service.ClientService;
 import com.lealpoints.service.model.ClientRegistration;
 import com.lealpoints.service.model.ValidationResult;
-import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class ClientServiceImpl extends BaseServiceImpl implements ClientService {
@@ -53,11 +51,21 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
 
     private Client registerClientAndCompanyMapping(ClientRegistration clientRegistration) throws Exception {
         //Client could exist for other companies
-        Client client = _clientRepository.insertIfDoesNotExist(clientRegistration.getPhone(), true);
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _clientRepository.insertIfDoesNotExist(clientRegistration.getPhone(), true);
         CompanyClientMapping companyClientMapping = new CompanyClientMapping();
         companyClientMapping.setCompanyId(clientRegistration.getCompanyId());
+        Client client = getClient(serviceResult);
         companyClientMapping.setClient(client);
         _companyClientMappingRepository.insert(companyClientMapping);
+        return client;
+    }
+
+    private Client getClient(xyz.greatapp.libs.service.ServiceResult serviceResult) {
+        JSONObject jsonObject = new JSONObject(serviceResult.getObject());
+        Client client = new Client();
+        client.setCanReceivePromotionSms(jsonObject.getBoolean("can_receive_promo_sms"));
+        client.setPhone(jsonObject.getString("phone"));
+        client.setClientId(jsonObject.getLong("client_id"));
         return client;
     }
 
@@ -84,10 +92,11 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
         if (phoneValidation.isInvalid()) {
             return phoneValidation;
         }
-        Client client = _clientRepository.getByPhone(clientRegistration.getPhone());
-        if (client != null) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _clientRepository.getByPhone(clientRegistration.getPhone());
+        if (!serviceResult.getObject().equals("{}")) {
             CompanyClientMapping companyClientMapping =
-                _companyClientMappingRepository.getByCompanyIdClientId(clientRegistration.getCompanyId(), client.getClientId());
+                _companyClientMappingRepository.getByCompanyIdClientId(clientRegistration.getCompanyId(),
+                        new JSONObject(serviceResult.getObject()).getLong("client_id"));
             if (companyClientMapping != null) {
                 return new ValidationResult(false, getServiceMessage(Message.THE_CLIENT_ALREADY_EXISTS));
             }

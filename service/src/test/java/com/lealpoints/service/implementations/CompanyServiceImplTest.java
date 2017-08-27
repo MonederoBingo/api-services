@@ -141,6 +141,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     @Test
     public void testGetPointsInCompanyByPhone() throws Exception
     {
+        //given
         final List<PointsInCompany> expectedPointsInCompanies = new ArrayList<>();
         expectedPointsInCompanies.add(createCompany(1, "name1", "logo1", 100));
         expectedPointsInCompanies.add(createCompany(2, "name2", "logo2", 200));
@@ -148,7 +149,10 @@ public class CompanyServiceImplTest extends BaseServiceTest
         ClientRepository clientRepository = createClientRepository();
         CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, clientRepository, null, null, null);
 
+        //when
         ServiceResult<List<PointsInCompany>> serviceResult = companyService.getPointsInCompanyByPhone("1234567890");
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
@@ -264,7 +268,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     private ClientRepository createClientRepository() throws Exception
     {
         ClientRepository clientRepository = createMock(ClientRepository.class);
-        expect(clientRepository.getByPhone(anyString())).andReturn(new Client());
+        expect(clientRepository.getByPhone(anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         replay(clientRepository);
         return clientRepository;
     }
