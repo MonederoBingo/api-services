@@ -3,7 +3,6 @@ package com.lealpoints.repository;
 
 import com.lealpoints.model.Client;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Component;
 import xyz.greatapp.libs.service.ServiceResult;
 import xyz.greatapp.libs.service.context.ThreadContextService;
 import xyz.greatapp.libs.service.database.common.ApiClientUtils;
+import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
 import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
 import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 import xyz.greatapp.libs.service.database.requests.fields.Join;
@@ -53,7 +53,7 @@ public class ClientRepository extends BaseRepository {
         ServiceResult result = getByCompanyId(companyId);
         JSONArray clients = new JSONArray(result.getObject());
         for (int i = 0; i < clients.length(); i++) {
-            if(phone.equals(clients.getJSONObject(i).get("phone"))) {
+            if (phone.equals(clients.getJSONObject(i).get("phone"))) {
                 return new ServiceResult(true, "", clients.getJSONObject(i).toString());
             }
         }
@@ -74,12 +74,17 @@ public class ClientRepository extends BaseRepository {
     }
 
     public long insert(Client client) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO client (phone, can_receive_promo_sms)");
-        sql.append(" VALUES (");
-        sql.append("'").append(client.getPhone()).append("', ");
-        sql.append("").append(client.canReceivePromotionSms()).append(");");
-        return getQueryAgent().executeInsert(sql.toString(), "client_id");
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("phone", client.getPhone()),
+                new ColumnValue("can_receive_promo_sms", client.canReceivePromotionSms())
+        };
+        HttpEntity<InsertQueryRQ> entity = c.getHttpEntityForInsert(new InsertQueryRQ("client", values, "client_id"));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/insert";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Long.parseLong(responseEntity.getBody().getObject());
     }
 
     public ServiceResult insertIfDoesNotExist(String phone, boolean canReceivePromotionSms) throws Exception {
@@ -89,7 +94,7 @@ public class ClientRepository extends BaseRepository {
             client.setPhone(phone);
             client.setCanReceivePromotionSms(canReceivePromotionSms);
             client.setClientId(insert(client));
-            serviceResult = new ServiceResult(serviceResult.isSuccess(), serviceResult.getMessage(), new JSONObject(client).toString());
+            serviceResult = new ServiceResult(serviceResult.isSuccess(), serviceResult.getMessage(), client.toJSONObject().toString());
         }
         return serviceResult;
     }
