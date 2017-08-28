@@ -1,7 +1,7 @@
 package com.lealpoints.repository;
 
-import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.ClientUser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -16,20 +16,23 @@ import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 import xyz.greatapp.libs.service.database.requests.fields.Join;
 import xyz.greatapp.libs.service.location.ServiceLocator;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
 public class ClientUserRepository extends BaseRepository {
 
     private static final Common c = new Common();
-    @Autowired
+    private final ClientRepository clientRepository;
     private ServiceLocator serviceLocator;
-    @Autowired
     private ThreadContextService threadContextService;
     private ApiClientUtils apiClientUtils = new ApiClientUtils();
+
+    @Autowired
+    public ClientUserRepository(ServiceLocator serviceLocator, ThreadContextService threadContextService, ClientRepository clientRepository) {
+        this.serviceLocator = serviceLocator;
+        this.threadContextService = threadContextService;
+        this.clientRepository = clientRepository;
+    }
 
     public long insert(ClientUser clientUser) throws Exception {
         ColumnValue[] values = new ColumnValue[]{
@@ -48,11 +51,22 @@ public class ClientUserRepository extends BaseRepository {
     }
 
     public int updateSmsKey(String smsKey, String phone) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE client_user");
-        sql.append(" SET sms_key = '").append(smsKey).append("'");
-        sql.append(" WHERE client_id = (SELECT client_id FROM client WHERE phone = '").append(phone).append("');");
-        return getQueryAgent().executeUpdate(sql.toString());
+
+        ServiceResult client = clientRepository.getByPhone(phone);
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("sms_key", smsKey)
+        };
+        ColumnValue[] filter = new ColumnValue[]{
+                new ColumnValue("client_id", new JSONObject(client.getObject()).getLong("client_id"))
+        };
+        HttpEntity<UpdateQueryRQ> entity = c.getHttpEntityForUpdate(new UpdateQueryRQ("client_user", values, filter));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/update";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Integer.parseInt(responseEntity.getBody().getObject());
+
     }
 
     public xyz.greatapp.libs.service.ServiceResult getByClientId(final long clientId) throws Exception {
@@ -118,37 +132,17 @@ public class ClientUserRepository extends BaseRepository {
         return Integer.parseInt(responseEntity.getBody().getObject());
     }
 
-    public ClientUser getByClientUserIdApiKey(final Integer userId, final String apiKey) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<ClientUser>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT client_user.* FROM client_user");
-                sql.append(" WHERE client_user.client_user_id = ").append("?").append("");
-                sql.append(" AND client_user.api_key = ?;");
-                return sql.toString();
-            }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{userId, apiKey};
-            }
-
-            @Override
-            public ClientUser build(ResultSet resultSet) throws SQLException {
-                return buildClientUser(resultSet);
-            }
-        });
-    }
-
-    private ClientUser buildClientUser(ResultSet resultSet) throws SQLException {
-        ClientUser clientUser = new ClientUser();
-        clientUser.setClientUserId(resultSet.getLong("client_user_id"));
-        clientUser.setClientId(resultSet.getLong("client_id"));
-        clientUser.setName(resultSet.getString("name"));
-        clientUser.setEmail(resultSet.getString("email"));
-        clientUser.setPassword(resultSet.getString("password"));
-        clientUser.setSmsKey(resultSet.getString("sms_key"));
-        return clientUser;
+    public ServiceResult getByClientUserIdApiKey(final Integer userId, final String apiKey) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("client_user_id", userId),
+                new ColumnValue("api_key", apiKey)
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("client_user", filters, new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/select";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return responseEntity.getBody();
     }
 }

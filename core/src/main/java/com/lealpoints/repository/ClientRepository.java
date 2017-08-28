@@ -23,12 +23,16 @@ import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 public class ClientRepository extends BaseRepository {
 
     private static final Common c = new Common();
-    @Autowired
     private ServiceLocator serviceLocator;
-    @Autowired
     private ThreadContextService threadContextService;
 
     private ApiClientUtils apiClientUtils = new ApiClientUtils();
+
+    @Autowired
+    public ClientRepository(ServiceLocator serviceLocator, ThreadContextService threadContextService) {
+        this.serviceLocator = serviceLocator;
+        this.threadContextService = threadContextService;
+    }
 
     public xyz.greatapp.libs.service.ServiceResult getByCompanyId(final long companyId) throws Exception {
         ColumnValue[] filters = new ColumnValue[]{
