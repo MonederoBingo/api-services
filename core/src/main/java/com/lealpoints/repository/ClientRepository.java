@@ -12,12 +12,10 @@ import xyz.greatapp.libs.service.context.ThreadContextService;
 import xyz.greatapp.libs.service.database.common.ApiClientUtils;
 import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
 import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.UpdateQueryRQ;
 import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 import xyz.greatapp.libs.service.database.requests.fields.Join;
 import xyz.greatapp.libs.service.location.ServiceLocator;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
@@ -100,15 +98,18 @@ public class ClientRepository extends BaseRepository {
     }
 
     public int updateCanReceivePromoSms(long clientId, boolean canReceivePromo) throws Exception {
-        return getQueryAgent().executeUpdate(
-                "UPDATE client SET can_receive_promo_sms = " + canReceivePromo + " WHERE client_id = " + clientId + ";");
-    }
-
-    private Client buildClient(ResultSet resultSet) throws SQLException {
-        Client client = new Client();
-        client.setClientId(resultSet.getLong("client_id"));
-        client.setPhone(resultSet.getString("phone"));
-        client.setCanReceivePromotionSms(resultSet.getBoolean("can_receive_promo_sms"));
-        return client;
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("can_receive_promo_sms", canReceivePromo)
+        };
+        ColumnValue[] filter = new ColumnValue[]{
+                new ColumnValue("client_id", clientId)
+        };
+        HttpEntity<UpdateQueryRQ> entity = c.getHttpEntityForUpdate(new UpdateQueryRQ("client", values, filter));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/update";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Integer.parseInt(responseEntity.getBody().getObject());
     }
 }

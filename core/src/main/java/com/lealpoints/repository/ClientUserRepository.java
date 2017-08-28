@@ -103,9 +103,6 @@ public class ClientUserRepository extends BaseRepository {
     }
 
     public int updateApiKeyById(long clientUserId, String apiKey) throws Exception {
-        getQueryAgent()
-                .executeUpdate("UPDATE client_user SET api_key = '" + apiKey + "' WHERE client_user_id = '" + clientUserId + "';");
-
         ColumnValue[] values = new ColumnValue[]{
                 new ColumnValue("api_key", apiKey)
         };
