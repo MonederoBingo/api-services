@@ -42,7 +42,7 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
 
     public ServiceResult sendMobileAppAdMessage(long companyId, String phone) {
         try {
-            final Company company = companyRepository.getByCompanyId(companyId);
+            final xyz.greatapp.libs.service.ServiceResult company = companyRepository.getByCompanyId(companyId);
             final xyz.greatapp.libs.service.ServiceResult client = clientRepository.getByPhone(phone);
             if ("{}".equals(client.getObject())) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
@@ -50,7 +50,7 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
             long clientId = new JSONObject(client.getObject()).getLong("client_id");
             xyz.greatapp.libs.service.ServiceResult serviceResult1 = companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId);
             final double points = new JSONObject(serviceResult1.getObject()).getDouble("points");
-            if (company != null) {
+            if (!"{}".equals(company.getObject())) {
                 final String smsMessage = getSMSMessage(points);
                 logger.info("Promo SMS sent to: " + phone);
                 _smsService.sendSMSMessage(phone, smsMessage);

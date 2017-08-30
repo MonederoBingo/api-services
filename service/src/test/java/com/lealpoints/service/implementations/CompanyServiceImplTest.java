@@ -39,18 +39,19 @@ import com.lealpoints.service.util.ServiceUtil;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.mail.MessagingException;
 
 import org.apache.commons.fileupload.FileItem;
 import org.easymock.EasyMock;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Test;
 
-public class CompanyServiceImplTest extends BaseServiceTest
-{
+public class CompanyServiceImplTest extends BaseServiceTest {
     @Test
-    public void testRegister() throws Exception
-    {
+    public void testRegister() throws Exception {
         final CompanyRepository companyRepository = createCompanyRepository();
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository();
         final QueryAgent queryAgent = createQueryAgent();
@@ -58,7 +59,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
         threadContext.setEnvironment(new DevEnvironment());
         final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
         PromotionConfigurationRepository promotionConfigurationRepository = createStrictMock(PromotionConfigurationRepository.class);
-        expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration> anyObject())).andReturn(1L);
+        expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1L);
         replay(promotionConfigurationRepository);
         NotificationService notificationService = createNotificationService();
         PointsConfigurationService pointsConfigurationService = createMock(PointsConfigurationService.class);
@@ -80,8 +81,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
         verify(companyRepository, companyUserRepository, threadContextService, queryAgent);
     }
 
-    private NotificationService createNotificationService() throws MessagingException
-    {
+    private NotificationService createNotificationService() throws MessagingException {
         NotificationService notificationService = createMock(NotificationService.class);
         notificationService.sendActivationEmail(anyString(), anyString());
         expectLastCall();
@@ -90,8 +90,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     @Test
-    public void testRegisterWhenPasswordIsDifferentFromConfirmation() throws Exception
-    {
+    public void testRegisterWhenPasswordIsDifferentFromConfirmation() throws Exception {
         final CompanyServiceImpl companyService = createCompanyService(null, null, null, null, null, null, null);
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("123456");
@@ -105,8 +104,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     @Test
-    public void testRegisterWhenPasswordIsShort() throws Exception
-    {
+    public void testRegisterWhenPasswordIsShort() throws Exception {
         CompanyServiceImpl companyService = createCompanyService(null, null, null, null, null, null, null);
         final CompanyRegistration companyRegistration = new CompanyRegistration();
         companyRegistration.setPassword("12345");
@@ -120,8 +118,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     @Test
-    public void testRegisterWhenThereIsAnExistentEmail() throws Exception
-    {
+    public void testRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
         CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null, null);
 
@@ -139,8 +136,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     @Test
-    public void testGetPointsInCompanyByPhone() throws Exception
-    {
+    public void testGetPointsInCompanyByPhone() throws Exception {
         //given
         final List<PointsInCompany> expectedPointsInCompanies = new ArrayList<>();
         expectedPointsInCompanies.add(createCompany(1, "name1", "logo1", 100));
@@ -150,7 +146,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
         CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, clientRepository, null, null, null);
 
         //when
-        ServiceResult<List<PointsInCompany>> serviceResult = companyService.getPointsInCompanyByPhone("1234567890");
+        xyz.greatapp.libs.service.ServiceResult serviceResult = companyService.getPointsInCompanyByPhone("1234567890");
 
         //then
         assertNotNull(serviceResult);
@@ -158,22 +154,25 @@ public class CompanyServiceImplTest extends BaseServiceTest
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
-        List<PointsInCompany> actualClients = serviceResult.getObject();
-        assertEquals(2, actualClients.size());
-        assertEquals(1, actualClients.get(0).getCompanyId());
-        assertEquals("name1", actualClients.get(0).getName());
-        assertEquals("logo1", actualClients.get(0).getUrlImageLogo());
-        assertEquals(100, actualClients.get(0).getPoints(), 0.00);
-        assertEquals(2, actualClients.get(1).getCompanyId());
-        assertEquals("name2", actualClients.get(1).getName());
-        assertEquals("logo2", actualClients.get(1).getUrlImageLogo());
-        assertEquals(200, actualClients.get(1).getPoints(), 0.00);
+        JSONArray actualClients = new JSONArray(serviceResult.getObject());
+        assertEquals(2, actualClients.length());
+
+        JSONObject client1 = actualClients.getJSONObject(0);
+        assertEquals(1, client1.get("company_id"));
+        assertEquals("name1", client1.get("name"));
+        assertEquals("logo1", client1.get("url_image_logo"));
+        assertEquals(100, client1.getDouble("points"), 0.00);
+
+        JSONObject client2 = actualClients.getJSONObject(1);
+        assertEquals(2, client2.get("company_id"));
+        assertEquals("name2", client2.get("name"));
+        assertEquals("logo2", client2.get("url_image_logo"));
+        assertEquals(200, client2.getDouble("points"), 0.00);
         verify(companyRepository, clientRepository);
     }
 
     @Test
-    public void testUpdateImageLogo() throws Exception
-    {
+    public void testUpdateImageLogo() throws Exception {
         CompanyRepository companyRepository = createCompanyRepositoryForUpdate();
         ThreadContext threadContext = new ThreadContext();
         threadContext.setEnvironment(new DevEnvironment());
@@ -191,24 +190,28 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     @Test
-    public void testGetByCompanyId() throws Exception
-    {
+    public void testGetByCompanyId() throws Exception {
+        //given
         final Company company = new Company();
         company.setName("name");
         company.setUrlImageLogo("logo.png");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
         CompanyServiceImpl companyService = createCompanyService(companyRepository, null, null, null, null, null, null);
-        ServiceResult<Company> serviceResult = companyService.getByCompanyId(1);
+
+        //when
+        xyz.greatapp.libs.service.ServiceResult serviceResult = companyService.getByCompanyId(1);
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
-        assertEquals("name", company.getName());
-        assertTrue(company.getUrlImageLogo().contains("logo.png"));
+        assertEquals("name", new JSONObject(serviceResult.getObject()).get("name"));
+        assertTrue(new JSONObject(serviceResult.getObject()).get("url_image_logo").toString().contains("logo.png"));
         verify(companyRepository);
     }
 
     @Test
-    public void testGetLogo() throws Exception
-    {
+    public void testGetLogo() throws Exception {
+        //given
         final Company company = new Company();
         company.setName("name");
         company.setUrlImageLogo("logo.png");
@@ -216,14 +219,24 @@ public class CompanyServiceImplTest extends BaseServiceTest
         ThreadContext threadContext = createMock(ThreadContext.class);
         expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
         replay(threadContext);
-        CompanyServiceImpl companyService = createCompanyService(companyRepository, null, createThreadContextService(threadContext), null, null, null, null);
+        CompanyServiceImpl companyService = createCompanyService(
+                companyRepository,
+                null,
+                createThreadContextService(threadContext),
+                null,
+                null,
+                null,
+                null);
+
+        //when
         final File logo = companyService.getLogo(1);
+
+        //then
         assertNotNull(logo);
     }
 
     @Test
-    public void testGetLogoWithoutUrlImage() throws Exception
-    {
+    public void testGetLogoWithoutUrlImage() throws Exception {
         final Company company = new Company();
         company.setName("name");
         company.setUrlImageLogo("");
@@ -237,26 +250,22 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     private CompanyServiceImpl createCompanyService(final CompanyRepository companyRepository,
-            final CompanyUserRepository companyUserRepository,
-            final ThreadContextService threadContextService,
-            ClientRepository clientRepository,
-            PromotionConfigurationRepository promotionConfigurationRepository,
-            NotificationService notificationService, PointsConfigurationService pointsConfigurationService)
-    {
+                                                    final CompanyUserRepository companyUserRepository,
+                                                    final ThreadContextService threadContextService,
+                                                    ClientRepository clientRepository,
+                                                    PromotionConfigurationRepository promotionConfigurationRepository,
+                                                    NotificationService notificationService, PointsConfigurationService pointsConfigurationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository, clientRepository, threadContextService,
-                promotionConfigurationRepository, new ServiceUtil(), notificationService, pointsConfigurationService)
-        {
+                promotionConfigurationRepository, new ServiceUtil(), notificationService, pointsConfigurationService) {
 
             @Override
-            public ServiceMessage getServiceMessage(Message message, String... params)
-            {
+            public ServiceMessage getServiceMessage(Message message, String... params) {
                 return new ServiceMessage(message.name());
             }
         };
     }
 
-    private FileItem createFileItem() throws Exception
-    {
+    private FileItem createFileItem() throws Exception {
         FileItem fileItem = createMock(FileItem.class);
         expect(fileItem.getContentType()).andReturn("image/png");
         fileItem.write((File) anyObject());
@@ -265,8 +274,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
         return fileItem;
     }
 
-    private ClientRepository createClientRepository() throws Exception
-    {
+    private ClientRepository createClientRepository() throws Exception {
         ClientRepository clientRepository = createMock(ClientRepository.class);
         expect(clientRepository.getByPhone(anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
         replay(clientRepository);
@@ -274,8 +282,7 @@ public class CompanyServiceImplTest extends BaseServiceTest
     }
 
     private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent,
-            ThreadContext threadContext) throws SQLException
-    {
+                                                                          ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
         expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(2);
@@ -283,16 +290,14 @@ public class CompanyServiceImplTest extends BaseServiceTest
         return threadContextService;
     }
 
-    private ThreadContextService createThreadContextService(ThreadContext threadContext) throws SQLException
-    {
+    private ThreadContextService createThreadContextService(ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(1);
         replay(threadContextService);
         return threadContextService;
     }
 
-    private CompanyUserRepository createCompanyUserRepository() throws Exception
-    {
+    private CompanyUserRepository createCompanyUserRepository() throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
         expect(companyUserRepository.getByEmail(anyString())).andReturn(null).times(1);
         expect(companyUserRepository.insert((CompanyUser) anyObject())).andReturn(1L).times(1);
@@ -300,40 +305,43 @@ public class CompanyServiceImplTest extends BaseServiceTest
         return companyUserRepository;
     }
 
-    private CompanyRepository createCompanyRepository() throws Exception
-    {
+    private CompanyRepository createCompanyRepository() throws Exception {
         final CompanyRepository companyRepository = EasyMock.createMock(CompanyRepository.class);
         expect(companyRepository.insert((Company) anyObject())).andReturn(1L).times(1);
         replay(companyRepository);
         return companyRepository;
     }
 
-    private CompanyRepository createCompanyRepositoryForUpdate() throws Exception
-    {
+    private CompanyRepository createCompanyRepositoryForUpdate() throws Exception {
         final CompanyRepository companyRepository = EasyMock.createMock(CompanyRepository.class);
         expect(companyRepository.updateUrlImageLogo(anyLong(), anyString())).andReturn(1).times(1);
         replay(companyRepository);
         return companyRepository;
     }
 
-    private CompanyRepository createCompanyRepositoryForGetPoints(List<PointsInCompany> pointsInCompanies) throws Exception
-    {
+    private CompanyRepository createCompanyRepositoryForGetPoints(List<PointsInCompany> pointsInCompanies) throws Exception {
         CompanyRepository clientRepository = createMock(CompanyRepository.class);
-        expect(clientRepository.getPointsInCompanyByClientId(anyLong())).andReturn(pointsInCompanies).anyTimes();
+        JSONObject[] strings = new JSONObject[pointsInCompanies.size()];
+        for(int i = 0; i < pointsInCompanies.size(); i++) {
+            strings[i] = pointsInCompanies.get(i).toJSONObject();
+        }
+        expect(clientRepository.getPointsInCompanyByClientId(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new JSONArray(strings).toString()))
+                .anyTimes();
         replay(clientRepository);
         return clientRepository;
     }
 
-    private CompanyRepository createCompanyRepositoryForGet(Company company) throws Exception
-    {
+    private CompanyRepository createCompanyRepositoryForGet(Company company) throws Exception {
         CompanyRepository clientRepository = createMock(CompanyRepository.class);
-        expect(clientRepository.getByCompanyId(anyLong())).andReturn(company).anyTimes();
+        expect(clientRepository.getByCompanyId(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", company.toJSONObject().toString()))
+                .anyTimes();
         replay(clientRepository);
         return clientRepository;
     }
 
-    private CompanyUserRepository createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail() throws Exception
-    {
+    private CompanyUserRepository createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
         expect(companyUserRepository.getByEmail(anyString())).andReturn(new CompanyUser()).times(1);
         replay(companyUserRepository);

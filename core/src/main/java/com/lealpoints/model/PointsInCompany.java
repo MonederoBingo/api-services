@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 public class PointsInCompany {
     private long companyId;
     private String name;
@@ -36,5 +38,14 @@ public class PointsInCompany {
 
     public void setPoints(float points) {
         this.points = points;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("company_id", companyId);
+        jsonObject.put("name", name);
+        jsonObject.put("url_image_logo", urlImageLogo);
+        jsonObject.put("points", points);
+        return jsonObject;
     }
 }

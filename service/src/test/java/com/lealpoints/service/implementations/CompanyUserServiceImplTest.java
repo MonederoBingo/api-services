@@ -31,6 +31,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testLoginUser() throws Exception {
+        //given
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository(companyUser);
         CompanyRepository companyRepository = createCompanyRepository();
@@ -40,7 +41,11 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
         companyUserLogin.setPassword("password");
+
+        //when
         ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
@@ -313,7 +318,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     private CompanyRepository createCompanyRepository() throws Exception {
         CompanyRepository companyRepository = createMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
+        expect(companyRepository.getByCompanyId(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Company().toJSONObject().toString()));
         replay(companyRepository);
         return companyRepository;
     }

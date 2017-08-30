@@ -12,7 +12,6 @@ import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.*;
@@ -28,7 +27,8 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         expectLastCall();
 
         CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
+        expect(companyRepository.getByCompanyId(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Company().toJSONObject().toString()));
 
         CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
@@ -87,7 +87,8 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         expectLastCall();
 
         CompanyRepository companyRepository = createNiceMock(CompanyRepository.class);
-        expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
+        expect(companyRepository.getByCompanyId(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Company().toJSONObject().toString()));
 
         CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
         expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))

@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -64,7 +65,9 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
                     loginResult.setCompanyId(companyUser.getCompanyId());
                     loginResult.setCompanyUserId(companyUser.getCompanyUserId());
                     loginResult.setLanguage(companyUser.getLanguage());
-                    loginResult.setCompanyName(companyRepository.getByCompanyId(companyUser.getCompanyId()).getName());
+                    xyz.greatapp.libs.service.ServiceResult serviceResult = companyRepository.getByCompanyId(companyUser.getCompanyId());
+                    String name = new JSONObject(serviceResult.getObject()).getString("name");
+                    loginResult.setCompanyName(name);
                     loginResult.setApiKey(apiKey);
                     return new ServiceResult<>(true, ServiceMessage.EMPTY, loginResult);
                 }

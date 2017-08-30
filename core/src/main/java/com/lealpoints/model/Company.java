@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 @Table
 public class Company {
     private long companyId;
@@ -28,5 +30,13 @@ public class Company {
 
     public void setUrlImageLogo(String urlImageLogo) {
         this.urlImageLogo = urlImageLogo;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("company_id", companyId);
+        jsonObject.put("name", name == null ? "" : name);
+        jsonObject.put("url_image_logo", urlImageLogo);
+        return jsonObject;
     }
 }

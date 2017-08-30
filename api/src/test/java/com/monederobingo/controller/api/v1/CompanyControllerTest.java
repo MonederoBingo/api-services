@@ -9,6 +9,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.easymock.EasyMock;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
@@ -46,32 +47,37 @@ public class CompanyControllerTest {
 
     @Test
     public void testGet() throws Exception {
+        //given
         Company company = new Company();
         company.setName("name");
         company.setUrlImageLogo("logo.png");
-        ServiceResult<Company> serviceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, company);
+        xyz.greatapp.libs.service.ServiceResult serviceResult = new xyz.greatapp.libs.service.ServiceResult(true, "", company.toJSONObject().toString());
         CompanyServiceImpl companyService = createCompanyServiceForGet(serviceResult);
         CompanyController companyController = new CompanyController(companyService);
-        ResponseEntity<ServiceResult<Company>> responseEntity = companyController.get(1);
+
+        //when
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> responseEntity = companyController.get(1);
+
+        //then
         assertNotNull(responseEntity);
-        ServiceResult actualServiceResult = responseEntity.getBody();
+        xyz.greatapp.libs.service.ServiceResult actualServiceResult = responseEntity.getBody();
         assertNotNull(actualServiceResult);
         assertTrue(actualServiceResult.isSuccess());
         assertNotNull(actualServiceResult.getObject());
-        Company actualCompany = serviceResult.getObject();
-        assertEquals("name", actualCompany.getName());
-        assertEquals("logo.png", actualCompany.getUrlImageLogo());
+        JSONObject actualCompany = new JSONObject(serviceResult.getObject());
+        assertEquals("name", actualCompany.get("name"));
+        assertEquals("logo.png", actualCompany.get("url_image_logo"));
         verify(companyService);
     }
 
     private CompanyServiceImpl createCompanyService(ServiceResult<Boolean> serviceResult) {
         CompanyServiceImpl companyService = createMock(CompanyServiceImpl.class);
-        expect(companyService.updateLogo((List<FileItem>) anyObject(), anyLong())).andReturn(serviceResult);
+        expect(companyService.updateLogo(anyObject(), anyLong())).andReturn(serviceResult);
         replay(companyService);
         return companyService;
     }
 
-    private CompanyServiceImpl createCompanyServiceForGet(ServiceResult<Company> company) throws Exception {
+    private CompanyServiceImpl createCompanyServiceForGet(xyz.greatapp.libs.service.ServiceResult company) throws Exception {
         final CompanyServiceImpl companyService = EasyMock.createMock(CompanyServiceImpl.class);
         expect(companyService.getByCompanyId(anyLong())).andReturn(company).times(1);
         replay(companyService);

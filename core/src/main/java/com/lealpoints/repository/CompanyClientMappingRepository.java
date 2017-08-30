@@ -22,9 +22,9 @@ import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 @Component
 public class CompanyClientMappingRepository extends BaseRepository {
     private static final Common c = new Common();
-    private ServiceLocator serviceLocator;
-    private ThreadContextService threadContextService;
-    private ApiClientUtils apiClientUtils = new ApiClientUtils();
+    private final ServiceLocator serviceLocator;
+    private final ThreadContextService threadContextService;
+    private final ApiClientUtils apiClientUtils = new ApiClientUtils();
 
     @Autowired
     public CompanyClientMappingRepository(ServiceLocator serviceLocator, ThreadContextService threadContextService) {
@@ -89,6 +89,5 @@ public class CompanyClientMappingRepository extends BaseRepository {
                 entity,
                 ServiceResult.class);
         return Integer.parseInt(responseEntity.getBody().getObject());
-
     }
 }

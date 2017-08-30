@@ -3,83 +3,96 @@ package com.lealpoints.repository;
 import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.PointsInCompany;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.ServiceResult;
+import xyz.greatapp.libs.service.context.ThreadContextService;
+import xyz.greatapp.libs.service.database.common.ApiClientUtils;
+import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
+import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.UpdateQueryRQ;
+import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
+import xyz.greatapp.libs.service.database.requests.fields.Join;
+import xyz.greatapp.libs.service.location.ServiceLocator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+
+import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
 public class CompanyRepository extends BaseRepository {
+    private static final Common c = new Common();
+    private final ServiceLocator serviceLocator;
+    private final ThreadContextService threadContextService;
+    private final ApiClientUtils apiClientUtils = new ApiClientUtils();
+
+    @Autowired
+    public CompanyRepository(ServiceLocator serviceLocator, ThreadContextService threadContextService) {
+        this.serviceLocator = serviceLocator;
+        this.threadContextService = threadContextService;
+    }
 
     public long insert(Company company) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO company (name, url_image_logo)");
-        sql.append(" VALUES (");
-        sql.append("'").append(company.getName()).append("', ");
-        sql.append("'").append(company.getUrlImageLogo()).append("');");
-
-        return getQueryAgent().executeInsert(sql.toString(), "company_id");
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("name", company.getName()),
+                new ColumnValue("url_image_logo", company.getUrlImageLogo())
+        };
+        HttpEntity<InsertQueryRQ> entity = c.getHttpEntityForInsert(new InsertQueryRQ("company", values, "company_id"));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/insert";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Long.parseLong(responseEntity.getBody().getObject());
     }
 
     public int updateUrlImageLogo(long companyId, String urlImageLogo) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE company");
-        sql.append(" SET url_image_logo = '").append(urlImageLogo).append("'");
-        sql.append(" WHERE company_id = ").append(companyId).append(";");
-        return getQueryAgent().executeUpdate(sql.toString());
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("url_image_logo", urlImageLogo)
+        };
+        ColumnValue[] filter = new ColumnValue[]{
+                new ColumnValue("company_id", companyId)
+        };
+        HttpEntity<UpdateQueryRQ> entity = c.getHttpEntityForUpdate(new UpdateQueryRQ("company", values, filter));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/update";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Integer.parseInt(responseEntity.getBody().getObject());
     }
 
-    public Company getByCompanyId(final long companyId) throws Exception {
-        final Company company = getQueryAgent().selectObject(new DbBuilder<Company>() {
-            @Override
-            public String sql() {
-                return "SELECT * FROM company WHERE company_id = ?;";
-            }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{companyId};
-            }
-
-            @Override
-            public Company build(ResultSet resultSet) throws SQLException {
-                Company company = new Company();
-                company.setCompanyId(resultSet.getLong("company_id"));
-                company.setName(resultSet.getString("name"));
-                company.setUrlImageLogo(resultSet.getString("url_image_logo"));
-                return company;
-            }
-        });
-        return company;
+    public ServiceResult getByCompanyId(final long companyId) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("company_id", companyId)
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("company", filters, new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/select";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return responseEntity.getBody();
     }
 
-    public List<PointsInCompany> getPointsInCompanyByClientId(final long clientId) throws Exception {
-        return getQueryAgent().selectList(new DbBuilder<PointsInCompany>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT company.*, company_client_mapping.points FROM ").append("company");
-                sql.append(" INNER JOIN company_client_mapping USING (").append("company_id").append(")");
-                sql.append(" WHERE company_client_mapping.client_id = ? ;");
-                return sql.toString();
-            }
+    public ServiceResult getPointsInCompanyByClientId(final long clientId) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("client_id", clientId, "company_client_mapping")
+        };
+        Join[] joins = new Join[]{
+                new Join("company_client_mapping", "company_id", "company_id")
+        };
 
-            @Override
-            public Object[] values() {
-                return new Object[]{clientId};
-            }
-
-            @Override
-            public PointsInCompany build(ResultSet resultSet) throws SQLException {
-                PointsInCompany pointsInCompany = new PointsInCompany();
-                pointsInCompany.setCompanyId(resultSet.getLong("company_id"));
-                pointsInCompany.setName(resultSet.getString("name"));
-                pointsInCompany.setUrlImageLogo(resultSet.getString("url_image_logo"));
-                pointsInCompany.setPoints(resultSet.getFloat("points"));
-                return pointsInCompany;
-            }
-        });
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("company", filters, joins));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/selectList";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return responseEntity.getBody();
     }
 
 }
