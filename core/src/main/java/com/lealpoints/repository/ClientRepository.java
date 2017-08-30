@@ -25,7 +25,6 @@ public class ClientRepository extends BaseRepository {
     private static final Common c = new Common();
     private ServiceLocator serviceLocator;
     private ThreadContextService threadContextService;
-
     private ApiClientUtils apiClientUtils = new ApiClientUtils();
 
     @Autowired

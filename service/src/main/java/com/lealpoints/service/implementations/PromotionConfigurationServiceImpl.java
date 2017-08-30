@@ -2,7 +2,6 @@ package com.lealpoints.service.implementations;
 
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
@@ -63,9 +62,9 @@ public class PromotionConfigurationServiceImpl extends BaseServiceImpl implement
             if (client.getObject().equals("{}")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
-            final CompanyClientMapping companyClientMapping =
+            final xyz.greatapp.libs.service.ServiceResult serviceResult =
                     _companyClientMappingRepository.getByCompanyIdClientId(companyId, new JSONObject(client.getObject()).getLong("client_id"));
-            if (companyClientMapping == null) {
+            if (serviceResult.getObject().equals("{}")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
             final List<PromotionConfiguration> promotionConfigurations = _promotionConfigurationRepository.getByCompanyId(companyId);
@@ -73,7 +72,7 @@ public class PromotionConfigurationServiceImpl extends BaseServiceImpl implement
                     (List<PromotionConfiguration>) CollectionUtils.select(promotionConfigurations, new Predicate<PromotionConfiguration>() {
                         @Override
                         public boolean evaluate(PromotionConfiguration promotionConfiguration) {
-                            return promotionConfiguration.getRequiredPoints() <= companyClientMapping.getPoints();
+                            return promotionConfiguration.getRequiredPoints() <= new JSONObject(serviceResult.getObject()).getDouble("points");
                         }
                     });
             ServiceMessage message = ServiceMessage.EMPTY;

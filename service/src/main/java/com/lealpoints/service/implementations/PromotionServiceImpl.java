@@ -47,16 +47,17 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
 
-            CompanyClientMapping companyClientMapping = _companyClientMappingRepository.getByCompanyIdClientId(
+            xyz.greatapp.libs.service.ServiceResult serviceResult = _companyClientMappingRepository.getByCompanyIdClientId(
                     promotionApplying.getCompanyId(), new JSONObject(client.getObject()).getLong("client_id"));
             PromotionConfiguration promotionConfiguration = _promotionConfigurationRepository.getById(
                     promotionApplying.getPromotionConfigurationId());
 
-            if (companyClientMapping.getPoints() < promotionConfiguration.getRequiredPoints()) {
+            if (new JSONObject(serviceResult.getObject()).getDouble("points") < promotionConfiguration.getRequiredPoints()) {
                 return new ServiceResult<>(false, getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_ENOUGH_POINTS));
             }
             queryAgent.beginTransaction();
-            long promotionId = insertPromotionAndUpdatePoints(promotionConfiguration, companyClientMapping);
+            long promotionId = insertPromotionAndUpdatePoints(promotionConfiguration,
+                    CompanyClientMapping.fromJSONObject(new JSONObject(serviceResult.getObject())));
             queryAgent.commitTransaction();
             return new ServiceResult<>(true, getServiceMessage(Message.PROMOTION_APPLIED), promotionId);
         } catch (Exception ex) {

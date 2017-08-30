@@ -147,8 +147,10 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository() throws Exception {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.insertIfDoesNotExist(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+        expect(companyClientMappingRepository.insertIfDoesNotExist(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyClientMapping().toJSONObject().toString()));
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyClientMapping().toJSONObject().toString()));
         expect(companyClientMappingRepository.updatePoints((CompanyClientMapping) anyObject())).andReturn(1);
         return companyClientMappingRepository;
     }
@@ -162,7 +164,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     private PointsRepository createPointsRepository() throws Exception {
         PointsRepository pointsRepository = createMock(PointsRepository.class);
-        expect(pointsRepository.insert((Points) anyObject())).andReturn(1l);
+        expect(pointsRepository.insert((Points) anyObject())).andReturn(1L);
         expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString())).andReturn(null);
         return pointsRepository;
     }

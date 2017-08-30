@@ -94,10 +94,10 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
         }
         xyz.greatapp.libs.service.ServiceResult serviceResult = _clientRepository.getByPhone(clientRegistration.getPhone());
         if (!serviceResult.getObject().equals("{}")) {
-            CompanyClientMapping companyClientMapping =
+            xyz.greatapp.libs.service.ServiceResult companyClientMapping =
                 _companyClientMappingRepository.getByCompanyIdClientId(clientRegistration.getCompanyId(),
                         new JSONObject(serviceResult.getObject()).getLong("client_id"));
-            if (companyClientMapping != null) {
+            if (!"{}".equals(companyClientMapping.getObject())) {
                 return new ValidationResult(false, getServiceMessage(Message.THE_CLIENT_ALREADY_EXISTS));
             }
         }

@@ -48,7 +48,8 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
             }
             long clientId = new JSONObject(client.getObject()).getLong("client_id");
-            final double points = companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId).getPoints();
+            xyz.greatapp.libs.service.ServiceResult serviceResult1 = companyClientMappingRepository.getByCompanyIdClientId(companyId, clientId);
+            final double points = new JSONObject(serviceResult1.getObject()).getDouble("points");
             if (company != null) {
                 final String smsMessage = getSMSMessage(points);
                 logger.info("Promo SMS sent to: " + phone);

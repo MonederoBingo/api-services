@@ -208,7 +208,13 @@ public class PromotionConfigurationServiceImplTest {
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository(CompanyClientMapping companyClientMapping) throws Exception {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(companyClientMapping);
+        if(companyClientMapping == null) {
+            expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                    .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", "{}"));
+        } else {
+            expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                    .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", companyClientMapping.toJSONObject().toString()));
+        }
         replay(companyClientMappingRepository);
         return companyClientMappingRepository;
     }

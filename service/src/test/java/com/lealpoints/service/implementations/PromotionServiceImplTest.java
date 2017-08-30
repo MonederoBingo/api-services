@@ -60,7 +60,8 @@ public class PromotionServiceImplTest extends BaseServiceTest {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
         CompanyClientMapping companyClientMapping = new CompanyClientMapping();
         companyClientMapping.setClient(new Client());
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(companyClientMapping);
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", companyClientMapping.toJSONObject().toString()));
         expect(companyClientMappingRepository.updatePoints((CompanyClientMapping) anyObject())).andReturn(1);
         replay(companyClientMappingRepository);
         return companyClientMappingRepository;

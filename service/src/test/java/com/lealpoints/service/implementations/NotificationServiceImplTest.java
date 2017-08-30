@@ -31,7 +31,8 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
 
         CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyClientMapping().toJSONObject().toString()));
 
         ClientRepository clientRepository = createStrictMock(ClientRepository.class);
         expect(clientRepository.getByPhone(anyString())).andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Client().toJSONObject().toString()));
@@ -89,7 +90,8 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         expect(companyRepository.getByCompanyId(anyLong())).andReturn(new Company());
 
         CompanyClientMappingRepository companyClientMappingRepository = createNiceMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyClientMapping().toJSONObject().toString()));
 
         ClientRepository clientRepository = createStrictMock(ClientRepository.class);
         expect(clientRepository.getByPhone(anyString()))

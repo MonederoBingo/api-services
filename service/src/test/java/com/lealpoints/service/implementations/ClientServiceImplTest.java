@@ -174,14 +174,16 @@ public class ClientServiceImplTest extends BaseServiceTest {
     private CompanyClientMappingRepository createCompanyClientMappingRepositoryForInsert() throws Exception {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
         expect(companyClientMappingRepository.insert((CompanyClientMapping) anyObject())).andReturn(1L);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(null);
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(false, "", "{}"));
         replay(companyClientMappingRepository);
         return companyClientMappingRepository;
     }
 
     private CompanyClientMappingRepository createCompanyClientMappingRepositoryWhenThereIsAnExistentMapping() throws Exception {
         CompanyClientMappingRepository companyClientMappingRepository = createMock(CompanyClientMappingRepository.class);
-        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong())).andReturn(new CompanyClientMapping());
+        expect(companyClientMappingRepository.getByCompanyIdClientId(anyLong(), anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyClientMapping().toJSONObject().toString()));
         replay(companyClientMappingRepository);
         return companyClientMappingRepository;
     }

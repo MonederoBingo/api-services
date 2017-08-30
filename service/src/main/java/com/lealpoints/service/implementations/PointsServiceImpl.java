@@ -3,7 +3,6 @@ package com.lealpoints.service.implementations;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Points;
 import com.lealpoints.model.PointsConfiguration;
@@ -36,8 +35,8 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
 
     @Autowired
     public PointsServiceImpl(PointsRepository pointsRepository, PointsConfigurationRepository pointsConfigurationRepository,
-            ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
-            PhoneValidatorServiceImpl phoneValidatorService, PointsConfigurationServiceImpl pointsConfigurationService) {
+                             ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
+                             PhoneValidatorServiceImpl phoneValidatorService, PointsConfigurationServiceImpl pointsConfigurationService) {
         super(threadContextService);
         _pointsRepository = pointsRepository;
         _pointsConfigurationRepository = pointsConfigurationRepository;
@@ -94,11 +93,12 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         _pointsRepository.insert(points);
 
         // Updating points in company client mapping table
-        CompanyClientMapping companyClientMapping =
-            _companyClientMappingRepository.getByCompanyIdClientId(pointsAwarding.getCompanyId(), clientId);
-        if (companyClientMapping == null) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult =
+                _companyClientMappingRepository.getByCompanyIdClientId(pointsAwarding.getCompanyId(), clientId);
+        if ("{}".equals(serviceResult.getObject())) {
             throw new IllegalArgumentException("CompanyClientMapping doesn't exist.");
         }
+        CompanyClientMapping companyClientMapping = CompanyClientMapping.fromJSONObject(new JSONObject(serviceResult.getObject()));
         companyClientMapping.setPoints(companyClientMapping.getPoints() + points.getEarnedPoints());
         _companyClientMappingRepository.updatePoints(companyClientMapping);
         return points.getEarnedPoints();
