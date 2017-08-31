@@ -6,11 +6,9 @@ import com.lealpoints.service.model.CompanyUserRegistration;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
+import org.json.JSONArray;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
@@ -37,30 +35,36 @@ public class CompanyUserControllerTest {
 
     @Test
     public void testGet() throws Exception {
-        List<CompanyUser> expectedUsers = new ArrayList<>();
-        expectedUsers.add(createCompanyUser("fernando", "fernando@monederobingo.com"));
-        expectedUsers.add(createCompanyUser("alonso", "alonso@monederobingo.com"));
-        final ServiceResult<List<CompanyUser>> expectedServiceResult = new ServiceResult<>
-                (true, new ServiceMessage("1"), expectedUsers);
+        //given
+        JSONArray expectedUsers = new JSONArray();
+        expectedUsers.put(createCompanyUser("fernando", "fernando@monederobingo.com").toJSONObject());
+        expectedUsers.put(createCompanyUser("alonso", "alonso@monederobingo.com").toJSONObject());
+        final xyz.greatapp.libs.service.ServiceResult expectedServiceResult =
+                new xyz.greatapp.libs.service.ServiceResult(true, "", expectedUsers.toString());
         final CompanyUserServiceImpl companyUserService = createCompanyUserServiceForGet(expectedServiceResult);
         final CompanyUserController companyUserController = new CompanyUserController(companyUserService);
 
-        ResponseEntity<ServiceResult<List<CompanyUser>>> responseEntity = companyUserController.get(1L);
+        //when
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> responseEntity = companyUserController.get(1L);
+
+        //then
         assertNotNull(responseEntity);
-        ServiceResult actualServiceResults = responseEntity.getBody();
+        xyz.greatapp.libs.service.ServiceResult actualServiceResults = responseEntity.getBody();
         assertNotNull(actualServiceResults);
         assertEquals(expectedServiceResult.isSuccess(), actualServiceResults.isSuccess());
         assertEquals(expectedServiceResult.getMessage(), actualServiceResults.getMessage());
         assertNotNull(expectedServiceResult.getObject());
-        List<CompanyUser> companyUser = expectedServiceResult.getObject();
-        assertEquals(2, companyUser.size());
-        assertEquals("fernando", companyUser.get(0).getName());
-        assertEquals("fernando@monederobingo.com", companyUser.get(0).getEmail());
-        assertEquals("alonso", companyUser.get(1).getName());
-        assertEquals("alonso@monederobingo.com", companyUser.get(1).getEmail());
+
+        JSONArray companyUser = new JSONArray(actualServiceResults.getObject());
+        assertEquals(2, companyUser.length());
+
+        assertEquals("fernando", companyUser.getJSONObject(0).getString("name"));
+        assertEquals("fernando@monederobingo.com", companyUser.getJSONObject(0).getString("email"));
+        assertEquals("alonso", companyUser.getJSONObject(1).getString("name"));
+        assertEquals("alonso@monederobingo.com", companyUser.getJSONObject(1).getString("email"));
     }
 
-    private CompanyUserServiceImpl createCompanyUserServiceForGet(ServiceResult<List<CompanyUser>> serviceResult) throws Exception {
+    private CompanyUserServiceImpl createCompanyUserServiceForGet(xyz.greatapp.libs.service.ServiceResult serviceResult) throws Exception {
         final CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
         expect(companyUserService.getByCompanyId(anyLong())).andReturn(serviceResult);
         replay(companyUserService);
@@ -76,7 +80,7 @@ public class CompanyUserControllerTest {
 
     private CompanyUserServiceImpl createCompanyUserServiceForRegister(ServiceResult<String> serviceResult) throws Exception {
         final CompanyUserServiceImpl companyUserService = EasyMock.createMock(CompanyUserServiceImpl.class);
-        expect(companyUserService.register((CompanyUserRegistration) anyObject())).andReturn(serviceResult).times(1);
+        expect(companyUserService.register(anyObject())).andReturn(serviceResult).times(1);
         replay(companyUserService);
         return companyUserService;
     }

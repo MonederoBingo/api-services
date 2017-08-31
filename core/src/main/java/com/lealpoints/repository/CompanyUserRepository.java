@@ -2,11 +2,9 @@ package com.lealpoints.repository;
 
 import com.lealpoints.DatabaseServiceResult;
 import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.CompanyUser;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,12 +16,12 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import xyz.greatapp.libs.service.ServiceResult;
 import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
 import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
 import xyz.greatapp.libs.service.database.requests.UpdateQueryRQ;
 import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +74,7 @@ public class CompanyUserRepository extends BaseRepository {
         return hasHttps ? "https://" + homePageUrl : "http://" + homePageUrl;
     }
 
-    public List<CompanyUser> getByCompanyId(final long companyId) throws Exception {
+    public ServiceResult getByCompanyId(final long companyId) throws Exception {
 
         ColumnValue[] filters = new ColumnValue[]{
                 new ColumnValue("company_id", companyId)
@@ -85,32 +83,18 @@ public class CompanyUserRepository extends BaseRepository {
         HttpEntity<SelectQueryRQ> entity = new HttpEntity<>(
                 new SelectQueryRQ("company_user", filters),
                 getHttpHeaders());
-        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/selectList",
                 entity,
-                DatabaseServiceResult.class);
+                ServiceResult.class);
         if (responseEntity.getBody().getObject().equals("{}")) {
             return null;
         }
 
-        JSONArray jsonArray = new JSONArray(responseEntity.getBody().getObject().toString());
-        List<CompanyUser> companyUserList = new ArrayList<>();
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            CompanyUser companyUser = new CompanyUser();
-            companyUser.setCompanyId(jsonObject.getLong("company_id"));
-            companyUser.setCompanyUserId(jsonObject.getLong("company_user_id"));
-            companyUser.setActive(jsonObject.getBoolean("active"));
-            companyUser.setEmail(jsonObject.getString("email"));
-            companyUser.setName(jsonObject.getString("name"));
-            companyUserList.add(companyUser);
-        }
-
-        return companyUserList;
+        return responseEntity.getBody();
     }
 
-    public CompanyUser getByEmailAndPassword(final String email, final String password) throws Exception {
+    public ServiceResult getByEmailAndPassword(final String email, final String password) throws Exception {
         ColumnValue[] filters = new ColumnValue[]{
                 new ColumnValue("email", email),
                 new ColumnValue("password", password)
@@ -119,17 +103,17 @@ public class CompanyUserRepository extends BaseRepository {
         HttpEntity<SelectQueryRQ> entity = new HttpEntity<>(
                 new SelectQueryRQ("company_user", filters),
                 getHttpHeaders());
-        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/select",
                 entity,
-                DatabaseServiceResult.class);
+                ServiceResult.class);
         if (responseEntity.getBody().getObject().equals("{}")) {
             return null;
         }
-        return buildCompanyUser(new JSONObject(responseEntity.getBody()).getString("object"));
+        return responseEntity.getBody();
     }
 
-    public CompanyUser getByEmail(final String email) throws Exception {
+    public ServiceResult getByEmail(final String email) throws Exception {
 
         SelectQueryRQ selectQueryRQ = new SelectQueryRQ("company_user", new ColumnValue[]{
                 new ColumnValue("email", email)
@@ -139,14 +123,14 @@ public class CompanyUserRepository extends BaseRepository {
                 getHttpHeaders());
 
 
-        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/select",
                 entity,
-                DatabaseServiceResult.class);
+                ServiceResult.class);
         if (responseEntity.getBody().getObject().equals("{}")) {
             return null;
         }
-        return buildCompanyUser(new JSONObject(responseEntity.getBody()).getString("object"));
+        return responseEntity.getBody();
     }
 
     private HttpHeaders getHttpHeaders() {
@@ -181,9 +165,20 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public int updatePasswordByEmail(final String email, final String password, final boolean mustChangePassword) throws Exception {
-        return getQueryAgent().executeUpdate(
-                "UPDATE company_user SET password = '" + password + "', must_change_password = " + mustChangePassword +
-                        " WHERE email = '" + email + "';");
+        RestTemplate restTemplate = getRestTemplate();
+        ColumnValue[] sets = new ColumnValue[] {
+                new ColumnValue("password", password),
+                new ColumnValue("must_change_password", mustChangePassword)
+        };
+        ColumnValue[] filters = new ColumnValue[] {
+                new ColumnValue("email", email)
+        };
+        UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
+        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+                getDatabaseURL() + "/update",
+                updateQuery,
+                DatabaseServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject().toString());
     }
 
     public int updateApiKeyByEmail(final String email, final String apiKey) throws Exception {
@@ -208,56 +203,22 @@ public class CompanyUserRepository extends BaseRepository {
         return getQueryAgent().executeUpdate("UPDATE company_user SET activation_key = NULL WHERE activation_key = '" + activationKey + "';");
     }
 
-    public CompanyUser getByCompanyUserIdApiKey(final Integer companyUserId, final String apiKey) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<CompanyUser>() {
-            @Override
-            public String sql() {
-                StringBuilder sql = new StringBuilder();
-                sql.append("SELECT company_user.* FROM company_user");
-                sql.append(" WHERE company_user.api_key = ?").append(";");
-                return sql.toString();
-            }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{apiKey};
-            }
-
-            @Override
-            public CompanyUser build(ResultSet resultSet) throws SQLException {
-                return buildCompanyUser(resultSet);
-            }
+    public ServiceResult getByCompanyUserIdApiKey(final Integer companyUserId, final String apiKey) throws Exception {
+        SelectQueryRQ selectQueryRQ = new SelectQueryRQ("company_user", new ColumnValue[]{
+                new ColumnValue("api_key", apiKey)
         });
-    }
+        HttpEntity<SelectQueryRQ> entity = new HttpEntity<>(
+                selectQueryRQ,
+                getHttpHeaders());
 
-    private CompanyUser buildCompanyUser(ResultSet resultSet) throws SQLException {
-        CompanyUser companyUser = new CompanyUser();
-        companyUser.setCompanyUserId(resultSet.getLong("company_user_id"));
-        companyUser.setCompanyId(resultSet.getLong("company_id"));
-        companyUser.setName(resultSet.getString("name"));
-        companyUser.setEmail(resultSet.getString("email"));
-        companyUser.setPassword(resultSet.getString("password"));
-        companyUser.setActive(resultSet.getBoolean("active"));
-        companyUser.setActivationKey(resultSet.getString("activation_key"));
-        companyUser.setLanguage(resultSet.getString("language"));
-        companyUser.setMustChangePassword(resultSet.getBoolean("must_change_password"));
-        companyUser.setApiKey(resultSet.getString("api_key"));
-        return companyUser;
-    }
 
-    private CompanyUser buildCompanyUser(String stringObject) throws SQLException {
-        JSONObject object = new JSONObject(stringObject);
-        CompanyUser companyUser = new CompanyUser();
-        companyUser.setCompanyUserId(object.getLong("company_user_id"));
-        companyUser.setCompanyId(object.getLong("company_id"));
-        companyUser.setName(object.getString("name"));
-        companyUser.setEmail(object.getString("email"));
-        companyUser.setPassword(object.getString("password"));
-        companyUser.setActive(object.getBoolean("active"));
-        companyUser.setActivationKey(object.getString("activation_key"));
-        companyUser.setLanguage(object.getString("language"));
-        companyUser.setMustChangePassword(object.getBoolean("must_change_password"));
-        companyUser.setApiKey(object.getString("api_key"));
-        return companyUser;
+        ResponseEntity<ServiceResult> responseEntity = getRestTemplate().postForEntity(
+                getDatabaseURL() + "/select",
+                entity,
+                ServiceResult.class);
+        if (responseEntity.getBody().getObject().equals("{}")) {
+            return null;
+        }
+        return responseEntity.getBody();
     }
 }

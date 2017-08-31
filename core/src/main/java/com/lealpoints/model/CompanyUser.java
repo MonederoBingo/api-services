@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 @Table
 public class CompanyUser {
 
@@ -92,5 +94,20 @@ public class CompanyUser {
 
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("company_user_id", companyUserId);
+        jsonObject.put("company_id", companyId);
+        jsonObject.put("name", name);
+        jsonObject.put("email", email);
+        jsonObject.put("password", password);
+        jsonObject.put("active", active);
+        jsonObject.put("activation_key", activationKey == null ? "" : activationKey);
+        jsonObject.put("language", language);
+        jsonObject.put("must_change_password", mustChangePassword);
+        jsonObject.put("api_key", apiKey);
+        return jsonObject;
     }
 }

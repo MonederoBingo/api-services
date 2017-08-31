@@ -17,6 +17,7 @@ import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.service.util.ServiceUtil;
 import org.easymock.EasyMock;
+import org.json.JSONArray;
 import org.junit.Test;
 
 import javax.mail.MessagingException;
@@ -66,18 +67,18 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         expectedUsers.add(createCompanyUser("alonso", "alonso@monederobingo.com"));
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForGet(expectedUsers);
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null, null, null, null);
-        ServiceResult<List<CompanyUser>> serviceResult = companyUserService.getByCompanyId(1);
+        xyz.greatapp.libs.service.ServiceResult serviceResult = companyUserService.getByCompanyId(1);
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
         assertEquals("", serviceResult.getMessage());
         assertNotNull(serviceResult.getObject());
 
-        List<CompanyUser> actualUsers = serviceResult.getObject();
-        assertEquals(2, actualUsers.size());
-        assertEquals("fernando", actualUsers.get(0).getName());
-        assertEquals("fernando@monederobingo.com", actualUsers.get(0).getEmail());
-        assertEquals("alonso", actualUsers.get(1).getName());
-        assertEquals("alonso@monederobingo.com", actualUsers.get(1).getEmail());
+        JSONArray actualUsers = new JSONArray(serviceResult.getObject());
+        assertEquals(2, actualUsers.length());
+        assertEquals("fernando", actualUsers.getJSONObject(0).getString("name"));
+        assertEquals("fernando@monederobingo.com", actualUsers.getJSONObject(0).getString("email"));
+        assertEquals("alonso", actualUsers.getJSONObject(1).getString("name"));
+        assertEquals("alonso@monederobingo.com", actualUsers.getJSONObject(1).getString("email"));
         verify(companyUserRepository);
     }
 
@@ -145,6 +146,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testUserLoginWhenNotUpdatingApiKey() throws Exception {
+        //given
         CompanyUser companyUser = createCompanyUser(1, 1, "name", "a@a.com", "password", true, "es", true);
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryWhenNotUpdatingApiKey(companyUser);
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null,
@@ -159,7 +161,11 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         CompanyUserLogin companyUserLogin = new CompanyUserLogin();
         companyUserLogin.setEmail("a@a.com");
         companyUserLogin.setPassword("password");
+
+        //when
         ServiceResult<CompanyLoginResult> serviceResult = companyUserService.loginUser(companyUserLogin);
+
+        //then
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Message.COMMON_USER_ERROR.name(), serviceResult.getMessage());
@@ -185,6 +191,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void sendActivationEmail() throws Exception {
+        //given
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendActivation();
         final NotificationServiceImpl notificationService = createNotificationService();
         final CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null,
@@ -194,7 +201,11 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
                 return new ServiceMessage(message.name());
             }
         };
+
+        //when
         ServiceResult serviceResult = companyUserService.sendActivationEmail("a@a.com");
+
+        //then
         assertNotNull(serviceResult);
         assertTrue(serviceResult.isSuccess());
     }
@@ -209,6 +220,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     @Test
     public void testSendActivationEmailWhenEmailDoesNotExist() throws Exception {
+        //given
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForSendingActivationWhenEmailDoesNotExist();
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository, null, null,
                 null, null, null) {
@@ -217,7 +229,11 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
                 return new ServiceMessage(message.name());
             }
         };
+
+        //when
         ServiceResult serviceResult = companyUserService.sendActivationEmail("a@a.com");
+
+        //then
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Message.THIS_EMAIL_DOES_NOT_EXIST.name(), serviceResult.getMessage());
@@ -334,21 +350,24 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepositoryForSendActivation() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmail(anyString())).andReturn(new CompanyUser());
+        expect(companyUserRepository.getByEmail(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyUser().toJSONObject().toString()));
         replay(companyUserRepository);
         return companyUserRepository;
     }
 
     private CompanyUserRepository createCompanyUserRepositoryForSendingActivationWhenEmailDoesNotExist() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmail(anyString())).andReturn(null);
+        expect(companyUserRepository.getByEmail(anyString())).andReturn(
+                new xyz.greatapp.libs.service.ServiceResult(true, "", "{}"));
         replay(companyUserRepository);
         return companyUserRepository;
     }
 
     private CompanyUserRepository createCompanyUserRepositoryForSendingTempPasswordEmail() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmail(anyString())).andReturn(new CompanyUser());
+        expect(companyUserRepository.getByEmail(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyUser().toJSONObject().toString()));
         expect(companyUserRepository.updatePasswordByEmail(anyString(), anyString(), anyBoolean())).andReturn(1);
         replay(companyUserRepository);
         return companyUserRepository;
@@ -356,20 +375,23 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepository(CompanyUser companyUser) throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(companyUser);
+        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", companyUser.toJSONObject().toString()));
         expect(companyUserRepository.updateApiKeyByEmail(anyString(), anyString())).andReturn(1);
         return companyUserRepository;
     }
 
     private CompanyUserRepository createCompanyUserRepositoryIsNotActive(CompanyUser companyUser) throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(companyUser);
+        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", companyUser.toJSONObject().toString()));
         return companyUserRepository;
     }
 
     private CompanyUserRepository createCompanyUserRepositoryWhenNotUpdatingApiKey(CompanyUser companyUser) throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString())).andReturn(companyUser);
+        expect(companyUserRepository.getByEmailAndPassword(anyString(), anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", companyUser.toJSONObject().toString()));
         expect(companyUserRepository.updateApiKeyByEmail(anyString(), anyString())).andReturn(0);
         return companyUserRepository;
     }
@@ -383,7 +405,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     }
 
     private CompanyUser createCompanyUser(int companyUserId, int companyId, String name, String email, String password, boolean active,
-        String language, boolean mustChangePassword) {
+                                          String language, boolean mustChangePassword) {
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyUserId(companyUserId);
         companyUser.setCompanyId(companyId);
@@ -418,7 +440,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
                                                             ThreadContextService threadContextService,
                                                             CompanyServiceImpl companyService) throws MessagingException {
         return new CompanyUserServiceImpl(companyUserRepository,
-                    threadContextService, null, companyService, createNotificationService(), new ServiceUtil());
+                threadContextService, null, companyService, createNotificationService(), new ServiceUtil());
     }
 
     private CompanyServiceImpl createCompanyService(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService) throws Exception {
@@ -447,7 +469,9 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmail(anyString())).andReturn(new CompanyUser()).times(1);
+        expect(companyUserRepository.getByEmail(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyUser().toJSONObject().toString()))
+                .times(1);
         replay(companyUserRepository);
         return companyUserRepository;
     }
@@ -502,7 +526,13 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepositoryForGet(List<CompanyUser> companyUserList) throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByCompanyId(anyLong())).andReturn(companyUserList).anyTimes();
+        JSONArray jsonArray = new JSONArray();
+        for (CompanyUser companyUser : companyUserList) {
+            jsonArray.put(companyUser.toJSONObject());
+        }
+        expect(companyUserRepository.getByCompanyId(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", jsonArray.toString()))
+                .anyTimes();
         replay(companyUserRepository);
         return companyUserRepository;
     }

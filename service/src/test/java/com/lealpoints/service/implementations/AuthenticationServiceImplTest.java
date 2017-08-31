@@ -18,7 +18,8 @@ public class AuthenticationServiceImplTest extends BaseServiceTest {
     @Test
     public void testIsValidCompanyApiKey() throws Exception {
         CompanyUserRepository companyUserRepository = createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByCompanyUserIdApiKey(anyInt(), anyString())).andReturn(new CompanyUser());
+        expect(companyUserRepository.getByCompanyUserIdApiKey(anyInt(), anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyUser().toJSONObject().toString()));
         replay((companyUserRepository));
         AuthenticationServiceImpl authenticationService = new AuthenticationServiceImpl(null, companyUserRepository, null) {
             @Override

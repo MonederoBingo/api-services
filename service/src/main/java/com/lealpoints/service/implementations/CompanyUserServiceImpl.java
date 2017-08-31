@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
-import java.util.List;
 
 @Component
 public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUserService {
@@ -53,19 +52,21 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
             if (validateCredentials.isInvalid()) {
                 return new ServiceResult<>(false, validateCredentials.getServiceMessage());
             } else {
-                CompanyUser companyUser = companyUserRepository.getByEmailAndPassword(companyUserLogin.getEmail(), companyUserLogin.getPassword());
+                xyz.greatapp.libs.service.ServiceResult companyUser =
+                        companyUserRepository.getByEmailAndPassword(companyUserLogin.getEmail(), companyUserLogin.getPassword());
                 final ValidationResult validateLogin = validateUserLogin(companyUser, loginResult);
                 if (validateLogin.isInvalid()) {
                     return new ServiceResult<>(false, validateLogin.getServiceMessage(), loginResult);
                 } else {
-                    String apiKey = updateApiKey(companyUser);
-                    loginResult.setEmail(companyUser.getEmail());
-                    loginResult.setMustChangePassword(companyUser.getMustChangePassword());
+                    JSONObject jsonObject = new JSONObject(companyUser.getObject());
+                    String apiKey = updateApiKey(jsonObject.getString("email"));
+                    loginResult.setEmail(jsonObject.getString("email"));
+                    loginResult.setMustChangePassword(jsonObject.getBoolean("must_change_password"));
                     loginResult.setActive(true);
-                    loginResult.setCompanyId(companyUser.getCompanyId());
-                    loginResult.setCompanyUserId(companyUser.getCompanyUserId());
-                    loginResult.setLanguage(companyUser.getLanguage());
-                    xyz.greatapp.libs.service.ServiceResult serviceResult = companyRepository.getByCompanyId(companyUser.getCompanyId());
+                    loginResult.setCompanyId(jsonObject.getLong("company_id"));
+                    loginResult.setCompanyUserId(jsonObject.getLong("company_user_id"));
+                    loginResult.setLanguage(jsonObject.getString("language"));
+                    xyz.greatapp.libs.service.ServiceResult serviceResult = companyRepository.getByCompanyId(jsonObject.getLong("company_id"));
                     String name = new JSONObject(serviceResult.getObject()).getString("name");
                     loginResult.setCompanyName(name);
                     loginResult.setApiKey(apiKey);
@@ -98,11 +99,11 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     public ServiceResult sendActivationEmail(String email) {
         try {
-            final CompanyUser companyUser = companyUserRepository.getByEmail(email);
-            if (companyUser == null) {
+            final xyz.greatapp.libs.service.ServiceResult companyUser = companyUserRepository.getByEmail(email);
+            if ("{}".equals(companyUser.getObject())) {
                 return new ServiceResult(false, getServiceMessage(Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
-            notificationService.sendActivationEmail(email, companyUser.getActivationKey());
+            notificationService.sendActivationEmail(email, new JSONObject(companyUser.getObject()).getString("activation_key"));
             return new ServiceResult(true, getServiceMessage(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -112,8 +113,8 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     public ServiceResult sendTempPasswordEmail(String email) {
         try {
-            final CompanyUser companyUser = companyUserRepository.getByEmail(email);
-            if (companyUser == null) {
+            final xyz.greatapp.libs.service.ServiceResult companyUser = companyUserRepository.getByEmail(email);
+            if ("{}".equals(companyUser.getObject())) {
                 return new ServiceResult(false, getServiceMessage(Message.THIS_EMAIL_DOES_NOT_EXIST));
             }
             final String tempPassword = RandomStringUtils.random(8, true, true);
@@ -171,11 +172,11 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
-    private ValidationResult validateUserLogin(CompanyUser companyUser, CompanyLoginResult loginResult) throws Exception {
-        if (companyUser == null) {
+    private ValidationResult validateUserLogin(xyz.greatapp.libs.service.ServiceResult serviceResult, CompanyLoginResult loginResult) throws Exception {
+        if ("{}".equals(serviceResult.getObject())) {
             return new ValidationResult(false, getServiceMessage(Message.LOGIN_FAILED));
         }
-        if (!companyUser.isActive()) {
+        if (!new JSONObject(serviceResult.getObject()).getBoolean("active")) {
             loginResult.setActive(false);
             return new ValidationResult(false, getServiceMessage(Message.YOUR_USER_IS_NOT_ACTIVE));
         }
@@ -213,13 +214,12 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         }
     }
 
-    public ServiceResult<List<CompanyUser>> getByCompanyId(long companyId) {
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyId(long companyId) {
         try {
-            final List<CompanyUser> companyUsers = companyUserRepository.getByCompanyId(companyId);
-            return new ServiceResult<>(true, ServiceMessage.EMPTY, companyUsers);
+            return companyUserRepository.getByCompanyId(companyId);
         } catch (Exception ex){
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
+            return new xyz.greatapp.libs.service.ServiceResult(false, "", null);
         }
     }
 
@@ -241,9 +241,9 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         return new ValidationResult(true, ServiceMessage.EMPTY);
     }
 
-    private String updateApiKey(CompanyUser companyUser) throws Exception {
+    private String updateApiKey(String email) throws Exception {
         String apiKey = RandomStringUtils.random(20, true, true) + "com";
-        final int updatedRows = companyUserRepository.updateApiKeyByEmail(companyUser.getEmail(), apiKey);
+        final int updatedRows = companyUserRepository.updateApiKeyByEmail(email, apiKey);
         if (updatedRows != 1) {
             logger.error("The company user api key could not be updated. updatedRows: " + updatedRows);
             throw new RuntimeException(getServiceMessage(Message.COMMON_USER_ERROR).getMessage());
@@ -251,7 +251,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         return apiKey;
     }
 
-    public Long registerCompanyUser(CompanyUserRegistration companyUserRegistration) throws Exception {
+    private Long registerCompanyUser(CompanyUserRegistration companyUserRegistration) throws Exception {
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyId(companyUserRegistration.getCompanyId());
         companyUser.setName(companyUserRegistration.getName());

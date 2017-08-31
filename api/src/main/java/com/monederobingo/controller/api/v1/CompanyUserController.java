@@ -39,8 +39,8 @@ public class CompanyUserController extends BaseController {
 
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<CompanyUser>>> get(@PathVariable("companyId") long companyId) {
-        ServiceResult<List<CompanyUser>> serviceResult = _companyUserService.getByCompanyId(companyId);
+    public ResponseEntity<xyz.greatapp.libs.service.ServiceResult> get(@PathVariable("companyId") long companyId) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _companyUserService.getByCompanyId(companyId);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 }

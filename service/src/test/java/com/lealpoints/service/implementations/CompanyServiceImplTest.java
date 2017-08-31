@@ -1,30 +1,11 @@
 package com.lealpoints.service.implementations;
 
-import static org.easymock.EasyMock.anyLong;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.anyString;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import com.lealpoints.context.ThreadContext;
 import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Client;
-import com.lealpoints.model.Company;
-import com.lealpoints.model.CompanyUser;
-import com.lealpoints.model.PointsInCompany;
-import com.lealpoints.model.PromotionConfiguration;
+import com.lealpoints.model.*;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.repository.CompanyUserRepository;
@@ -35,19 +16,20 @@ import com.lealpoints.service.model.CompanyRegistration;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.service.util.ServiceUtil;
-
-import java.io.File;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import javax.mail.MessagingException;
-
 import org.apache.commons.fileupload.FileItem;
 import org.easymock.EasyMock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
+
+import javax.mail.MessagingException;
+import java.io.File;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 public class CompanyServiceImplTest extends BaseServiceTest {
     @Test
@@ -322,7 +304,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     private CompanyRepository createCompanyRepositoryForGetPoints(List<PointsInCompany> pointsInCompanies) throws Exception {
         CompanyRepository clientRepository = createMock(CompanyRepository.class);
         JSONObject[] strings = new JSONObject[pointsInCompanies.size()];
-        for(int i = 0; i < pointsInCompanies.size(); i++) {
+        for (int i = 0; i < pointsInCompanies.size(); i++) {
             strings[i] = pointsInCompanies.get(i).toJSONObject();
         }
         expect(clientRepository.getPointsInCompanyByClientId(anyLong()))
@@ -343,7 +325,9 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmail(anyString())).andReturn(new CompanyUser()).times(1);
+        expect(companyUserRepository.getByEmail(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new CompanyUser().toJSONObject().toString()))
+                .times(1);
         replay(companyUserRepository);
         return companyUserRepository;
     }
