@@ -87,10 +87,6 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/selectList",
                 entity,
                 ServiceResult.class);
-        if (responseEntity.getBody().getObject().equals("{}")) {
-            return null;
-        }
-
         return responseEntity.getBody();
     }
 
@@ -107,9 +103,6 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 ServiceResult.class);
-        if (responseEntity.getBody().getObject().equals("{}")) {
-            return null;
-        }
         return responseEntity.getBody();
     }
 
@@ -127,9 +120,6 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 ServiceResult.class);
-        if (responseEntity.getBody().getObject().equals("{}")) {
-            return null;
-        }
         return responseEntity.getBody();
     }
 
@@ -200,7 +190,21 @@ public class CompanyUserRepository extends BaseRepository {
     }
 
     public int clearActivationKey(final String activationKey) throws Exception {
-        return getQueryAgent().executeUpdate("UPDATE company_user SET activation_key = NULL WHERE activation_key = '" + activationKey + "';");
+        RestTemplate restTemplate = getRestTemplate();
+        ColumnValue[] sets = new ColumnValue[] {
+                new ColumnValue("activation_key", null)
+        };
+        ColumnValue[] filters = new ColumnValue[] {
+                new ColumnValue("activation_key", activationKey)
+        };
+        UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
+
+
+        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+                getDatabaseURL() + "/update",
+                updateQuery,
+                DatabaseServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject().toString());
     }
 
     public ServiceResult getByCompanyUserIdApiKey(final Integer companyUserId, final String apiKey) throws Exception {
@@ -216,9 +220,6 @@ public class CompanyUserRepository extends BaseRepository {
                 getDatabaseURL() + "/select",
                 entity,
                 ServiceResult.class);
-        if (responseEntity.getBody().getObject().equals("{}")) {
-            return null;
-        }
         return responseEntity.getBody();
     }
 }

@@ -242,7 +242,8 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         if (!EmailValidator.getInstance().isValid(companyRegistration.getEmail())) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_INVALID));
         }
-        if (_companyUserRepository.getByEmail(companyRegistration.getEmail()) != null) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _companyUserRepository.getByEmail(companyRegistration.getEmail());
+        if (!"{}".equals(serviceResult.getObject())) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_ALREADY_EXISTS));
         }
         return new ValidationResult(true, ServiceMessage.EMPTY);

@@ -281,7 +281,9 @@ public class CompanyServiceImplTest extends BaseServiceTest {
 
     private CompanyUserRepository createCompanyUserRepository() throws Exception {
         final CompanyUserRepository companyUserRepository = EasyMock.createMock(CompanyUserRepository.class);
-        expect(companyUserRepository.getByEmail(anyString())).andReturn(null).times(1);
+        expect(companyUserRepository.getByEmail(anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", "{}"))
+                .times(1);
         expect(companyUserRepository.insert((CompanyUser) anyObject())).andReturn(1L).times(1);
         replay(companyUserRepository);
         return companyUserRepository;

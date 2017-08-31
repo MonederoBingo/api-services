@@ -235,7 +235,8 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         if (!EmailValidator.getInstance().isValid(companyUserRegistration.getEmail())) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_IS_INVALID));
         }
-        if (companyUserRepository.getByEmail(companyUserRegistration.getEmail()) != null) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = companyUserRepository.getByEmail(companyUserRegistration.getEmail());
+        if (!"{}".equals(serviceResult.getObject())) {
             return new ValidationResult(false, getServiceMessage(Message.EMAIL_ALREADY_EXISTS));
         }
         return new ValidationResult(true, ServiceMessage.EMPTY);
