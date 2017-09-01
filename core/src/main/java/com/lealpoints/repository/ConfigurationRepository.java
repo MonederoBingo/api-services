@@ -1,67 +1,73 @@
 package com.lealpoints.repository;
 
-import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.ServiceResult;
+import xyz.greatapp.libs.service.context.ThreadContextService;
+import xyz.greatapp.libs.service.database.common.ApiClientUtils;
+import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
+import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
+import xyz.greatapp.libs.service.database.requests.fields.Join;
+import xyz.greatapp.libs.service.location.ServiceLocator;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
 public class ConfigurationRepository extends BaseRepository {
 
+    private static final Common c = new Common();
+    private ServiceLocator serviceLocator;
+    private ThreadContextService threadContextService;
+    private ApiClientUtils apiClientUtils = new ApiClientUtils();
+
+    @Autowired
+    public ConfigurationRepository(ServiceLocator serviceLocator, ThreadContextService threadContextService) {
+        this.serviceLocator = serviceLocator;
+        this.threadContextService = threadContextService;
+    }
+
     public long insert(Configuration configuration) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO configuration(name, description, value)");
-        sql.append(" VALUES (");
-        sql.append("'").append(configuration.getName()).append("', ");
-        sql.append("'").append(configuration.getDescription()).append("', ");
-        sql.append("'").append(configuration.getValue()).append("');");
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("name", configuration.getName()),
+                new ColumnValue("description", configuration.getDescription()),
+                new ColumnValue("value", configuration.getValue())
+        };
+        HttpEntity<InsertQueryRQ> entity = c.getHttpEntityForInsert(new InsertQueryRQ("configuration", values, "configuration_id"));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/insert";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Long.parseLong(responseEntity.getBody().getObject());
 
-        return getQueryAgent().executeInsert(sql.toString(), "configuration_id");
     }
 
-    public List<Configuration> getConfigurationList() throws Exception {
-        return getQueryAgent().selectList(new DbBuilder<Configuration>() {
-            @Override
-            public String sql() {
-                return "SELECT configuration_id, name, description, value from configuration";
-            }
+    public ServiceResult getConfigurationList() throws Exception {
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("configuration", new ColumnValue[0], new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/selectList";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
 
-            @Override
-            public Object[] values() {
-                return new Object[0];
-            }
+        return responseEntity.getBody();
 
-            @Override
-            public Configuration build(ResultSet resultSet) throws SQLException {
-                Configuration configuration = new Configuration();
-                configuration.setConfigurationId(resultSet.getLong("configuration_id"));
-                configuration.setName(resultSet.getString("name"));
-                configuration.setDescription(resultSet.getString("description"));
-                configuration.setValue(resultSet.getString("value"));
-                return configuration;
-            }
-        });
     }
 
-    public String getValueByName(final String name) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<String>() {
-            @Override
-            public String sql() {
-                return "SELECT value FROM configuration WHERE name = ?;";
-            }
-
-            @Override
-            public Object[] values() {
-                return new Object[]{name};
-            }
-
-            @Override
-            public String build(ResultSet resultSet) throws SQLException {
-                return resultSet.getString("value");
-            }
-        });
+    public ServiceResult getValueByName(final String name) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("name", name)
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("configuration", filters, new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/select";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return responseEntity.getBody();
     }
 }

@@ -1,15 +1,15 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.model.Configuration;
 import com.lealpoints.repository.ConfigurationRepository;
 import com.lealpoints.service.ConfigurationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.ServiceResult;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -33,9 +33,10 @@ public class ConfigurationServiceImpl extends BaseServiceImpl implements Configu
     public void reloadConfiguration() {
         _configurationMap.clear();
         try {
-            final List<Configuration> configurationList = _configurationRepository.getConfigurationList();
-            for (Configuration configuration : configurationList) {
-                _configurationMap.put(configuration.getName(), configuration.getValue());
+            final ServiceResult configurationList = _configurationRepository.getConfigurationList();
+            JSONArray jsonArray = new JSONArray(configurationList.getObject());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                _configurationMap.put(jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("value"));
             }
         } catch (Exception e) {
             logger.error("Could not load configuration list", e);
@@ -56,7 +57,7 @@ public class ConfigurationServiceImpl extends BaseServiceImpl implements Configu
 
     public String getUncachedConfiguration(String key) {
         try {
-            return _configurationRepository.getValueByName(key);
+            return _configurationRepository.getValueByName(key).getObject();
         } catch (Exception e) {
             logger.error("Could not load configuration: " + key, e);
             throw new RuntimeException(e);

@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 /**
  * Created by aayala on 9/1/15.
  */
@@ -40,5 +42,14 @@ public class Configuration {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("configuration_id", configurationId);
+        jsonObject.put("name", name);
+        jsonObject.put("description", description);
+        jsonObject.put("value", value);
+        return jsonObject;
     }
 }
