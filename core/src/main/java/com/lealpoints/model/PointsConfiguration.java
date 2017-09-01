@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 @Table
 public class PointsConfiguration {
 
@@ -38,5 +40,14 @@ public class PointsConfiguration {
 
     public void setRequiredAmount(float requiredAmount) {
         this.requiredAmount = requiredAmount;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("points_configuration_id", pointsConfigurationId);
+        jsonObject.put("company_id", companyId);
+        jsonObject.put("points_to_earn", pointsToEarn);
+        jsonObject.put("required_amount", requiredAmount);
+        return jsonObject;
     }
 }

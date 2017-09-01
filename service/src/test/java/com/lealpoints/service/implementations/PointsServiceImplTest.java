@@ -9,15 +9,12 @@ import com.lealpoints.model.Points;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
-import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
-import com.lealpoints.service.PointsConfigurationService;
 import com.lealpoints.service.model.PointsAwarding;
 import com.lealpoints.service.model.ValidationResult;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMockSupport;
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -35,7 +32,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
         expect(pointsConfigurationService.getByCompanyId(anyInt()))
                 .andReturn(new ServiceResult<>(true, new ServiceMessage(""), createPointsConfiguration(10, 100)));
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(createPointsRepository(), null,
+                new PointsServiceImpl(createPointsRepository(),
                         createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()),
                         createPhoneValidatorService(true, ServiceMessage.EMPTY), pointsConfigurationService) {
                     @Override
@@ -63,7 +60,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
-        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null, null,
+        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null,
                 createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name())), null) {
 
             @Override
@@ -82,7 +79,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null, null,
+                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null,
                         createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -102,7 +99,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPointsWhenTheSaleKeyIsEmpty() throws Exception {
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(null, null, null, null, null,
+                new PointsServiceImpl(null, null, null, null,
                         createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {

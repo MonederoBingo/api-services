@@ -6,8 +6,12 @@ import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.*;
-import com.lealpoints.repository.*;
+import com.lealpoints.model.Company;
+import com.lealpoints.model.CompanyUser;
+import com.lealpoints.repository.ClientRepository;
+import com.lealpoints.repository.CompanyRepository;
+import com.lealpoints.repository.CompanyUserRepository;
+import com.lealpoints.repository.PromotionConfigurationRepository;
 import com.lealpoints.service.NotificationService;
 import com.lealpoints.service.model.CompanyLoginResult;
 import com.lealpoints.service.model.CompanyUserLogin;
@@ -444,7 +448,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     }
 
     private CompanyServiceImpl createCompanyService(CompanyUserRepository companyUserRepository, ThreadContextService threadContextService) throws Exception {
-        return createCompanyService(null, companyUserRepository, createPointsConfigurationRepository(),
+        return createCompanyService(null, companyUserRepository,
                 threadContextService, null, createStrictMock(PromotionConfigurationRepository.class), null);
     }
 
@@ -453,7 +457,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
         final QueryAgent queryAgent = createQueryAgent();
         final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent);
-        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null, null,
+        CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null,
                 null);
         CompanyUserServiceImpl companyUserService = createCompanyUserService(companyUserRepository, threadContextService, companyService);
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
@@ -476,16 +480,8 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         return companyUserRepository;
     }
 
-    private PointsConfigurationRepository createPointsConfigurationRepository() throws Exception {
-        PointsConfigurationRepository pointsConfigurationRepository = createMock(PointsConfigurationRepository.class);
-        expect(pointsConfigurationRepository.insert((PointsConfiguration) anyObject())).andReturn(1L);
-        replay(pointsConfigurationRepository);
-        return pointsConfigurationRepository;
-    }
-
     private CompanyServiceImpl createCompanyService(
-            final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository,
-            final PointsConfigurationRepository pointsConfigurationRepository, final ThreadContextService threadContextService,
+            final CompanyRepository companyRepository, final CompanyUserRepository companyUserRepository, final ThreadContextService threadContextService,
             ClientRepository clientRepository, PromotionConfigurationRepository promotionConfigurationRepository,
             NotificationService notificationService) {
         return new CompanyServiceImpl(companyRepository, companyUserRepository,

@@ -8,7 +8,6 @@ import com.lealpoints.model.Points;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
-import com.lealpoints.repository.PointsConfigurationRepository;
 import com.lealpoints.repository.PointsRepository;
 import com.lealpoints.service.PointsService;
 import com.lealpoints.service.model.PointsAwarding;
@@ -27,19 +26,17 @@ import org.springframework.stereotype.Component;
 public class PointsServiceImpl extends BaseServiceImpl implements PointsService {
     private static final Logger logger = LogManager.getLogger(PointsServiceImpl.class.getName());
     private final PointsRepository _pointsRepository;
-    private final PointsConfigurationRepository _pointsConfigurationRepository;
     private final ClientRepository _clientRepository;
     private final CompanyClientMappingRepository _companyClientMappingRepository;
     private final PhoneValidatorServiceImpl _phoneValidatorService;
     private final PointsConfigurationServiceImpl pointsConfigurationService;
 
     @Autowired
-    public PointsServiceImpl(PointsRepository pointsRepository, PointsConfigurationRepository pointsConfigurationRepository,
+    public PointsServiceImpl(PointsRepository pointsRepository,
                              ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
                              PhoneValidatorServiceImpl phoneValidatorService, PointsConfigurationServiceImpl pointsConfigurationService) {
         super(threadContextService);
         _pointsRepository = pointsRepository;
-        _pointsConfigurationRepository = pointsConfigurationRepository;
         _clientRepository = clientRepository;
         _companyClientMappingRepository = companyClientMappingRepository;
         _phoneValidatorService = phoneValidatorService;
