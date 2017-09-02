@@ -78,6 +78,7 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
+        //given
         PointsServiceImpl pointsService =
                 new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null,
                         createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
@@ -89,7 +90,11 @@ public class PointsServiceImplTest extends EasyMockSupport {
         replayAll();
         final PointsAwarding pointsAwarding = new PointsAwarding();
         pointsAwarding.setSaleKey("ABC");
+
+        //when
         ServiceResult<Float> serviceResult = pointsService.awardPoints(pointsAwarding);
+
+        //then
         assertNotNull(serviceResult);
         assertFalse(serviceResult.isSuccess());
         assertEquals(Message.SALE_KEY_ALREADY_EXISTS.name(), serviceResult.getMessage());
@@ -162,13 +167,15 @@ public class PointsServiceImplTest extends EasyMockSupport {
     private PointsRepository createPointsRepository() throws Exception {
         PointsRepository pointsRepository = createMock(PointsRepository.class);
         expect(pointsRepository.insert((Points) anyObject())).andReturn(1L);
-        expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString())).andReturn(null);
+        expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(false, "", "{}"));
         return pointsRepository;
     }
 
     private PointsRepository createPointsRepositoryWhenTheSaleKeyExists() throws Exception {
         PointsRepository pointsRepository = createMock(PointsRepository.class);
-        expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString())).andReturn(new Points());
+        expect(pointsRepository.getByCompanyIdSaleKey(anyLong(), anyString()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new Points().toJSONObject().toString()));
         return pointsRepository;
     }
 }

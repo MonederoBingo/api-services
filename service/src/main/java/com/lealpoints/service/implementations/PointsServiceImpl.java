@@ -117,8 +117,8 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         if (StringUtils.isEmpty(pointsAwarding.getSaleKey())) {
             return new ValidationResult(false, getServiceMessage(Message.EMPTY_SALE_KEY));
         }
-        Points points = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
-        if (points != null) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _pointsRepository.getByCompanyIdSaleKey(pointsAwarding.getCompanyId(), pointsAwarding.getSaleKey());
+        if (!"{}".equals(serviceResult.getObject())) {
             return new ValidationResult(false, getServiceMessage(Message.SALE_KEY_ALREADY_EXISTS));
         }
         return new ValidationResult(true, ServiceMessage.EMPTY);

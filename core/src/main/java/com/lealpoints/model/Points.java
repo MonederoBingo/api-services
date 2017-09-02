@@ -1,5 +1,7 @@
 package com.lealpoints.model;
 
+import org.json.JSONObject;
+
 import java.util.Date;
 
 @Table
@@ -84,5 +86,18 @@ public class Points {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public JSONObject toJSONObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("company_id", companyId);
+        jsonObject.put("client_id", clientId);
+        jsonObject.put("sale_key", saleKey);
+        jsonObject.put("sale_amount", saleAmount);
+        jsonObject.put("points_to_earn", pointsToEarn);
+        jsonObject.put("required_amount", requiredAmount);
+        jsonObject.put("earned_points", earnedPoints);
+        jsonObject.put("date", date);
+        return jsonObject;
     }
 }
