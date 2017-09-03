@@ -15,9 +15,7 @@ public class SpringConfig extends ResourceServerConfigurerAdapter
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/")
-                .permitAll()
-                .antMatchers("/api/**")
-                .authenticated();
+                .antMatchers("/**")
+                .permitAll();
     }
 }
