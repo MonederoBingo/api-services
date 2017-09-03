@@ -1,6 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
@@ -36,9 +36,7 @@ public class ClientServiceImpl extends BaseServiceImpl implements ClientService 
         try {
             ValidationResult validationResult = validateRegistration(clientRegistration);
             if (validationResult.isValid()) {
-                getThreadContextService().getQueryAgent().beginTransaction();
                 Client client = registerClientAndCompanyMapping(clientRegistration);
-                getThreadContextService().getQueryAgent().commitTransaction();
                 return new ServiceResult<>(true, getServiceMessage(Message.CLIENT_REGISTERED_SUCCESSFULLY), client.getClientId());
             } else {
                 return new ServiceResult<>(false, validationResult.getServiceMessage());

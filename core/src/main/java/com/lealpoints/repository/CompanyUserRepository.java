@@ -1,11 +1,9 @@
 package com.lealpoints.repository;
 
-import com.lealpoints.DatabaseServiceResult;
-import com.lealpoints.context.ThreadContextService;
+
 import com.lealpoints.model.CompanyUser;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpEntity;
@@ -17,19 +15,19 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import xyz.greatapp.libs.service.ServiceResult;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
 import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
 import xyz.greatapp.libs.service.database.requests.UpdateQueryRQ;
 import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
 @Component
-public class CompanyUserRepository extends BaseRepository {
+public class CompanyUserRepository {
 
     private final EurekaClient eurekaClient;
     private final ThreadContextService threadContextService;
@@ -54,14 +52,14 @@ public class CompanyUserRepository extends BaseRepository {
         HttpEntity<InsertQueryRQ> entity = new HttpEntity<>(
                 new InsertQueryRQ("company_user", values, "company_user_id"),
                 getHttpHeaders());
-        ResponseEntity<DatabaseServiceResult> responseEntity = getRestTemplate().postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = getRestTemplate().postForEntity(
                 getDatabaseURL() + "/insert",
                 entity,
-                DatabaseServiceResult.class);
+                ServiceResult.class);
         if (responseEntity.getBody().getObject().equals("{}")) {
             return 0L;
         }
-        return Long.parseLong(responseEntity.getBody().getObject().toString());
+        return Long.parseLong(responseEntity.getBody().getObject());
     }
 
     private String getDatabaseURL() {
@@ -139,72 +137,72 @@ public class CompanyUserRepository extends BaseRepository {
 
     public int updateActivateByActivationKey(final String activationKey) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        ColumnValue[] sets = new ColumnValue[] {
+        ColumnValue[] sets = new ColumnValue[]{
                 new ColumnValue("active", true)
         };
-        ColumnValue[] filters = new ColumnValue[] {
+        ColumnValue[] filters = new ColumnValue[]{
                 new ColumnValue("activation_key", activationKey)
         };
         UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
 
-        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,
-                DatabaseServiceResult.class);
-        return parseInt(responseEntity.getBody().getObject().toString());
+                ServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject());
     }
 
     public int updatePasswordByEmail(final String email, final String password, final boolean mustChangePassword) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        ColumnValue[] sets = new ColumnValue[] {
+        ColumnValue[] sets = new ColumnValue[]{
                 new ColumnValue("password", password),
                 new ColumnValue("must_change_password", mustChangePassword)
         };
-        ColumnValue[] filters = new ColumnValue[] {
+        ColumnValue[] filters = new ColumnValue[]{
                 new ColumnValue("email", email)
         };
         UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
-        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,
-                DatabaseServiceResult.class);
-        return parseInt(responseEntity.getBody().getObject().toString());
+                ServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject());
     }
 
     public int updateApiKeyByEmail(final String email, final String apiKey) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        ColumnValue[] sets = new ColumnValue[] {
+        ColumnValue[] sets = new ColumnValue[]{
                 new ColumnValue("api_key", apiKey)
         };
-        ColumnValue[] filters = new ColumnValue[] {
+        ColumnValue[] filters = new ColumnValue[]{
                 new ColumnValue("email", email)
         };
         UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
 
 
-        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,
-                DatabaseServiceResult.class);
-        return parseInt(responseEntity.getBody().getObject().toString());
+                ServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject());
     }
 
     public int clearActivationKey(final String activationKey) throws Exception {
         RestTemplate restTemplate = getRestTemplate();
-        ColumnValue[] sets = new ColumnValue[] {
+        ColumnValue[] sets = new ColumnValue[]{
                 new ColumnValue("activation_key", null)
         };
-        ColumnValue[] filters = new ColumnValue[] {
+        ColumnValue[] filters = new ColumnValue[]{
                 new ColumnValue("activation_key", activationKey)
         };
         UpdateQueryRQ updateQuery = new UpdateQueryRQ("company_user", sets, filters);
 
 
-        ResponseEntity<DatabaseServiceResult> responseEntity = restTemplate.postForEntity(
+        ResponseEntity<ServiceResult> responseEntity = restTemplate.postForEntity(
                 getDatabaseURL() + "/update",
                 updateQuery,
-                DatabaseServiceResult.class);
-        return parseInt(responseEntity.getBody().getObject().toString());
+                ServiceResult.class);
+        return parseInt(responseEntity.getBody().getObject());
     }
 
     public ServiceResult getByCompanyUserIdApiKey(final Integer companyUserId, final String apiKey) throws Exception {

@@ -1,6 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.repository.ClientRepository;
@@ -13,10 +12,13 @@ import org.apache.commons.collections15.CollectionUtils;
 import org.apache.commons.collections15.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -36,13 +38,12 @@ public class PromotionConfigurationServiceImpl extends BaseServiceImpl implement
         _clientRepository = clientRepository;
     }
 
-    public ServiceResult<List<PromotionConfiguration>> getByCompanyId(long companyId) {
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyId(long companyId) {
         try {
-            final List<PromotionConfiguration> promotionConfigurations = _promotionConfigurationRepository.getByCompanyId(companyId);
-            return new ServiceResult<>(true, ServiceMessage.EMPTY, promotionConfigurations);
+            return _promotionConfigurationRepository.getByCompanyId(companyId);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
+            return new xyz.greatapp.libs.service.ServiceResult(false, "", null);
         }
     }
 
@@ -56,33 +57,42 @@ public class PromotionConfigurationServiceImpl extends BaseServiceImpl implement
         }
     }
 
-    public ServiceResult<List<PromotionConfiguration>> getByCompanyIdRequiredPoints(long companyId, final String phone) {
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyIdRequiredPoints(long companyId, final String phone) {
         try {
             final xyz.greatapp.libs.service.ServiceResult client = _clientRepository.getByPhone(phone);
             if (client.getObject().equals("{}")) {
-                return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
+                return new xyz.greatapp.libs.service.ServiceResult(false, Message.PHONE_NUMBER_DOES_NOT_EXIST.name());
             }
             final xyz.greatapp.libs.service.ServiceResult serviceResult =
                     _companyClientMappingRepository.getByCompanyIdClientId(companyId, new JSONObject(client.getObject()).getLong("client_id"));
             if (serviceResult.getObject().equals("{}")) {
-                return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
+                return new xyz.greatapp.libs.service.ServiceResult(false, Message.PHONE_NUMBER_DOES_NOT_EXIST.name());
             }
-            final List<PromotionConfiguration> promotionConfigurations = _promotionConfigurationRepository.getByCompanyId(companyId);
+            final xyz.greatapp.libs.service.ServiceResult promotionConfigurations = _promotionConfigurationRepository.getByCompanyId(companyId);
+            JSONArray jsonArray = new JSONArray(promotionConfigurations.getObject());
+            List<PromotionConfiguration> configs = new ArrayList<>();
+            for (int i = 0; i < jsonArray.length(); i++) {
+                configs.add(PromotionConfiguration.fromJSONObject(jsonArray.getJSONObject(i)));
+            }
             final List<PromotionConfiguration> resultPromotionConfigurations =
-                    (List<PromotionConfiguration>) CollectionUtils.select(promotionConfigurations, new Predicate<PromotionConfiguration>() {
+                    (List<PromotionConfiguration>) CollectionUtils.select(configs, new Predicate<PromotionConfiguration>() {
                         @Override
                         public boolean evaluate(PromotionConfiguration promotionConfiguration) {
                             return promotionConfiguration.getRequiredPoints() <= new JSONObject(serviceResult.getObject()).getDouble("points");
                         }
                     });
-            ServiceMessage message = ServiceMessage.EMPTY;
+            String message = "";
             if (resultPromotionConfigurations.isEmpty()) {
-                message = getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_AVAILABLE_PROMOTIONS);
+                message = Message.CLIENT_DOES_NOT_HAVE_AVAILABLE_PROMOTIONS.name();
             }
-            return new ServiceResult<>(true, message, resultPromotionConfigurations);
+            JSONArray result = new JSONArray();
+            for (PromotionConfiguration resultPromotionConfiguration : resultPromotionConfigurations) {
+                result.put(resultPromotionConfiguration.toJSONObject());
+            }
+            return new xyz.greatapp.libs.service.ServiceResult(true, message, result.toString());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new ServiceResult<>(false, getServiceMessage(Message.COMMON_USER_ERROR), null);
+            return new xyz.greatapp.libs.service.ServiceResult(false, Message.COMMON_USER_ERROR.name(), null);
         }
     }
 

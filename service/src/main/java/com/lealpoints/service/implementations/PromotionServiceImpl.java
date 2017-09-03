@@ -1,9 +1,7 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Promotion;
 import com.lealpoints.model.PromotionConfiguration;
@@ -41,7 +39,6 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
 
     public ServiceResult<Long> applyPromotion(PromotionApplying promotionApplying) {
         try {
-            final QueryAgent queryAgent = getQueryAgent();
             final xyz.greatapp.libs.service.ServiceResult client = _clientRepository.getByPhone(promotionApplying.getPhoneNumber());
             if (client.getObject().equals("{}")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.PHONE_NUMBER_DOES_NOT_EXIST));
@@ -49,16 +46,16 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
 
             xyz.greatapp.libs.service.ServiceResult serviceResult = _companyClientMappingRepository.getByCompanyIdClientId(
                     promotionApplying.getCompanyId(), new JSONObject(client.getObject()).getLong("client_id"));
-            PromotionConfiguration promotionConfiguration = _promotionConfigurationRepository.getById(
+            xyz.greatapp.libs.service.ServiceResult promotionConfiguration = _promotionConfigurationRepository.getById(
                     promotionApplying.getPromotionConfigurationId());
 
-            if (new JSONObject(serviceResult.getObject()).getDouble("points") < promotionConfiguration.getRequiredPoints()) {
+            if (new JSONObject(serviceResult.getObject()).getDouble("points") <
+                    new JSONObject(promotionConfiguration.getObject()).getDouble("required_points")) {
                 return new ServiceResult<>(false, getServiceMessage(Message.CLIENT_DOES_NOT_HAVE_ENOUGH_POINTS));
             }
-            queryAgent.beginTransaction();
-            long promotionId = insertPromotionAndUpdatePoints(promotionConfiguration,
+            long promotionId = insertPromotionAndUpdatePoints(
+                    PromotionConfiguration.fromJSONObject(new JSONObject(promotionConfiguration.getObject())),
                     CompanyClientMapping.fromJSONObject(new JSONObject(serviceResult.getObject())));
-            queryAgent.commitTransaction();
             return new ServiceResult<>(true, getServiceMessage(Message.PROMOTION_APPLIED), promotionId);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
@@ -78,11 +75,8 @@ public class PromotionServiceImpl extends BaseServiceImpl implements PromotionSe
         promotion.setDescription(promotionConfiguration.getDescription());
         promotion.setUsedPoints(promotionConfiguration.getRequiredPoints());
         promotion.setDate(DateUtil.dateNow());
-        long promotionId = _promotionRepository.insert(promotion);
 
-        if (companyClientMapping == null) {
-            throw new IllegalArgumentException("CompanyClientMapping doesn't exist.");
-        }
+        long promotionId = _promotionRepository.insert(promotion);
         companyClientMapping.setPoints(companyClientMapping.getPoints() - promotion.getUsedPoints());
         _companyClientMappingRepository.updatePoints(companyClientMapping);
         return promotionId;

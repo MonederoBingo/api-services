@@ -4,7 +4,7 @@ import static java.util.Collections.emptyMap;
 
 import com.google.gson.Gson;
 import com.lealpoints.common.PropertyManager;
-import com.lealpoints.context.ThreadContextService;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Language;
 import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.service.PointsConfigurationService;
@@ -30,12 +30,12 @@ public class PointsConfigurationServiceImpl implements PointsConfigurationServic
         this.threadContextService = threadContextService;
     }
 
-    public ServiceResult<PointsConfiguration> getByCompanyId(long companyId)
+    public xyz.greatapp.libs.service.ServiceResult getByCompanyId(long companyId)
     {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response =
-                restTemplate.getForEntity(getPointsConfigurationURL() + "/" + companyId, String.class);
-        return parseServiceResult(response.getBody(), PointsConfiguration.class);
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> response =
+                restTemplate.getForEntity(getPointsConfigurationURL() + "/" + companyId, xyz.greatapp.libs.service.ServiceResult.class);
+        return response.getBody();
     }
 
     private String getPointsConfigurationURL()

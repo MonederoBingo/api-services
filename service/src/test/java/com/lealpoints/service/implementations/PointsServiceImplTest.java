@@ -1,7 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
@@ -16,6 +14,7 @@ import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMockSupport;
 import org.junit.Test;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import java.sql.SQLException;
 
@@ -30,14 +29,15 @@ public class PointsServiceImplTest extends EasyMockSupport {
     public void testAwardPoints() throws Exception {
         //given
         expect(pointsConfigurationService.getByCompanyId(anyInt()))
-                .andReturn(new ServiceResult<>(true, new ServiceMessage(""), createPointsConfiguration(10, 100)));
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "",
+                        createPointsConfiguration().toJSONObject().toString()));
         PointsServiceImpl pointsService =
                 new PointsServiceImpl(createPointsRepository(),
-                        createClientRepository(), createCompanyClientMappingRepository(), createThreadContextService(createQueryAgent()),
-                        createPhoneValidatorService(true, ServiceMessage.EMPTY), pointsConfigurationService) {
+                        createClientRepository(), createCompanyClientMappingRepository(),
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY), pointsConfigurationService, createThreadContextService()) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
-                        return new ServiceMessage(String.format(message.name(), params));
+                        return new ServiceMessage(String.format(message.name(), (Object) params));
                     }
                 };
         replayAll();
@@ -60,8 +60,8 @@ public class PointsServiceImplTest extends EasyMockSupport {
 
     @Test
     public void testAwardPointsWhenPhoneIsNotValid() throws Exception {
-        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null, null,
-                createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name())), null) {
+        PointsServiceImpl pointsService = new PointsServiceImpl(null, null, null,
+                createPhoneValidatorService(false, new ServiceMessage(Message.PHONE_MUST_HAVE_10_DIGITS.name())), null, createThreadContextService()) {
 
             @Override
             public ServiceMessage getServiceMessage(Message message, String... params) {
@@ -80,8 +80,8 @@ public class PointsServiceImplTest extends EasyMockSupport {
     public void testAwardPointsWhenTheSaleKeyExists() throws Exception {
         //given
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null, null,
-                        createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
+                new PointsServiceImpl(createPointsRepositoryWhenTheSaleKeyExists(), null, null,
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY), null, createThreadContextService()) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
                         return new ServiceMessage(message.name());
@@ -104,8 +104,8 @@ public class PointsServiceImplTest extends EasyMockSupport {
     @Test
     public void testAwardPointsWhenTheSaleKeyIsEmpty() throws Exception {
         PointsServiceImpl pointsService =
-                new PointsServiceImpl(null, null, null, null,
-                        createPhoneValidatorService(true, ServiceMessage.EMPTY), null) {
+                new PointsServiceImpl(null, null, null,
+                        createPhoneValidatorService(true, ServiceMessage.EMPTY), null, createThreadContextService()) {
                     @Override
                     public ServiceMessage getServiceMessage(Message message, String... params) {
                         return new ServiceMessage(message.name());
@@ -125,26 +125,15 @@ public class PointsServiceImplTest extends EasyMockSupport {
         return phoneValidatorService;
     }
 
-    private PointsConfiguration createPointsConfiguration(int pointsToEarn, int requiredAmount) {
+    private PointsConfiguration createPointsConfiguration() {
         final PointsConfiguration pointsConfiguration = new PointsConfiguration();
-        pointsConfiguration.setRequiredAmount(requiredAmount);
-        pointsConfiguration.setPointsToEarn(pointsToEarn);
+        pointsConfiguration.setRequiredAmount(100);
+        pointsConfiguration.setPointsToEarn(10);
         return pointsConfiguration;
     }
 
-    private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
-        ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(1);
-        return threadContextService;
-    }
-
-    private QueryAgent createQueryAgent() throws Exception {
-        QueryAgent queryAgent = createMock(QueryAgent.class);
-        queryAgent.beginTransaction();
-        expectLastCall().times(1);
-        queryAgent.commitTransaction();
-        expectLastCall().times(1);
-        return queryAgent;
+    private ThreadContextService createThreadContextService() throws SQLException {
+        return createMock(ThreadContextService.class);
     }
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository() throws Exception {

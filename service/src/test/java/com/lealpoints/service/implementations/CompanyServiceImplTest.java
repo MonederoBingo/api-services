@@ -1,9 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
-import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.*;
 import com.lealpoints.repository.ClientRepository;
@@ -21,6 +17,9 @@ import org.easymock.EasyMock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
+import xyz.greatapp.libs.service.Environment;
+import xyz.greatapp.libs.service.context.ThreadContext;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import javax.mail.MessagingException;
 import java.io.File;
@@ -36,10 +35,9 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     public void testRegister() throws Exception {
         final CompanyRepository companyRepository = createCompanyRepository();
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository();
-        final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
-        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent, threadContext);
+        threadContext.setEnvironment(Environment.DEV);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(threadContext);
         PromotionConfigurationRepository promotionConfigurationRepository = createStrictMock(PromotionConfigurationRepository.class);
         expect(promotionConfigurationRepository.insert(EasyMock.<PromotionConfiguration>anyObject())).andReturn(1L);
         replay(promotionConfigurationRepository);
@@ -60,7 +58,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         assertTrue(serviceResult.isSuccess());
         assertNotNull(serviceResult.getMessage());
         assertEquals(Message.WE_HAVE_SENT_YOU_AND_ACTIVATION_LINK.name(), serviceResult.getMessage());
-        verify(companyRepository, companyUserRepository, threadContextService, queryAgent);
+        verify(companyRepository, companyUserRepository, threadContextService);
     }
 
     private NotificationService createNotificationService() throws MessagingException {
@@ -157,7 +155,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
     public void testUpdateImageLogo() throws Exception {
         CompanyRepository companyRepository = createCompanyRepositoryForUpdate();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
+        threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext);
         CompanyServiceImpl companyService = createCompanyService(companyRepository, null, threadContextService,
                 null, null, null, null);
@@ -199,7 +197,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         company.setUrlImageLogo("logo.png");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
         ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
+        expect(threadContext.getEnvironment()).andReturn(Environment.DEV);
         replay(threadContext);
         CompanyServiceImpl companyService = createCompanyService(
                 companyRepository,
@@ -224,7 +222,7 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         company.setUrlImageLogo("");
         CompanyRepository companyRepository = createCompanyRepositoryForGet(company);
         ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getEnvironment()).andReturn(new DevEnvironment());
+        expect(threadContext.getEnvironment()).andReturn(Environment.DEV);
         replay(threadContext);
         CompanyServiceImpl companyService = createCompanyService(companyRepository, null, createThreadContextService(threadContext), null, null, null, null);
         final File logo = companyService.getLogo(1);
@@ -263,10 +261,8 @@ public class CompanyServiceImplTest extends BaseServiceTest {
         return clientRepository;
     }
 
-    private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent,
-                                                                          ThreadContext threadContext) throws SQLException {
+    private ThreadContextService createThreadContextServiceForRegistering(ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(2);
         replay(threadContextService);
         return threadContextService;

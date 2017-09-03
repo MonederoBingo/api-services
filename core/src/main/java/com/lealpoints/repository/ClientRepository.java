@@ -20,7 +20,7 @@ import xyz.greatapp.libs.service.location.ServiceLocator;
 import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
-public class ClientRepository extends BaseRepository {
+public class ClientRepository {
 
     private static final Common c = new Common();
     private ServiceLocator serviceLocator;

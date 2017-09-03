@@ -1,12 +1,12 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
-import com.lealpoints.environments.*;
+import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.service.BaseService;
 import com.lealpoints.service.response.ServiceMessage;
+import xyz.greatapp.libs.service.Environment;
+import xyz.greatapp.libs.service.context.ThreadContext;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 public class BaseServiceImpl implements BaseService {
 
@@ -17,23 +17,23 @@ public class BaseServiceImpl implements BaseService {
     }
 
     public ServiceMessage getServiceMessage(Message message, String... params) {
-        return ServiceMessage.createServiceMessage(message, getThreadContext().getLanguage(), params);
+        return ServiceMessage.createServiceMessage(message, Language.ENGLISH, params);
     }
 
     public boolean isProdEnvironment() {
-        return _threadContextService.getThreadContext().getEnvironment() instanceof ProdEnvironment;
+        return _threadContextService.getThreadContext().getEnvironment() == xyz.greatapp.libs.service.Environment.PROD;
     }
 
     public boolean isUATEnvironment() {
-        return _threadContextService.getThreadContext().getEnvironment() instanceof UATEnvironment;
+        return _threadContextService.getThreadContext().getEnvironment() == Environment.UAT;
     }
 
     public boolean isDevEnvironment() {
-        return _threadContextService.getThreadContext().getEnvironment() instanceof DevEnvironment;
+        return _threadContextService.getThreadContext().getEnvironment() == Environment.DEV;
     }
 
     public boolean isFunctionalTestEnvironment() {
-        return _threadContextService.getThreadContext().getEnvironment() instanceof FunctionalTestEnvironment;
+        return _threadContextService.getThreadContext().getEnvironment() == Environment.AUTOMATION_TEST;
     }
 
     public Environment getEnvironment() {
@@ -46,9 +46,5 @@ public class BaseServiceImpl implements BaseService {
 
     public ThreadContext getThreadContext() {
         return _threadContextService.getThreadContext();
-    }
-
-    public QueryAgent getQueryAgent() {
-        return _threadContextService.getQueryAgent();
     }
 }

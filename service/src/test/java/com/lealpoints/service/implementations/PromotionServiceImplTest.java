@@ -1,7 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
@@ -29,8 +28,7 @@ public class PromotionServiceImplTest extends BaseServiceTest {
         PromotionRepository promotionRepository = createPromotionRepository();
         PromotionConfigurationRepository promotionConfigurationRepository = createPromotionConfigurationRepository();
         ClientRepository clientRepository = createClientRepository();
-        final QueryAgent queryAgent = createQueryAgent();
-        ThreadContextService threadContextService = createThreadContextService(queryAgent);
+        ThreadContextService threadContextService = createThreadContextService();
         CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepository();
         PromotionServiceImpl promotionService =
                 new PromotionServiceImpl(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, clientRepository,
@@ -53,7 +51,7 @@ public class PromotionServiceImplTest extends BaseServiceTest {
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.PROMOTION_APPLIED.name(), serviceResult.getMessage());
         assertTrue(serviceResult.getObject() > 0);
-        verify(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, queryAgent, threadContextService);
+        verify(promotionRepository, promotionConfigurationRepository, companyClientMappingRepository, threadContextService);
     }
 
     private CompanyClientMappingRepository createCompanyClientMappingRepository() throws Exception {
@@ -67,10 +65,9 @@ public class PromotionServiceImplTest extends BaseServiceTest {
         return companyClientMappingRepository;
     }
 
-    private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
+    private ThreadContextService createThreadContextService() throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
 
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(1);
         replay(threadContextService);
         return threadContextService;
     }
@@ -85,7 +82,8 @@ public class PromotionServiceImplTest extends BaseServiceTest {
 
     private PromotionConfigurationRepository createPromotionConfigurationRepository() throws Exception {
         PromotionConfigurationRepository promotionConfigurationRepository = createMock(PromotionConfigurationRepository.class);
-        expect(promotionConfigurationRepository.getById(anyLong())).andReturn(new PromotionConfiguration());
+        expect(promotionConfigurationRepository.getById(anyLong()))
+                .andReturn(new xyz.greatapp.libs.service.ServiceResult(true, "", new PromotionConfiguration().toJSONObject().toString()));
         replay(promotionConfigurationRepository);
         return promotionConfigurationRepository;
     }

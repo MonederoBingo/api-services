@@ -1,9 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
-import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Company;
@@ -23,6 +19,9 @@ import com.lealpoints.service.util.ServiceUtil;
 import org.easymock.EasyMock;
 import org.json.JSONArray;
 import org.junit.Test;
+import xyz.greatapp.libs.service.Environment;
+import xyz.greatapp.libs.service.context.ThreadContext;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
@@ -179,8 +178,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void activateUser() throws Exception {
         CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForActivate();
-        final QueryAgent queryAgent = createQueryAgent();
-        final ThreadContextService threadContextService = createThreadContextService(queryAgent);
+        final ThreadContextService threadContextService = createThreadContextService();
         CompanyUserServiceImpl companyUserService = new CompanyUserServiceImpl(companyUserRepository,
                 threadContextService, null, null, null, null) {
             @Override
@@ -400,10 +398,9 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         return companyUserRepository;
     }
 
-    private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
+    private ThreadContextService createThreadContextService() throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
 
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
         replay(threadContextService);
         return threadContextService;
     }
@@ -425,8 +422,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testRegister() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepository();
-        final QueryAgent queryAgent = createQueryAgent();
-        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering();
         final CompanyServiceImpl companyService = createCompanyService(companyUserRepository, threadContextService);
         final CompanyUserServiceImpl companyUserService = createCompanyUserService(companyUserRepository, threadContextService, companyService);
         final CompanyUserRegistration companyUserRegistration = new CompanyUserRegistration();
@@ -437,7 +433,6 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         assertTrue(serviceResult.isSuccess());
         assertNotNull(serviceResult.getMessage());
         assertEquals(Message.USER_SUCCESSFULLY_ADDED.get(Language.ENGLISH), serviceResult.getMessage());
-        verify(companyUserRepository, threadContextService, queryAgent);
     }
 
     private CompanyUserServiceImpl createCompanyUserService(CompanyUserRepository companyUserRepository,
@@ -455,8 +450,7 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testRegisterWhenThereIsAnExistentEmail() throws Exception {
         final CompanyUserRepository companyUserRepository = createCompanyUserRepositoryForRegisterWhenThereIsAnExistentEmail();
-        final QueryAgent queryAgent = createQueryAgent();
-        final ThreadContextService threadContextService = createThreadContextServiceForRegistering(queryAgent);
+        final ThreadContextService threadContextService = createThreadContextServiceForRegistering();
         CompanyServiceImpl companyService = createCompanyService(null, companyUserRepository, null, null, null,
                 null);
         CompanyUserServiceImpl companyUserService = createCompanyUserService(companyUserRepository, threadContextService, companyService);
@@ -504,12 +498,10 @@ public class CompanyUserServiceImplTest extends BaseServiceTest {
         return companyUserRepository;
     }
 
-    private ThreadContextService createThreadContextServiceForRegistering(QueryAgent queryAgent) throws SQLException {
+    private ThreadContextService createThreadContextServiceForRegistering() throws SQLException {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
-        threadContext.setLanguage(Language.ENGLISH);
+        threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(6);
         replay(threadContextService);
         return threadContextService;

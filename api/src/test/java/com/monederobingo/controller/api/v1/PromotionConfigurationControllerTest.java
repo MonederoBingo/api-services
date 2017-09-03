@@ -4,11 +4,9 @@ import com.lealpoints.model.PromotionConfiguration;
 import com.lealpoints.service.implementations.PromotionConfigurationServiceImpl;
 import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
+import org.json.JSONArray;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
@@ -17,32 +15,39 @@ public class PromotionConfigurationControllerTest {
 
     @Test
     public void testGet() throws Exception {
-        List<PromotionConfiguration> expectedPromotionConfigurations = new ArrayList<>();
-        expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "10% off", 1200));
-        expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "20% off", 2400));
-        ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, expectedPromotionConfigurations);
+        //given
+        JSONArray expectedPromotionConfigurations = new JSONArray();
+        expectedPromotionConfigurations.put(
+                createPromotionConfiguration(1, 1, "10% off", 1200).toJSONObject());
+        expectedPromotionConfigurations.put(
+                createPromotionConfiguration(2, 1, "20% off", 2400).toJSONObject());
+        xyz.greatapp.libs.service.ServiceResult expectedServiceResult =
+                new xyz.greatapp.libs.service.ServiceResult(true, "", expectedPromotionConfigurations.toString());
         PromotionConfigurationServiceImpl pointsConfigurationService = createPromotionConfigurationServiceForGet(expectedServiceResult);
         PromotionConfigurationController pointsConfigurationController = new PromotionConfigurationController(pointsConfigurationService);
 
-        ResponseEntity<ServiceResult<List<PromotionConfiguration>>> responseEntity = pointsConfigurationController.get(1);
+        //when
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> responseEntity = pointsConfigurationController.get(1);
+
+        //then
         assertNotNull(responseEntity);
-        ServiceResult<List<PromotionConfiguration>> serviceResult = responseEntity.getBody();
+        xyz.greatapp.libs.service.ServiceResult serviceResult = responseEntity.getBody();
         assertNotNull(serviceResult);
         assertEquals(expectedServiceResult.isSuccess(), serviceResult.isSuccess());
         assertEquals(expectedServiceResult.getMessage(), serviceResult.getMessage());
-        List<PromotionConfiguration> actualPromotionConfigurations = serviceResult.getObject();
+        JSONArray actualPromotionConfigurations = new JSONArray(serviceResult.getObject());
         assertNotNull(actualPromotionConfigurations);
-        assertEquals(2, actualPromotionConfigurations.size());
+        assertEquals(2, actualPromotionConfigurations.length());
         assertNotNull(actualPromotionConfigurations.get(0));
-        assertEquals(1, actualPromotionConfigurations.get(0).getPromotionConfigurationId());
-        assertEquals(1, actualPromotionConfigurations.get(0).getCompanyId());
-        assertEquals("10% off", actualPromotionConfigurations.get(0).getDescription());
-        assertEquals(1200, actualPromotionConfigurations.get(0).getRequiredPoints(), 0.00);
+        assertEquals(1, actualPromotionConfigurations.getJSONObject(0).getLong("promotion_configuration_id"));
+        assertEquals(1, actualPromotionConfigurations.getJSONObject(0).getLong("company_id"));
+        assertEquals("10% off", actualPromotionConfigurations.getJSONObject(0).getString("description"));
+        assertEquals(1200, actualPromotionConfigurations.getJSONObject(0).getDouble("required_points"), 0.00);
         assertNotNull(actualPromotionConfigurations.get(1));
-        assertEquals(2, actualPromotionConfigurations.get(1).getPromotionConfigurationId());
-        assertEquals(1, actualPromotionConfigurations.get(1).getCompanyId());
-        assertEquals("20% off", actualPromotionConfigurations.get(1).getDescription());
-        assertEquals(2400, actualPromotionConfigurations.get(1).getRequiredPoints(), 0.00);
+        assertEquals(2, actualPromotionConfigurations.getJSONObject(1).getLong("promotion_configuration_id"));
+        assertEquals(1, actualPromotionConfigurations.getJSONObject(1).getLong("company_id"));
+        assertEquals("20% off", actualPromotionConfigurations.getJSONObject(1).getString("description"));
+        assertEquals(2400, actualPromotionConfigurations.getJSONObject(1).getDouble("required_points"), 0.00);
 
         verify(pointsConfigurationService);
     }
@@ -67,34 +72,41 @@ public class PromotionConfigurationControllerTest {
 
     @Test
     public void testGetByPhone() throws Exception {
-        List<PromotionConfiguration> expectedPromotionConfigurations = new ArrayList<>();
-        expectedPromotionConfigurations.add(createPromotionConfiguration(1, 1, "5% off", 600));
-        expectedPromotionConfigurations.add(createPromotionConfiguration(2, 1, "10% off", 1000));
-        ServiceResult<List<PromotionConfiguration>> expectedServiceResult = new ServiceResult<>(true, ServiceMessage.EMPTY, expectedPromotionConfigurations);
+        //given
+        JSONArray expectedPromotionConfigurations = new JSONArray();
+        expectedPromotionConfigurations.put(
+                createPromotionConfiguration(1, 1, "5% off", 600).toJSONObject());
+        expectedPromotionConfigurations.put(
+                createPromotionConfiguration(2, 1, "10% off", 1000).toJSONObject());
+        xyz.greatapp.libs.service.ServiceResult expectedServiceResult =
+                new xyz.greatapp.libs.service.ServiceResult(true, "", expectedPromotionConfigurations.toString());
         PromotionConfigurationServiceImpl pointsConfigurationService =
-            createPromotionConfigurationServiceForGetByRequiredPoints(expectedServiceResult);
+                createPromotionConfigurationServiceForGetByRequiredPoints(expectedServiceResult);
         PromotionConfigurationController pointsConfigurationController = new PromotionConfigurationController(pointsConfigurationService);
 
-        ResponseEntity<ServiceResult<List<PromotionConfiguration>>> responseEntity =
-            pointsConfigurationController.getAvailableByPhone(1, "1234567890");
+        //when
+        ResponseEntity<xyz.greatapp.libs.service.ServiceResult> responseEntity =
+                pointsConfigurationController.getAvailableByPhone(1, "1234567890");
+
+        //then
         assertNotNull(responseEntity);
-        ServiceResult<List<PromotionConfiguration>> serviceResult = responseEntity.getBody();
+        xyz.greatapp.libs.service.ServiceResult serviceResult = responseEntity.getBody();
         assertNotNull(serviceResult);
         assertEquals(expectedServiceResult.isSuccess(), serviceResult.isSuccess());
         assertEquals(expectedServiceResult.getMessage(), serviceResult.getMessage());
-        List<PromotionConfiguration> actualPromotionConfigurations = serviceResult.getObject();
+        JSONArray actualPromotionConfigurations = new JSONArray(serviceResult.getObject());
         assertNotNull(actualPromotionConfigurations);
-        assertEquals(2, actualPromotionConfigurations.size());
+        assertEquals(2, actualPromotionConfigurations.length());
         assertNotNull(actualPromotionConfigurations.get(0));
-        assertEquals(1, actualPromotionConfigurations.get(0).getPromotionConfigurationId());
-        assertEquals(1, actualPromotionConfigurations.get(0).getCompanyId());
-        assertEquals("5% off", actualPromotionConfigurations.get(0).getDescription());
-        assertEquals(600, actualPromotionConfigurations.get(0).getRequiredPoints(), 0.00);
+        assertEquals(1, actualPromotionConfigurations.getJSONObject(0).getLong("promotion_configuration_id"));
+        assertEquals(1, actualPromotionConfigurations.getJSONObject(0).getLong("company_id"));
+        assertEquals("5% off", actualPromotionConfigurations.getJSONObject(0).getString("description"));
+        assertEquals(600, actualPromotionConfigurations.getJSONObject(0).getDouble("required_points"), 0.00);
         assertNotNull(actualPromotionConfigurations.get(1));
-        assertEquals(2, actualPromotionConfigurations.get(1).getPromotionConfigurationId());
-        assertEquals(1, actualPromotionConfigurations.get(1).getCompanyId());
-        assertEquals("10% off", actualPromotionConfigurations.get(1).getDescription());
-        assertEquals(1000, actualPromotionConfigurations.get(1).getRequiredPoints(), 0.00);
+        assertEquals(2, actualPromotionConfigurations.getJSONObject(1).getLong("promotion_configuration_id"));
+        assertEquals(1, actualPromotionConfigurations.getJSONObject(1).getLong("company_id"));
+        assertEquals("10% off", actualPromotionConfigurations.getJSONObject(1).getString("description"));
+        assertEquals(1000, actualPromotionConfigurations.getJSONObject(1).getDouble("required_points"), 0.00);
 
         verify(pointsConfigurationService);
     }
@@ -119,7 +131,7 @@ public class PromotionConfigurationControllerTest {
     }
 
     private PromotionConfiguration createPromotionConfiguration(long promotionConfigurationId, long companyId, String description,
-        float requiredPoints) {
+                                                                float requiredPoints) {
         PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
         promotionConfiguration.setPromotionConfigurationId(promotionConfigurationId);
         promotionConfiguration.setCompanyId(companyId);
@@ -128,18 +140,20 @@ public class PromotionConfigurationControllerTest {
         return promotionConfiguration;
     }
 
-    private PromotionConfigurationServiceImpl createPromotionConfigurationServiceForGet(ServiceResult<List<PromotionConfiguration>> serviceResult)
-        throws Exception {
+    private PromotionConfigurationServiceImpl createPromotionConfigurationServiceForGet(xyz.greatapp.libs.service.ServiceResult serviceResult)
+            throws Exception {
         PromotionConfigurationServiceImpl pointsConfigurationService = createMock(PromotionConfigurationServiceImpl.class);
-        expect(pointsConfigurationService.getByCompanyId(anyLong())).andReturn(serviceResult);
+        expect(pointsConfigurationService.getByCompanyId(anyLong()))
+                .andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;
     }
 
     private PromotionConfigurationServiceImpl createPromotionConfigurationServiceForGetByRequiredPoints(
-        ServiceResult<List<PromotionConfiguration>> serviceResult) throws Exception {
+            xyz.greatapp.libs.service.ServiceResult serviceResult) throws Exception {
         PromotionConfigurationServiceImpl pointsConfigurationService = createMock(PromotionConfigurationServiceImpl.class);
-        expect(pointsConfigurationService.getByCompanyIdRequiredPoints(anyLong(), anyString())).andReturn(serviceResult);
+        expect(pointsConfigurationService.getByCompanyIdRequiredPoints(anyLong(), anyString()))
+                .andReturn(serviceResult);
         replay(pointsConfigurationService);
         return pointsConfigurationService;
     }

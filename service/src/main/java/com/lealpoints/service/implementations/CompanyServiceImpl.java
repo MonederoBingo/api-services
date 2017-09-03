@@ -1,6 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Company;
 import com.lealpoints.model.CompanyUser;
@@ -25,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import java.io.File;
 import java.util.Date;
@@ -60,10 +60,8 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         try {
             ValidationResult validationResult = validateRegistration(companyRegistration);
             if (validationResult.isValid()) {
-                getThreadContextService().getQueryAgent().beginTransaction();
                 final String activationKey = _serviceUtil.generateActivationKey();
                 long companyId = registerAndInitializeCompany(companyRegistration, activationKey);
-                getQueryAgent().commitTransaction();
                 return createServiceResult(companyId, activationKey);
             } else {
                 return new ServiceResult<>(false, validationResult.getServiceMessage());
@@ -106,7 +104,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            return new xyz.greatapp.libs.service.ServiceResult (false, "", null);
+            return new xyz.greatapp.libs.service.ServiceResult(false, "", null);
         }
     }
 
@@ -119,7 +117,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
                     return new ServiceResult<>(false, getServiceMessage(Message.INVALID_LOGO_FILE));
                 }
                 final String fileName = companyId + "." + getExtensionFromContentType(contentType);
-                fileItem.write(new File(String.valueOf(getThreadContext().getEnvironment().getImageDir() + fileName)));
+                fileItem.write(new File(String.valueOf("images/prod/" + fileName)));
                 _companyRepository.updateUrlImageLogo(companyId, fileName);
             } else {
                 return new ServiceResult<>(false, getServiceMessage(Message.COULD_NOT_READ_FILE));
@@ -137,9 +135,9 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
             if (!"{}".equals(company.getObject())) {
                 String urlImageLogo = new JSONObject(company.getObject()).get("url_image_logo").toString();
                 if (StringUtils.isEmpty(urlImageLogo)) {
-                    return new File(getThreadContext().getEnvironment().getImageDir() + "no_image.png");
+                    return new File("images/prod/" + "no_image.png");
                 } else {
-                    return new File(getThreadContext().getEnvironment().getImageDir() + urlImageLogo);
+                    return new File("images/prod/" + urlImageLogo);
                 }
             } else {
                 logger.error("None company has the companyId: " + companyId);

@@ -1,8 +1,7 @@
 package com.lealpoints.repository;
 
-import com.lealpoints.db.util.DbBuilder;
+
 import com.lealpoints.model.Company;
-import com.lealpoints.model.PointsInCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +16,10 @@ import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
 import xyz.greatapp.libs.service.database.requests.fields.Join;
 import xyz.greatapp.libs.service.location.ServiceLocator;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
-public class CompanyRepository extends BaseRepository {
+public class CompanyRepository {
     private static final Common c = new Common();
     private final ServiceLocator serviceLocator;
     private final ThreadContextService threadContextService;

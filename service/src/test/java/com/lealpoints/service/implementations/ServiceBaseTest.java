@@ -1,7 +1,7 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
+import xyz.greatapp.libs.service.context.ThreadContext;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

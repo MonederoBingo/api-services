@@ -1,6 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
@@ -81,14 +81,14 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
 
     public ServiceResult activateUser(String activationKey) {
         try {
-            getQueryAgent().beginTransaction();
+
             int updatedRows = companyUserRepository.updateActivateByActivationKey(activationKey);
             if (updatedRows > 0) {
                 companyUserRepository.clearActivationKey(activationKey);
-                getQueryAgent().commitTransaction();
+
                 return new ServiceResult(true, getServiceMessage(Message.YOUR_USER_HAS_BEEN_ACTIVATED));
             } else {
-                getQueryAgent().rollbackTransaction();
+
                 return new ServiceResult(false, getServiceMessage(Message.COMMON_USER_ERROR));
             }
         } catch (Exception ex) {
@@ -200,9 +200,8 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         try {
             ValidationResult validationResult = validateRegistration(companyUserRegistration);
             if (validationResult.isValid()) {
-                getThreadContextService().getQueryAgent().beginTransaction();
                 long companyUserId = registerCompanyUser(companyUserRegistration);
-                getQueryAgent().commitTransaction();
+
                 return new ServiceResult<>(true, getServiceMessage(Message.USER_SUCCESSFULLY_ADDED),
                         Long.toString(companyUserId));
             } else {
@@ -260,7 +259,7 @@ public class CompanyUserServiceImpl extends BaseServiceImpl implements CompanyUs
         companyUser.setEmail(companyUserRegistration.getEmail());
         companyService.setUserActivation(companyUser);
         companyUser.setActivationKey(_serviceUtil.generateActivationKey());
-        String language = getThreadContext().getLanguage().getLangId();
+        String language = "en";
         companyUser.setLanguage(language);
         companyUser.setMustChangePassword(true);
         companyUser.setCompanyUserId(companyUserRepository.insert(companyUser));

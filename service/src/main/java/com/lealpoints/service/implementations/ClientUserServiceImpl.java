@@ -1,6 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.ClientUser;
 import com.lealpoints.model.NotificationEmail;
@@ -45,9 +45,7 @@ public class ClientUserServiceImpl extends BaseServiceImpl implements ClientUser
         try {
             ValidationResult validationResult = validateRegistration(clientUserRegistration);
             if (validationResult.isValid()) {
-                getThreadContextService().getQueryAgent().beginTransaction();
                 String key = registerClientAndClientUser(clientUserRegistration);
-                getThreadContextService().getQueryAgent().commitTransaction();
                 return new ServiceResult<>(true, ServiceMessage.EMPTY, key);
             } else {
                 return new ServiceResult<>(false, validationResult.getServiceMessage());

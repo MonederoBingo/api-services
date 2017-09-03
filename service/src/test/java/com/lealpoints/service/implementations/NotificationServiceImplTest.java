@@ -1,8 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.i18n.Language;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.Company;
@@ -121,30 +118,6 @@ public class NotificationServiceImplTest extends ServiceBaseTest {
         assertTrue(serviceResult.isSuccess());
         assertEquals(Message.MOBILE_APP_AD_MESSAGE_SENT_SUCCESSFULLY.name(), serviceResult.getMessage());
         verify(smsService, clientRepository);
-    }
-
-    @Test
-    public void getSMSMessageSpanish() {
-        ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getLanguage()).andReturn(Language.SPANISH);
-        replay(threadContext);
-        ThreadContextService threadContextService = createThreadContextService(threadContext);
-        NotificationServiceImpl notificationService = new NotificationServiceImpl(threadContextService, null, null, null, null);
-        String smsMessage = notificationService.getSMSMessage(1000);
-        assertNotNull(smsMessage);
-        assertEquals("Has obtenido 1000 puntos. Instala Monedero Bingo para ver las promociones. https://goo.gl/tjyahK", smsMessage);
-    }
-
-    @Test
-    public void getSMSMessageEnglish() {
-        ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getLanguage()).andReturn(Language.ENGLISH);
-        replay(threadContext);
-        ThreadContextService threadContextService = createThreadContextService(threadContext);
-        NotificationServiceImpl notificationService = new NotificationServiceImpl(threadContextService, null, null, null, null);
-        String smsMessage = notificationService.getSMSMessage(1000);
-        assertNotNull(smsMessage);
-        assertEquals("You've got 1000 points. Install Monedero Bingo to see our promotions. https://goo.gl/tjyahK", smsMessage);
     }
 
     @Test

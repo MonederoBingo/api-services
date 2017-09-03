@@ -1,13 +1,12 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.environments.Environment;
 import com.lealpoints.environments.ProdEnvironment;
-import com.lealpoints.environments.UnitTestEnvironment;
 import com.lealpoints.service.ConfigurationService;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import xyz.greatapp.libs.service.Environment;
+import xyz.greatapp.libs.service.context.ThreadContext;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
@@ -57,7 +56,7 @@ public class SMSServiceImplTest extends ServiceBaseTest {
 
     private ThreadContext createThreadContext() {
         ThreadContext threadContext = createMock(ThreadContext.class);
-        expect(threadContext.getEnvironment()).andReturn(new ProdEnvironment());
+        expect(threadContext.getEnvironment()).andReturn(Environment.PROD);
         replay(threadContext);
         return threadContext;
     }

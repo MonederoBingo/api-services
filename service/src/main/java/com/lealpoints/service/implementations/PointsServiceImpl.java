@@ -1,11 +1,8 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.CompanyClientMapping;
 import com.lealpoints.model.Points;
-import com.lealpoints.model.PointsConfiguration;
 import com.lealpoints.repository.ClientRepository;
 import com.lealpoints.repository.CompanyClientMappingRepository;
 import com.lealpoints.repository.PointsRepository;
@@ -21,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 @Component
 public class PointsServiceImpl extends BaseServiceImpl implements PointsService {
@@ -33,8 +31,9 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
 
     @Autowired
     public PointsServiceImpl(PointsRepository pointsRepository,
-                             ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository, ThreadContextService threadContextService,
-                             PhoneValidatorServiceImpl phoneValidatorService, PointsConfigurationServiceImpl pointsConfigurationService) {
+                             ClientRepository clientRepository, CompanyClientMappingRepository companyClientMappingRepository,
+                             PhoneValidatorServiceImpl phoneValidatorService, PointsConfigurationServiceImpl pointsConfigurationService,
+                             ThreadContextService threadContextService) {
         super(threadContextService);
         _pointsRepository = pointsRepository;
         _clientRepository = clientRepository;
@@ -47,10 +46,7 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         try {
             ValidationResult validationResult = validateRegistration(pointsAwarding);
             if (validationResult.isValid()) {
-                final QueryAgent queryAgent = getQueryAgent();
-                queryAgent.beginTransaction();
                 float earnedPoints = awardPointsAndUpdateClientStatus(pointsAwarding);
-                queryAgent.commitTransaction();
                 if (earnedPoints > 0) {
                     return new ServiceResult<>(true, getServiceMessage(Message.POINTS_AWARDED, "" + earnedPoints), earnedPoints);
                 } else {
@@ -67,8 +63,8 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
 
     private float awardPointsAndUpdateClientStatus(PointsAwarding pointsAwarding) throws Exception {
         //Inserting client if it doesn't exist
-        PointsConfiguration pointsConfiguration = pointsConfigurationService.getByCompanyId(pointsAwarding.getCompanyId()).getObject();
-        if (pointsConfiguration == null) {
+        xyz.greatapp.libs.service.ServiceResult pointsConfiguration = pointsConfigurationService.getByCompanyId(pointsAwarding.getCompanyId());
+        if ("{}".equals(pointsConfiguration.getObject())) {
             throw new IllegalArgumentException("Points configuration doesn't exist");
         }
         xyz.greatapp.libs.service.ServiceResult client = _clientRepository.insertIfDoesNotExist(pointsAwarding.getPhoneNumber(), true);
@@ -76,14 +72,15 @@ public class PointsServiceImpl extends BaseServiceImpl implements PointsService 
         long clientId = new JSONObject(client.getObject()).getLong("client_id");
         _companyClientMappingRepository.insertIfDoesNotExist(pointsAwarding.getCompanyId(), clientId);
 
+        JSONObject jsonObject = new JSONObject(pointsConfiguration.getObject());
         Points points = new Points();
         points.setCompanyId(pointsAwarding.getCompanyId());
         points.setClientId(clientId);
         points.setSaleKey(pointsAwarding.getSaleKey());
-        points.setRequiredAmount(pointsConfiguration.getRequiredAmount());
-        points.setPointsToEarn(pointsConfiguration.getPointsToEarn());
+        points.setRequiredAmount((float) jsonObject.getDouble("required_amount"));
+        points.setPointsToEarn((float) jsonObject.getDouble("points_to_earn"));
         points.setSaleAmount(pointsAwarding.getSaleAmount());
-        points.setEarnedPoints(calculateEarnedPoints(points, pointsAwarding.getSaleAmount(), pointsConfiguration.getRequiredAmount()));
+        points.setEarnedPoints(calculateEarnedPoints(points, pointsAwarding.getSaleAmount(), (float) jsonObject.getDouble("required_amount")));
         points.setDate(DateUtil.dateNow());
 
         //Inserting points for this client

@@ -31,17 +31,17 @@ public class PromotionConfigurationController extends BaseController {
 
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<PromotionConfiguration>>> get(@PathVariable("companyId") long companyId) {
-        ServiceResult<List<PromotionConfiguration>> serviceResult = _promotionConfigurationService.getByCompanyId(companyId);
+    public ResponseEntity<xyz.greatapp.libs.service.ServiceResult> get(@PathVariable("companyId") long companyId) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _promotionConfigurationService.getByCompanyId(companyId);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{companyId}/{phone}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<List<PromotionConfiguration>>> getAvailableByPhone(
+    public ResponseEntity<xyz.greatapp.libs.service.ServiceResult> getAvailableByPhone(
             @PathVariable("companyId") long companyId, @PathVariable("phone") String phone) {
 
-        ServiceResult<List<PromotionConfiguration>> serviceResult =
+        xyz.greatapp.libs.service.ServiceResult serviceResult =
                 _promotionConfigurationService.getByCompanyIdRequiredPoints(companyId, phone);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }

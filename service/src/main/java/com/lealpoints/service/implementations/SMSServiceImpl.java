@@ -1,7 +1,7 @@
 package com.lealpoints.service.implementations;
 
 import com.lealpoints.common.PropertyManager;
-import com.lealpoints.context.ThreadContextService;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.service.ConfigurationService;
 import com.lealpoints.service.SMSService;
 import com.lealpoints.service.annotation.OnlyProduction;

@@ -1,9 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
-import com.lealpoints.model.Client;
-import com.lealpoints.model.Company;
 import com.lealpoints.model.CompanyUser;
 import com.lealpoints.model.NotificationEmail;
 import com.lealpoints.repository.ClientRepository;
@@ -12,12 +9,12 @@ import com.lealpoints.repository.CompanyRepository;
 import com.lealpoints.service.NotificationService;
 import com.lealpoints.service.response.ServiceResult;
 import com.lealpoints.util.EmailUtil;
-import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import javax.mail.MessagingException;
 import java.text.DecimalFormat;
@@ -81,7 +78,7 @@ public class NotificationServiceImpl extends BaseServiceImpl implements Notifica
     }
 
     public String getActivationUrl(String activationKey) {
-        return getEnvironment().getClientUrl() + "activate?key=" + activationKey;
+        return "localhost:8080/activate?key=" + activationKey;
     }
 
     public String getSMSMessage(double points) {

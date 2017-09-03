@@ -1,9 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContext;
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
-import com.lealpoints.environments.DevEnvironment;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.ClientUser;
@@ -16,6 +12,9 @@ import com.lealpoints.service.response.ServiceMessage;
 import com.lealpoints.service.response.ServiceResult;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import xyz.greatapp.libs.service.Environment;
+import xyz.greatapp.libs.service.context.ThreadContext;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 
 import javax.mail.MessagingException;
 import java.sql.SQLException;
@@ -29,11 +28,10 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
     public void testRegister() throws Exception {
         ClientUserRepository clientUserRepository = createClientUserRepository();
         ClientRepository clientRepository = createClientRepositoryForRegister();
-        final QueryAgent queryAgent = createQueryAgent();
 
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
-        final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
+        threadContext.setEnvironment(Environment.DEV);
+        final ThreadContextService threadContextService = createThreadContextService(threadContext);
         ClientUserServiceImpl clientUserService =
                 new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null) {
                     @Override
@@ -61,10 +59,9 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
         clientUser.setClientUserId(2);
         ClientUserRepository clientUserRepository = createClientUserRepositoryWhenClientExists(clientUser);
         ClientRepository clientRepository = createClientRepositoryForRegister();
-        final QueryAgent queryAgent = createQueryAgent();
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
-        final ThreadContextService threadContextService = createThreadContextService(queryAgent, threadContext);
+        threadContext.setEnvironment(Environment.DEV);
+        final ThreadContextService threadContextService = createThreadContextService(threadContext);
         ClientUserServiceImpl clientUserService =
                 new ClientUserServiceImpl(clientUserRepository, clientRepository, threadContextService, null) {
                     @Override
@@ -246,7 +243,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testResendKey() throws Exception {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
+        threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext, 1);
         ClientUserServiceImpl clientUserService =
                 new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null) {
@@ -265,7 +262,7 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
     @Test
     public void testGenerateAndSendRegistrationSMS() throws Exception {
         ThreadContext threadContext = new ThreadContext();
-        threadContext.setEnvironment(new DevEnvironment());
+        threadContext.setEnvironment(Environment.DEV);
         ThreadContextService threadContextService = createThreadContextService(threadContext, 3);
         ClientUserServiceImpl clientUserService =
                 new ClientUserServiceImpl(createClientUserRepositoryForUpdateSms(), null, threadContextService, null) {
@@ -280,9 +277,8 @@ public class ClientUserServiceImplTest extends BaseServiceTest {
         assertNotEquals("", key);
     }
 
-    private ThreadContextService createThreadContextService(QueryAgent queryAgent, ThreadContext threadContext) throws SQLException {
+    private ThreadContextService createThreadContextService(ThreadContext threadContext) throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
         expect(threadContextService.getThreadContext()).andReturn(threadContext).times(1);
         replay(threadContextService);
         return threadContextService;

@@ -1,79 +1,94 @@
 package com.lealpoints.repository;
 
-import com.lealpoints.db.util.DbBuilder;
 import com.lealpoints.model.PromotionConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import xyz.greatapp.libs.service.ServiceResult;
+import xyz.greatapp.libs.service.context.ThreadContextService;
+import xyz.greatapp.libs.service.database.common.ApiClientUtils;
+import xyz.greatapp.libs.service.database.requests.DeleteQueryRQ;
+import xyz.greatapp.libs.service.database.requests.InsertQueryRQ;
+import xyz.greatapp.libs.service.database.requests.SelectQueryRQ;
+import xyz.greatapp.libs.service.database.requests.UpdateQueryRQ;
+import xyz.greatapp.libs.service.database.requests.fields.ColumnValue;
+import xyz.greatapp.libs.service.database.requests.fields.Join;
+import xyz.greatapp.libs.service.location.ServiceLocator;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
-public class PromotionConfigurationRepository extends BaseRepository {
+public class PromotionConfigurationRepository {
 
-    public PromotionConfiguration getById(final long id) throws Exception {
-        return getQueryAgent().selectObject(new DbBuilder<PromotionConfiguration>() {
-            @Override
-            public String sql() {
-                return "SELECT * FROM promotion_configuration WHERE promotion_configuration_id = ?;";
-            }
+    private static final Common c = new Common();
+    private ServiceLocator serviceLocator;
+    private ThreadContextService threadContextService;
+    private ApiClientUtils apiClientUtils = new ApiClientUtils();
 
-            @Override
-            public Object[] values() {
-                return new Object[]{id};
-            }
-
-            @Override
-            public PromotionConfiguration build(ResultSet resultSet) throws SQLException {
-                PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
-                promotionConfiguration.setPromotionConfigurationId(resultSet.getLong("promotion_configuration_id"));
-                promotionConfiguration.setCompanyId(resultSet.getLong("company_id"));
-                promotionConfiguration.setDescription(resultSet.getString("description"));
-                promotionConfiguration.setRequiredPoints(resultSet.getFloat("required_points"));
-                return promotionConfiguration;
-            }
-        });
+    @Autowired
+    public PromotionConfigurationRepository(ServiceLocator serviceLocator, ThreadContextService threadContextService) {
+        this.serviceLocator = serviceLocator;
+        this.threadContextService = threadContextService;
     }
 
-    public List<PromotionConfiguration> getByCompanyId(final long companyId) throws Exception {
-        return getQueryAgent().selectList(new DbBuilder<PromotionConfiguration>() {
-            @Override
-            public String sql() {
-                return "SELECT * FROM promotion_configuration WHERE company_id = ? ;";
-            }
+    public ServiceResult getById(final long id) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("promotion_configuration_id", id)
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("promotion_configuration", filters, new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/select";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return responseEntity.getBody();
+    }
 
-            @Override
-            public Object[] values() {
-                return new Object[]{companyId};
-            }
+    public ServiceResult getByCompanyId(final long companyId) throws Exception {
+        ColumnValue[] filters = new ColumnValue[]{
+                new ColumnValue("company_id", companyId)
+        };
+        HttpEntity<SelectQueryRQ> entity = c.getHttpEntityForSelect(new SelectQueryRQ("promotion_configuration",
+                filters, new Join[0]));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/selectList";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
 
-            @Override
-            public PromotionConfiguration build(ResultSet resultSet) throws SQLException {
-                PromotionConfiguration promotionConfiguration = new PromotionConfiguration();
-                promotionConfiguration.setPromotionConfigurationId(resultSet.getLong("promotion_configuration_id"));
-                promotionConfiguration.setCompanyId(resultSet.getLong("company_id"));
-                promotionConfiguration.setDescription(resultSet.getString("description"));
-                promotionConfiguration.setRequiredPoints(resultSet.getFloat("required_points"));
-                return promotionConfiguration;
-            }
-        });
+        return responseEntity.getBody();
+
     }
 
     public long insert(PromotionConfiguration promotionConfiguration) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO promotion_configuration(company_id, description, required_points)");
-        sql.append(" VALUES (");
-        sql.append(promotionConfiguration.getCompanyId()).append(", ");
-        sql.append("'").append(promotionConfiguration.getDescription()).append("', ");
-        sql.append(promotionConfiguration.getRequiredPoints()).append(");");
+        ColumnValue[] values = new ColumnValue[]{
+                new ColumnValue("company_id", promotionConfiguration.getCompanyId()),
+                new ColumnValue("description", promotionConfiguration.getDescription()),
+                new ColumnValue("required_points", promotionConfiguration.getRequiredPoints())
+        };
+        HttpEntity<InsertQueryRQ> entity = c.getHttpEntityForInsert(new InsertQueryRQ("promotion_configuration",
+                values, "promotion_configuration_id"));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/insert";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Long.parseLong(responseEntity.getBody().getObject());
 
-        return getQueryAgent().executeInsert(sql.toString(), "promotion_configuration_id");
     }
 
     public int delete(long promotionConfigurationId) throws Exception {
-        StringBuilder sql = new StringBuilder();
-        sql.append("DELETE FROM promotion_configuration");
-        sql.append(" WHERE promotion_configuration_id = ").append(promotionConfigurationId).append(";");
-        return getQueryAgent().executeUpdate(sql.toString());
+        ColumnValue[] filter = new ColumnValue[]{
+                new ColumnValue("promotion_configuration_id", promotionConfigurationId)
+        };
+        HttpEntity<DeleteQueryRQ> entity = c.getHttpEntityForDelete(new DeleteQueryRQ("promotion_configuration", filter));
+        String url = serviceLocator.getServiceURI(DATABASE, threadContextService.getEnvironment()) + "/delete";
+        ResponseEntity<ServiceResult> responseEntity = apiClientUtils.getRestTemplate().postForEntity(
+                url,
+                entity,
+                ServiceResult.class);
+        return Integer.parseInt(responseEntity.getBody().getObject());
+
     }
 }

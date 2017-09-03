@@ -1,7 +1,6 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.context.ThreadContextService;
-import com.lealpoints.db.queryagent.QueryAgent;
+import xyz.greatapp.libs.service.context.ThreadContextService;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.model.Client;
 import com.lealpoints.model.CompanyClientMapping;
@@ -30,8 +29,7 @@ public class ClientServiceImplTest extends BaseServiceTest {
         client.setClientId(1);
         client.setPhone("");
         final ClientRepository clientRepository = createClientRepository(client.toJSONObject().toString());
-        final QueryAgent queryAgent = createQueryAgent();
-        final ThreadContextService threadContextService = createThreadContextService(queryAgent);
+        final ThreadContextService threadContextService = createThreadContextService();
         final CompanyClientMappingRepository companyClientMappingRepository = createCompanyClientMappingRepositoryForInsert();
         PhoneValidatorServiceImpl phoneValidationService = createStrictMock(PhoneValidatorServiceImpl.class);
         expect(phoneValidationService.validate(anyString())).andReturn(new ValidationResult(true));
@@ -163,10 +161,9 @@ public class ClientServiceImplTest extends BaseServiceTest {
         verify(clientRepository);
     }
 
-    private ThreadContextService createThreadContextService(QueryAgent queryAgent) throws SQLException {
+    private ThreadContextService createThreadContextService() throws SQLException {
         ThreadContextService threadContextService = createMock(ThreadContextService.class);
 
-        expect(threadContextService.getQueryAgent()).andReturn(queryAgent).times(2);
         replay(threadContextService);
         return threadContextService;
     }

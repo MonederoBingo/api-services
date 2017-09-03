@@ -5,7 +5,7 @@ import com.lealpoints.service.response.ServiceResult;
 
 public interface PointsConfigurationService {
 
-    ServiceResult<PointsConfiguration> getByCompanyId(long companyId);
+    xyz.greatapp.libs.service.ServiceResult getByCompanyId(long companyId);
 
     ServiceResult<Boolean> update(PointsConfiguration pointsConfiguration);
 

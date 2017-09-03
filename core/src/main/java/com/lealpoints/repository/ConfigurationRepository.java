@@ -17,7 +17,7 @@ import xyz.greatapp.libs.service.location.ServiceLocator;
 import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
-public class ConfigurationRepository extends BaseRepository {
+public class ConfigurationRepository {
 
     private static final Common c = new Common();
     private ServiceLocator serviceLocator;

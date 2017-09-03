@@ -31,8 +31,8 @@ public class PointsConfigurationController extends BaseController {
 
     @RequestMapping(value = "/{companyId}", method = GET, headers = ACCEPT_HEADER)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<ServiceResult<PointsConfiguration>> get(@PathVariable("companyId") long companyId) {
-        ServiceResult<PointsConfiguration> serviceResult = _pointsConfigurationService.getByCompanyId(companyId);
+    public ResponseEntity<xyz.greatapp.libs.service.ServiceResult> get(@PathVariable("companyId") long companyId) {
+        xyz.greatapp.libs.service.ServiceResult serviceResult = _pointsConfigurationService.getByCompanyId(companyId);
         return new ResponseEntity<>(serviceResult, HttpStatus.OK);
     }
 

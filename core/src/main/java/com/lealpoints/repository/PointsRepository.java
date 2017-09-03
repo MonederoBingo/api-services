@@ -21,7 +21,7 @@ import java.util.Locale;
 import static xyz.greatapp.libs.service.ServiceName.DATABASE;
 
 @Component
-public class PointsRepository extends BaseRepository {
+public class PointsRepository {
 
     private static final Common c = new Common();
     private ServiceLocator serviceLocator;

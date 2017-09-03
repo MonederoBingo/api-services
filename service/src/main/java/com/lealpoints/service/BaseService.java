@@ -1,6 +1,5 @@
 package com.lealpoints.service;
 
-import com.lealpoints.environments.Environment;
 import com.lealpoints.i18n.Message;
 import com.lealpoints.service.response.ServiceMessage;
 
@@ -10,5 +9,5 @@ public interface BaseService {
 
     boolean isProdEnvironment();
 
-    Environment getEnvironment();
+    xyz.greatapp.libs.service.Environment getEnvironment();
 }
