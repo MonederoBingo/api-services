@@ -1,6 +1,5 @@
 package com.lealpoints.service.implementations;
 
-import com.lealpoints.environments.ProdEnvironment;
 import com.lealpoints.service.ConfigurationService;
 import org.easymock.EasyMock;
 import org.junit.Test;
