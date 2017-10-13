@@ -23,6 +23,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import xyz.greatapp.libs.service.context.ThreadContextService;
 
@@ -180,7 +181,7 @@ public class CompanyServiceImpl extends BaseServiceImpl implements CompanyServic
         CompanyUser companyUser = new CompanyUser();
         companyUser.setCompanyId(companyId);
         companyUser.setName(companyRegistration.getUsername());
-        companyUser.setPassword(companyRegistration.getPassword());
+        companyUser.setPassword(new BCryptPasswordEncoder().encode(companyRegistration.getPassword()));
         companyUser.setEmail(companyRegistration.getEmail());
         setUserActivation(companyUser);
         companyUser.setActivationKey(activationKey);
